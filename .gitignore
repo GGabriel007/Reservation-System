@@ -29,4 +29,5 @@ client/*.sw?
 client/*.env
 server/*.env
 
+.DS_Store
 
