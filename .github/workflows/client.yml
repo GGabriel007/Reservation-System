@@ -33,7 +33,7 @@ jobs:
         with: 
           aws-access-key-id: ${{ secrets.ACCESS_KEY_P2 }} 
 
-          aws-secret-access-key: $ {{ secrets.SECRET_ACCESS_KEY_P2 }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY_P2 }}
           
           aws-region: us-east-1 
             
