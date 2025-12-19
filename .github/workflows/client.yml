@@ -36,7 +36,21 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY_P2 }}
           
           aws-region: us-east-1 
-            
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6.1.0
+        with: 
+            node-version: 25
+
+      - name: Install dependencies 
+        working-directory: client/
+        run: npm install
+             
+
+      - name: Build React
+        working-directory: client/
+        run: npm run build 
+        
       
 
       
