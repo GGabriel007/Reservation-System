@@ -50,6 +50,11 @@ jobs:
       - name: Build React
         working-directory: client/
         run: npm run build 
+
+      - name: deploy AWS
+        run: aws s3 sync client/dist/ s3://project-2-tioca-20251117-gg-sn/
+
+        
         
       
 
