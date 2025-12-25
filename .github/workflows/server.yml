@@ -8,6 +8,7 @@ on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: ["main"]
+    paths: ['server/**']
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
@@ -48,6 +49,6 @@ jobs:
         working-directory: server/
         run: |
           aws s3 cp archive.zip s3://elasticbeanstalk-us-east-1-397345411365/${{github.run_id}}-archive.zip
-          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label 123456 --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
-          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-env --version-label 123456
+          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label v1.0.${{ github.run_number }} --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
+          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-env --version-label v1.0.${{ github.run_number }}
           aws elasticbeanstalk wait environment-updated --application-name Liore-Project2 --environment-name Liore-Project2-env
