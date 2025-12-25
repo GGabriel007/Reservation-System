@@ -52,6 +52,6 @@ jobs:
         working-directory: server/
         run: |
           aws s3 cp archive.zip s3://elasticbeanstalk-us-east-1-397345411365/${{github.run_id}}-archive.zip
-          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label 1.0.8 --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
-          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-env --version-label 1.0.8
+          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label $VERSION --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
+          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-env --version-label $VERSION
           aws elasticbeanstalk wait environment-updated --application-name Liore-Project2 --environment-name Liore-Project2-env
