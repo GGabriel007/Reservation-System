@@ -10,11 +10,11 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "build": "npm run clean && npm run prepare && npm run prepare-procfile && npm run zip",
+    "build": "npm run clean && npm run prepare && npm run prepare-procfile && npm run zip && rm -rf dist",
     "clean": "rm -rf dist && mkdir -p dist",
-    "prepare": "rsync -av --exclude='node_modules' --exclude='package-lock.json' --exclude='.git' --exclude='dist/' ./ dist/",
+    "prepare": "rsync -av --exclude='node_modules' --exclude='package-lock.json' --exclude='.git' --exclude='dist/' --exclude='*.zip' ./ dist/",
     "prepare-procfile": "echo web: node server.js > dist/Procfile",
-    "zip": "zip archive.zip dist/*"
+    "zip": "cd dist; zip -r ../archive.zip *"
   },
   "dependencies": {
     "cors": "^2.8.5",

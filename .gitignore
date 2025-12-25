@@ -29,5 +29,8 @@ client/*.sw?
 client/*.env
 server/*.env
 
+server/dist
+server/*.zip
+
 .DS_Store
 
