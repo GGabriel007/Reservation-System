@@ -12,6 +12,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+env:
+  VERSION: v1.0.${{ github.run_number }}
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -49,6 +52,6 @@ jobs:
         working-directory: server/
         run: |
           aws s3 cp archive.zip s3://elasticbeanstalk-us-east-1-397345411365/${{github.run_id}}-archive.zip
-          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label v1.0.${{ github.run_number }} --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
-          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-env --version-label v1.0.${{ github.run_number }}
+          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label $VERSION --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
+          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-env --version-label $VERSION
           aws elasticbeanstalk wait environment-updated --application-name Liore-Project2 --environment-name Liore-Project2-env
