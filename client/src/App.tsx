@@ -1,9 +1,20 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 
 function App() {
+
+  const [serverMessage, setServerMessage] = useState("Waiting for backend...");
+
+  useEffect(() => {
+    // Using EC2 instance URL
+    fetch('http://ec2-54-210-167-76.compute-1.amazonaws.com')
+      .then(response => response.text())
+      .then(data => setServerMessage(data))
+      .catch(error => setServerMessage("Connection failed: " + error.message));
+  }, []);
+
   const [count, setCount] = useState(0)
 
   return (
@@ -22,6 +33,7 @@ function App() {
           count is {count}
         </button>
         <h1>Testing. 2 :D</h1>
+        <h1>Backend is saying: <strong>{serverMessage}</strong></h1>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
