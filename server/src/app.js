@@ -9,6 +9,7 @@ app.use(express.json());
 
 app.get("/", (req, res) => {
   console.log("Hello World");
+  res.send("hello world testing 2");
 });
 
 export default app;

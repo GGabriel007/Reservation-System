@@ -1,0 +1,57 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Express Build Pipeline
+run-name: Express Build Pipeline
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: ["main"]
+    paths: ['server/**']
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+env:
+  VERSION: 1.0.${{ github.run_number }}
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout frontend repo
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v6.1.0
+        with:
+          node-version: 25
+
+      - name: Install dependencies
+        working-directory: server/
+        run: npm install
+
+      - name: Build Express App
+        working-directory: server/
+        run: npm run build
+        
+      - name: "Configure AWS Credentials"
+        uses: aws-actions/configure-aws-credentials@v5.1.0
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_P2 }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY_P2 }}
+          aws-region: us-east-1
+
+      - name: deploy AWS
+        working-directory: server/
+        run: |
+          aws s3 cp archive.zip s3://elasticbeanstalk-us-east-1-397345411365/${{github.run_id}}-archive.zip
+          aws elasticbeanstalk create-application-version --application-name Liore-Project2 --version-label $VERSION --source-bundle S3Bucket="elasticbeanstalk-us-east-1-397345411365",S3Key="${{github.run_id}}-archive.zip"
+          aws elasticbeanstalk update-environment --application-name Liore-Project2 --environment-name Liore-Project2-prod --version-label $VERSION
+          aws elasticbeanstalk wait environment-updated --application-name Liore-Project2 --environment-name Liore-Project2-prod

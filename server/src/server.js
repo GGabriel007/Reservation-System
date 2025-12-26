@@ -1,11 +1,11 @@
 // App entry point (Express setup)
 
 import app from "./app.js";
-import { connectDB } from "./config/db.js";
+// import { connectDB } from "./config/db.js";
 
 const PORT = 5050;
 
-connectDB();
+// connectDB();
 
 app.listen(PORT, () => {
   console.log(`SERVER RUNNING ON PORT ${PORT}`);
