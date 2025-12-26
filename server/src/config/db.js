@@ -1,9 +1,17 @@
 //  MongoDB / DocumentDB connection
 
 import mongoose from "mongoose";
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export async function connectDB() {
-  const DB_URL = "mongodb://127.0.0.1:27017/reservation-system";
+  const DB_URL = process.env.MONGO_URL;
+
+  if (!DB_URL) {
+    console.error("MONGO_URL not found in environment variables");
+    process.exit(1);
+  }
 
   try {
     await mongoose.connect(DB_URL);
