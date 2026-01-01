@@ -31,6 +31,7 @@ server/*.env
 
 server/dist
 server/*.zip
+server/archive/
 
 .DS_Store
 

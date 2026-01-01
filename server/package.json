@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "nodemon src/server.js",
+    "dev": "NODE_ENV=development nodemon src/server.js",
     "build": "npm run clean && npm run prepare && npm run prepare-procfile && npm run zip && rm -rf dist",
     "clean": "rm -rf dist && mkdir -p dist",
     "prepare": "rsync -av --exclude='node_modules' --exclude='package-lock.json' --exclude='.git' --exclude='dist/' --exclude='*.zip' ./ dist/",
@@ -17,11 +17,16 @@
     "zip": "cd dist; zip -r ../archive.zip *"
   },
   "dependencies": {
+    "bcrypt": "^6.0.0",
     "cors": "^2.8.5",
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
+    "express-session": "^1.18.2",
     "mongodb": "^7.0.0",
-    "mongoose": "^9.0.2"
+    "mongoose": "^9.0.2",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-local": "^1.0.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.11"

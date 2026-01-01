@@ -1,12 +1,14 @@
 //  MongoDB / DocumentDB connection
-
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 
 dotenv.config();
 
 export async function connectDB() {
-  const DB_URL = process.env.MONGO_URL;
+  const DB_URL =
+    process.env.NODE_ENV === "development"
+      ? process.env.MONGO_LOCAL_URL
+      : process.env.MONGO_URL;
 
   if (!DB_URL) {
     console.error("MONGO_URL not found in environment variables");
