@@ -1,9 +1,12 @@
-//  MongoDB / DocumentDB connection
-
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export async function connectDB() {
   const DB_URL = process.env.MONGO_URL;
@@ -13,14 +16,20 @@ export async function connectDB() {
     process.exit(1);
   }
 
+  const caBundlePath = path.join(__dirname, "../global-bundle.pem");
+
   try {
-    await mongoose.connect(DB_URL);
-    console.log(`CONNECTED TO DB: ${DB_URL}`);
+    await mongoose.connect(DB_URL, {
+      tls: true,
+      tlsCAFile: caBundlePath, 
+      replicaSet: "rs0", 
+      readPreference: "secondaryPreferred",
+      retryWrites: false,
+    });
+
+    console.log("SUCCESS: Connected to AWS DocumentDB");
   } catch (error) {
-    // abort app if we cannot connect to db
-    console.error(
-      `FAILED TO CONNECT TO MONGO DB AT CONNECTION: ${DB_URL}. Error: ${error}`
-    );
+    console.error(`FAILED TO CONNECT TO DB: ${error.message}`);
     process.exit(1);
   }
 }
