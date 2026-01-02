@@ -9,7 +9,7 @@ function App() {
 
   useEffect(() => {
     // Using EC2 instance URL
-    fetch('http://ec2-54-210-167-76.compute-1.amazonaws.com')
+    fetch('http://ec2-54-210-167-76.compute-1.amazonaws.com:5050')
       .then(response => response.text())
       .then(data => setServerMessage(data))
       .catch(error => setServerMessage("Connection failed: " + error.message));
