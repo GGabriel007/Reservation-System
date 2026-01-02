@@ -9,12 +9,12 @@ export const UserRepo = {
   getAllUsers: () => User.find(),
 
   /**
-   * Find users by username
-   * @param {string} username - username to search for
+   * Find users by email
+   * @param {string} email - username to search for
    * @returns {Promise<Object>} user document
    */
-  getUserByName: async (username) => {
-    const user = await User.find({ username: username });
+  getUserByEmail: async (email) => {
+    const user = await User.findOne({ email: email });
     return user;
   },
 
@@ -25,5 +25,33 @@ export const UserRepo = {
    */
   createUser: async (userData) => {
     return User.create(userData);
+  },
+
+  /**
+   * Find and update user by email
+   * @param {string} email - email to search for
+   * @param {Object} userData - data for the user to be updated
+   * @returns {Promise<Object>} updated user document
+   */
+  updateUserByEmail: async (email, userData) => {
+    return User.findOneAndUpdate({ email: email }, userData, { new: true });
+  },
+
+  /**
+   * Delete user by email
+   * @param {string} email
+   * @returns {Promise<Object>} deleted user document
+   */
+  deleteUserByEmail: async (email) => {
+    return User.findOneAndDelete({ email: email });
+  },
+
+  /**
+   * Filter users by role
+   * @param {string} role
+   * @returns {Promise<Array>} Array of user documents with the specified role
+   */
+  filterRoles: async (role) => {
+    return User.find({ role: role });
   },
 };

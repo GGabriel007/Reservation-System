@@ -8,7 +8,7 @@ const localStrategy = new LocalStrategy(async (username, password, done) => {
   try {
     // check if the username is in the db
 
-    const user = await UserRepo.getUserByName(username);
+    const user = await UserRepo.getUserByUsername(username);
     if (user.length === 0) {
       // to get out, return done(<error>, <valid user object or false>, <options like this message>)
       return done(null, false, { message: "User does not exist!" });
@@ -16,7 +16,7 @@ const localStrategy = new LocalStrategy(async (username, password, done) => {
 
     // check if the passwords match
     // for bcrpyt.compare(), the unencypted password MUST come first
-    const matches = await bcrypt.compare(password, user[0].password);
+    const matches = await bcrypt.compare(password, user.password);
     if (!matches) {
       return done(null, false, { message: "Password does not match!" });
     }
