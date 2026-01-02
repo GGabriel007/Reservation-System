@@ -76,4 +76,21 @@ app.get('/cloud-data', async (req, res) => {
   }
 });
 
+app.get('/cloud-clear', async (req, res) => {
+  try {
+    const usersCollection = mongoose.connection.collection('users');
+    
+    // An empty object {} in deleteMany means "match everything"
+    const result = await usersCollection.deleteMany({});
+
+    res.json({
+      success: true,
+      message: "Database cleared successfully!",
+      deletedCount: result.deletedCount
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 export default app;
