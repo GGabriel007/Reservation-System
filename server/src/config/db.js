@@ -44,7 +44,7 @@ export async function connectDB() {
 
     await mongoose.connect(DB_URL, isProduction ? awsOptions : {});
 
-    console.log(`SUCCESS: Connected to ${isProduction ? "AWS DocumentDB" : "Local MongoDB"}`);
+    console.log(`SUCCESS: Connected to testing databases ${isProduction ? "AWS DocumentDB" : "Local MongoDB"}`);
   } catch (error) {
     console.error(`FAILED TO CONNECT TO DB: ${error.message}`);
     process.exit(1);
