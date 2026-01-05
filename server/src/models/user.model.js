@@ -33,8 +33,11 @@ const userSchema = new mongoose.Schema({
   },
   loginMethod: {
     type: String,
-    enum: ["local", "google"],
+    enum: ["none", "local", "google"],
     default: "local",
+  },
+  googleId: {
+    type: String,
   },
   phoeneNumber: {
     type: String,

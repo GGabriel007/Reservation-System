@@ -32,10 +32,12 @@ passport.use(localStrategy);
 
 // in order for sessions to work, we need to be able to serialize and deserialize the user
 passport.serializeUser((user, done) => {
+  console.log("in serializeuser");
   done(null, user.id);
 });
 
 passport.deserializeUser((user, done) => {
+  console.log("in deseralize");
   done(null, user);
 });
 

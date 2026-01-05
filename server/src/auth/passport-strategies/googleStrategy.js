@@ -22,13 +22,13 @@ const googleStrategy = new GoogleStrategy(
 
 passport.use(googleStrategy);
 
-// in order for sessions to work, we need to be able to serialize and deserialize the user
-passport.serializeUser((user, done) => {
-  done(null, user);
-});
+// // in order for sessions to work, we need to be able to serialize and deserialize the user
+// passport.serializeUser((user, done) => {
+//   done(null, user);
+// });
 
-passport.deserializeUser((user, done) => {
-  done(null, user);
-});
+// passport.deserializeUser((user, done) => {
+//   done(null, user);
+// });
 
 export default googleStrategy;

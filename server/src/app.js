@@ -31,7 +31,7 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60, // 1 minute for testing
+      maxAge: 10000 * 60, // 10 minute for testing
       secure: false, // true in production with HTTPS
     },
     store: MongoStore.create({

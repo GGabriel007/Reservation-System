@@ -21,6 +21,11 @@ const passportStatelessAuth = (req, res, next) => {
     if (!user) {
       return res.status(401).json({ message: "You are not authorized!" });
     }
+    req.login(user, function (err) {
+      if (err) {
+        return next(err);
+      }
+    });
     req.user = user;
     next();
   })(req, res, next);

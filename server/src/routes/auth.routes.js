@@ -2,6 +2,7 @@ import { Router } from "express";
 import { AuthController } from "../controllers/auth.controller.js";
 import passport from "passport";
 import authMiddleware from "../middleware/authenticate.js";
+import passportStatelessAuth from "../auth/passport-middleware/passportStatelessAuth.js";
 
 const router = Router();
 
@@ -22,8 +23,9 @@ const router = Router();
  * Method: GET
  * Endpoint: /auth/local/login
  */
-router.get("/local/login", passport.authenticate("local"), (req, res) => {
-  res.json({ message: "You have successfully logged in" });
+router.get("/local/login", passportStatelessAuth, (req, res) => {
+  const { password, ...rest } = req.user._doc;
+  res.json({ sessionId: req.session.id, cookie: req.session.cookie, rest });
 });
 
 /**
@@ -32,8 +34,6 @@ router.get("/local/login", passport.authenticate("local"), (req, res) => {
  * Endpoint: /auth/local/login
  */
 router.get("/need", authMiddleware, (req, res) => {
-  console.log("in need");
-  console.log(req.user);
   res.send(req.user);
 });
 
@@ -50,10 +50,7 @@ router.get(
   "/google/login",
   passport.authenticate("google", {
     scope: ["profile", "email"],
-  }),
-  (req, res) => {
-    console.log("Google login initiated");
-  }
+  })
 );
 
 /**
@@ -70,9 +67,13 @@ router.get(
     }
   ),
   (req, res) => {
-    res.json({ message: "You have successfully logged in" });
+    res.redirect("http://localhost:5173/user");
   } // what to do if they're succesful at logging in
 );
+
+router.get("/success", (req, res) => {
+  console.log(req.user);
+});
 
 /**
  * This route logs the user out by destroying their session
