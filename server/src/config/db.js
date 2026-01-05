@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-export async function connectDB() {
+const db = (async () => {
   const DB_URL =
     process.env.NODE_ENV === "development"
       ? process.env.MONGO_LOCAL_URL
@@ -16,8 +16,10 @@ export async function connectDB() {
   }
 
   try {
-    await mongoose.connect(DB_URL);
+    const db = await mongoose.connect(DB_URL);
     console.log(`CONNECTED TO DB: ${DB_URL}`);
+
+    return db.connection;
   } catch (error) {
     // abort app if we cannot connect to db
     console.error(
@@ -25,4 +27,6 @@ export async function connectDB() {
     );
     process.exit(1);
   }
-}
+})();
+
+export default db;

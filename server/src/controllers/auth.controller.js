@@ -3,30 +3,11 @@ import bcrypt from "bcrypt";
 
 export const AuthController = {
   /**
-   * Get all Auth users.
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  getAllUsers: async (req, res) => {
-    const auth = await UserRepo.getAllAuths();
-    res.json(auth);
-  },
-  /**
-   * Find Auth user by ID.
-   * @param {import('express').Request} req
-   * @param {import('express').Response} res
-   */
-  getUserByName: async (req, res) => {
-    const auth = await UserRepo.getAllAuths();
-    res.json(auth);
-  },
-  /**
    * Create a new Auth user.
    * @param {import('express').Request} req (with body: { username, password })
    * @param {import('express').Response} res
-   *
    */
-  createUser: async (req, res) => {
+  createLocalUser: async (req, res) => {
     const { username, password } = req.body;
 
     // encrypt the password and save the user to the database
@@ -36,7 +17,7 @@ export const AuthController = {
 
       // write to db
       await UserRepo.createUser({
-        username: username,
+        email: username,
         password: encrptyedPassword,
       });
 

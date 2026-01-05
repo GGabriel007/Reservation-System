@@ -31,6 +31,11 @@ const userSchema = new mongoose.Schema({
     enum: ["guest", "user", "admin"],
     default: "guest",
   },
+  loginMethod: {
+    type: String,
+    enum: ["local", "google"],
+    default: "local",
+  },
   phoeneNumber: {
     type: String,
     required: false,
