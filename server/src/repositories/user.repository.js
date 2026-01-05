@@ -9,13 +9,30 @@ export const UserRepo = {
   getAllUsers: () => User.find(),
 
   /**
+   * Find user by ID (Crucial for Passport Session)
+   * @param {string} id 
+   * @returns {Promise<Object|null>} user document
+   */
+  getUserById: async (id) => {
+    // If it's not a valid hex ID, it might be a Google ID string 
+    // or just a malformed request. Let's handle it gracefully.
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      // If your schema uses the Google ID as the primary key, search normally.
+      // But if you use standard ObjectIds, we should search the googleId field:
+      return await User.findOne({ googleId: id }); 
+    }
+    
+    return await User.findById(id);
+  },
+
+
+  /**
    * Find users by email
    * @param {string} email - username to search for
    * @returns {Promise<Object>} user document
    */
   getUserByEmail: async (email) => {
-    const user = await User.findOne({ email: email });
-    return user;
+    return await User.findOne({ email: email });
   },
 
   /**

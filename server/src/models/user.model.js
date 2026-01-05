@@ -31,10 +31,11 @@ const userSchema = new mongoose.Schema({
     enum: ["guest", "user", "admin"],
     default: "guest",
   },
-  loginMethod: {
-    type: String,
-    enum: ["none", "local", "google"],
-    default: "local",
+  loginMethod: { 
+    type: String, 
+    required: true, 
+    enum: ["local", "google"], 
+    default: "local" 
   },
   googleId: {
     type: String,

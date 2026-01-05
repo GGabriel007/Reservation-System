@@ -9,7 +9,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
-    "dev": "NODE_ENV=development nodemon src/server.js",
+    "dev": "cross-env NODE_ENV=development nodemon src/server.js",
     "build": "npm run clean && npm run prepare && npm run prepare-procfile && npm run zip && rm -rf dist",
     "clean": "rm -rf dist && mkdir -p dist",
     "prepare": "rsync -av --exclude='node_modules' --exclude='package-lock.json' --exclude='.git' --exclude='dist/' --exclude='*.zip' ./ dist/",
@@ -30,6 +30,7 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "cross-env": "^10.1.0",
     "nodemon": "^3.1.11"
   }
 }

@@ -1,27 +1,34 @@
 import express from "express";
 import cors from "cors";
 import session from "express-session";
-import passportGoogleAuth from "./auth/passport-middleware/passportGoogleAuth.js";
-import "./auth/passport-strategies/googleStrategy.js";
-import "./auth/passport-strategies/localStrategy.js";
 import MongoStore from "connect-mongo";
-import db from "./config/db.js";
 import passport from "passport";
-
-// import adminRoutes from "./routes/admin.routes.js";
+import db from "./config/db.js";
+import "./auth/passport-config.js" // Standardizes Passport serialization/deserialization
 import authRoutes from "./routes/auth.routes.js";
 
 const app = express();
 
+/**
+ * GLOBAL MIDDLEWARE
+ * Configuration for cross-origin requests and body parsing.
+ */
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
-    credentials: true,
+    origin: "http://localhost:5173", 
+    credentials: true,              
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
 app.use(express.json());
 
+/**
+ * SESSION MANAGEMENT
+ * Persistent sessions stored in MongoDB to survive server restarts.
+ */
 /** PASSPORT **/
 app.use(
   session({
@@ -31,11 +38,14 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 10000 * 60, // 10 minute for testing
-      secure: false, // true in production with HTTPS
+      maxAge: 1000 * 60 * 60,
+      secure: false, 
+      sameSite: "lax",
     },
+    // FIX: Use mongoUrl instead of clientPromise
     store: MongoStore.create({
-      client: db.then((ele) => ele.getClient()),
+      mongoUrl: "mongodb://localhost:27017/test_db", 
+      ttl: 14 * 24 * 60 * 60, // sessions last 14 days
     }),
   })
 );
@@ -46,13 +56,17 @@ app.get("/", (req, res) => {
   res.send("hello world testing");
 });
 
-// then we tell the app to use Passport
+/**
+ * PASSPORT INITIALIZATION
+ * Must be defined AFTER session middleware and BEFORE routes.
+ */
 app.use(passport.initialize());
 app.use(passport.session());
 
 /** ROUTES **/
 app.use("/auth", authRoutes);
 
+// Placeholder for future administration features
 // app.use("/admin", adminRoutes);
 
 export default app;

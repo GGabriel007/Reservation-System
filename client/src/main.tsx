@@ -3,49 +3,34 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App";
-import { Home, Login, AdminDashboard, UserDashboard } from "./pages/index";
+import { Home, Login, AdminDashboard, UserDashboard, Signup } from "./pages/index";
 
 /**
- * Defines the application's route structure using React Router v6+.
- *
- * Routes:
- * - "/" → Main layout (App) with MainPage.
+ * Defines the application's route structure.
+ * We nest everything under "/" with <App /> as the element 
+ * so the Navbar is always visible.
  */
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App />,  
     children: [
       {
         path: "/",
         element: <Home />,
       },
-    ],
-  },
-  {
-    path: "/login",
-    element: <App />,
-    children: [
       {
         path: "/login",
         element: <Login />,
       },
-    ],
-  },
-  {
-    path: "/user",
-    element: <App />,
-    children: [
+      {
+        path: "/signup", //  
+        element: <Signup />,
+      },
       {
         path: "/user",
         element: <UserDashboard />,
       },
-    ],
-  },
-  {
-    path: "/admin",
-    element: <App />,
-    children: [
       {
         path: "/admin",
         element: <AdminDashboard />,
@@ -54,10 +39,6 @@ const router = createBrowserRouter([
   },
 ]);
 
-/**
- * Entry point for the React application.
- * Sets up the router configuration and renders the root React component.
- */
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <RouterProvider router={router} />
