@@ -1,30 +1,33 @@
-//  MongoDB / DocumentDB connection
+// server/src/config/db.js
 import mongoose from "mongoose";
-import dotenv from "dotenv";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
 
-dotenv.config();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const db = (async () => {
-  const DB_URL =
-    process.env.NODE_ENV === "development"
-      ? process.env.MONGO_LOCAL_URL
-      : process.env.MONGO_URL;
+  const isDev = process.env.NODE_ENV === "development";
+  const DB_URL = isDev ? process.env.MONGO_LOCAL_URL : process.env.MONGO_URL;
 
-  if (!DB_URL) {
-    console.error("MONGO_URL not found in environment variables");
-    process.exit(1);
+  const options = {};
+
+  if (!isDev) {
+    // Correct path: up one level from 'config' into 'src'
+    const caPath = path.resolve(__dirname, "../global-bundle.pem");
+    
+    if (fs.existsSync(caPath)) {
+        options.tlsCAFile = caPath;
+    } else {
+        console.error("CRITICAL: Certificate not found at", caPath);
+    }
   }
 
   try {
-    const db = await mongoose.connect(DB_URL);
-    console.log(`CONNECTED TO DB: ${DB_URL}`);
-
-    return db.connection;
+    await mongoose.connect(DB_URL, options);
+    console.log("CONNECTED TO DB");
   } catch (error) {
-    // abort app if we cannot connect to db
-    console.error(
-      `FAILED TO CONNECT TO MONGO DB AT CONNECTION: ${DB_URL}. Error: ${error}`
-    );
+    console.error("DB CONNECTION ERROR:", error.message);
     process.exit(1);
   }
 })();

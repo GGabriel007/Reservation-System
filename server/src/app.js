@@ -6,6 +6,7 @@ import passport from "passport";
 import db from "./config/db.js";
 import "./auth/passport-config.js" // Standardizes Passport serialization/deserialization
 import authRoutes from "./routes/auth.routes.js";
+import path from "path";
 
 const app = express();
 
@@ -33,19 +34,23 @@ app.use(express.json());
 app.use(
   session({
     name: "sid",
-    secret: "super-secret",
+    secret: process.env.SESSION_SECRET || "super-secret", // Use an env var!
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
-      secure: false, 
+      secure: process.env.NODE_ENV === "production", // Secure only in production
       sameSite: "lax",
     },
-    // FIX: Use mongoUrl instead of clientPromise
     store: MongoStore.create({
-      mongoUrl: "mongodb://localhost:27017/test_db", 
-      ttl: 14 * 24 * 60 * 60, // sessions last 14 days
+      // FIX: Use the same URL as your main database
+      mongoUrl: process.env.NODE_ENV === "production" ? process.env.MONGO_URL : process.env.MONGO_LOCAL_URL,
+      ttl: 14 * 24 * 60 * 60,
+      // Add TLS options for DocumentDB here too!
+      mongoOptions: process.env.NODE_ENV === "production" ? {
+        tlsCAFile: path.join(process.cwd(), "src/global-bundle.pem")
+      } : {}
     }),
   })
 );
