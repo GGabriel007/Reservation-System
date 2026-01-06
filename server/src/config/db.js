@@ -13,7 +13,6 @@ const db = (async () => {
   const options = {};
 
   if (!isDev) {
-    // Correct path: up one level from 'config' into 'src'
     const caPath = path.resolve(__dirname, "../global-bundle.pem");
     
     if (fs.existsSync(caPath)) {
@@ -25,7 +24,7 @@ const db = (async () => {
 
   try {
     await mongoose.connect(DB_URL, options);
-    console.log("CONNECTED TO DB");
+    console.log("CONNECTED TO DB 20251117");
   } catch (error) {
     console.error("DB CONNECTION ERROR:", error.message);
     process.exit(1);

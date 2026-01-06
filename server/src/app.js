@@ -4,7 +4,7 @@ import session from "express-session";
 import MongoStore from "connect-mongo";
 import passport from "passport";
 import db from "./config/db.js";
-import "./auth/passport-config.js" // Standardizes Passport serialization/deserialization
+import "./auth/passport-config.js";
 import authRoutes from "./routes/auth.routes.js";
 import path from "path";
 
@@ -17,7 +17,6 @@ const app = express();
 
 app.use(
   cors({
-    // Dynamically choose the origin based on the environment
     origin: process.env.NODE_ENV === "production" 
       ? "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com" 
       : "http://localhost:5173",
@@ -47,10 +46,8 @@ app.use(
       sameSite: "lax",
     },
     store: MongoStore.create({
-      // FIX: Use the same URL as your main database
       mongoUrl: process.env.NODE_ENV === "production" ? process.env.MONGO_URL : process.env.MONGO_LOCAL_URL,
       ttl: 14 * 24 * 60 * 60,
-      // Add TLS options for DocumentDB here too!
       mongoOptions: process.env.NODE_ENV === "production" ? {
         tlsCAFile: path.join(process.cwd(), "src/global-bundle.pem")
       } : {}
