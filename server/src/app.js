@@ -7,6 +7,7 @@ import db from "./config/db.js";
 import "./auth/passport-config.js";
 import authRoutes from "./routes/auth.routes.js";
 import path from "path";
+import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
 
@@ -68,10 +69,8 @@ app.get("/", (req, res) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
-/** ROUTES **/
-app.use("/auth", authRoutes);
-
 // Placeholder for future administration features
-// app.use("/admin", adminRoutes);
+app.use("/auth", authRoutes);
+app.use("/admin", adminRoutes);
 
 export default app;
