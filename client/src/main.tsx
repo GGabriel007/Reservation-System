@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./index.css";
 import App from "./App";
-import { Home, Login, AdminDashboard, UserDashboard, Signup } from "./pages/index";
+import { Home, Login, AdminDashboard, UserDashboard, Signup, AdminPanel } from "./pages/index";
 
 /**
  * Defines the application's route structure.
@@ -35,6 +35,10 @@ const router = createBrowserRouter([
         path: "/admin",
         element: <AdminDashboard />,
       },
+      {
+        path: "/adminPanel",
+        element: <AdminPanel />,
+      }
     ],
   },
 ]);
