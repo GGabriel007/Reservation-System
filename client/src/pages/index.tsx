@@ -1,8 +1,29 @@
+import AdminDashboard from "./AdminDashboard";
+import AdminPanel from "./AdminPanel";
+import BookRoom from "./BookRoom";
+import Checkout from "./Checkout";
+import CheckReservation from "./CheckReservation";
+import FoundReservation from "./FoundReservation";
 import Home from "./Home";
 import Login from "./Login";
-import AdminDashboard from "./AdminDashboard";
-import UserDashboard from "./UserDashboard";
+import PlainText from "./PlainText";
+import RoomListing from "./RoomListing";
 import Signup from "./Signup";
-import AdminPanel from "./AdminPanel";
+import UserDashboard from "./UserDashboard";
+import UserProfile from "./UserProfile";
 
-export { Home, Login, AdminDashboard, UserDashboard, Signup, AdminPanel };
+export {
+  AdminDashboard,
+  AdminPanel,
+  BookRoom,
+  Checkout,
+  CheckReservation,
+  FoundReservation,
+  Home,
+  Login,
+  PlainText,
+  RoomListing,
+  Signup,
+  UserDashboard,
+  UserProfile,
+};

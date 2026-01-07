@@ -10,6 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node src/server.js",
     "dev": "cross-env NODE_ENV=development nodemon src/server.js",
+    "dev-mac": "NODE_ENV=development nodemon src/server.js",
     "build": "npm run clean && npm run prepare && npm run prepare-procfile && npm run zip && rm -rf dist",
     "clean": "rm -rf dist && mkdir -p dist",
     "prepare": "rsync -av --include='global-bundle.pem' --exclude='node_modules' --exclude='package-lock.json' --exclude='.git' --exclude='dist/' --exclude='*.zip' ./ dist/",

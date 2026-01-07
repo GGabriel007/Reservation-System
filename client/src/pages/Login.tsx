@@ -2,8 +2,8 @@ import { useState } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 
 /**
- * Login Component
- * Provides two authentication paths: 
+ * Login Page Component
+ * Provides two authentication paths:
  * Local: Submits credentials via JSON Fetch request to establish a session.
  * Google OAuth: Redirects the browser to the Google authorization server.
  */
@@ -12,7 +12,7 @@ export default function Login() {
   const [password, setPassword] = useState<string>("");
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-  
+
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,7 +44,9 @@ export default function Login() {
       if (response.ok) {
         navigate("/user");
       } else {
-        const errorData = await response.json().catch(() => ({ message: "Invalid credentials" }));
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Invalid credentials" }));
         setErrorMessage(errorData.message || "Login failed");
       }
     } catch (error) {
@@ -78,7 +80,9 @@ export default function Login() {
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">Email Address</label>
+            <label className="text-sm font-medium text-gray-700">
+              Email Address
+            </label>
             <input
               type="email"
               className="border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
@@ -90,7 +94,9 @@ export default function Login() {
           </div>
 
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">Password</label>
+            <label className="text-sm font-medium text-gray-700">
+              Password
+            </label>
             <input
               type="password"
               className="border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
@@ -101,19 +107,24 @@ export default function Login() {
             />
           </div>
 
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={isSubmitting}
             className={`w-full py-3 rounded-lg font-semibold text-white transition-all 
-              ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 shadow-md"}`}
+              ${
+                isSubmitting
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 shadow-md"
+              }`}
           >
             {isSubmitting ? "Logging in..." : "Login with Email"}
           </button>
         </form>
 
         <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center"><span className="w-full border-t border-gray-200"></span></div>
-          
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-gray-200"></span>
+          </div>
         </div>
 
         <a
@@ -124,8 +135,10 @@ export default function Login() {
         </a>
 
         <footer className="mt-8 text-center text-sm text-gray-600">
-        
-          <Link to="/signup" className="text-blue-600 font-semibold hover:underline">
+          <Link
+            to="/signup"
+            className="text-blue-600 font-semibold hover:underline"
+          >
             Sign up
           </Link>
         </footer>

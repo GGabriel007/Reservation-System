@@ -1,0 +1,9 @@
+/* styles.module.css */
+.button {
+  background-color: blue;
+  color: white;
+}
+
+.active {
+  font-weight: bold;
+}
