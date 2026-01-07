@@ -72,15 +72,20 @@ router.get("/google/login", passport.authenticate("google", {
  * @desc    Google OAuth2 callback URL. Handles session persistence and redirection.
  */
 router.get("/google/callback", 
-  passport.authenticate("google", { failureRedirect: "http://localhost:5173/login" }),
+  passport.authenticate("google", { 
+    // CHANGE THIS: Don't hardcode localhost
+    failureRedirect: process.env.NODE_ENV === "production" ? "/login" : "http://localhost:5173/login" 
+  }),
   (req, res) => {
-    // Manually save session to ensure store is updated before redirecting the client
     req.session.save((err) => {
-      if (err) {
-        console.error("Session Save Error:", err);
-        return res.redirect("http://localhost:5173/login");
-      }
-      res.redirect("http://localhost:5173/user");
+      if (err) return res.redirect("/login");
+      
+      // CHANGE THIS: Redirect to the production URL or relative path
+      const redirectUrl = process.env.NODE_ENV === "production" 
+        ? "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com/user" 
+        : "http://localhost:5173/user";
+        
+      res.redirect(redirectUrl);
     });
   }
 );
