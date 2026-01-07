@@ -20,7 +20,7 @@ export default function UserDashboard() {
   // Environment-based API selection
   const baseUrl = import.meta.env.DEV
     ? "http://localhost:5050"
-    : "http://ec2-54-210-167-76.compute-1.amazonaws.com:5050/";
+    : "http://ec2-54-210-167-76.compute-1.amazonaws.com:5050";
 
   /**
    * Identity Check

@@ -18,11 +18,20 @@ const app = express();
 
 app.use(
   cors({
-    origin: process.env.NODE_ENV === "production" 
-      ? "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com" 
-      : "http://localhost:5173",
-      
-    credentials: true,               
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com",
+        "http://ec2-54-210-167-76.compute-1.amazonaws.com" // Added your EC2 address
+      ];
+
+      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -43,9 +52,9 @@ app.use(
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-      maxAge: 1000 * 60 * 60,
-      secure: false,
-      sameSite: "lax",
+    maxAge: 1000 * 60 * 60,
+    secure: false, 
+    sameSite: "lax",
     },
     store: MongoStore.create({
       mongoUrl: process.env.NODE_ENV === "production" ? process.env.MONGO_URL : process.env.MONGO_LOCAL_URL,
