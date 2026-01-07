@@ -44,17 +44,25 @@ router.post("/register", async (req, res) => {
  * @desc    Authenticates local credentials via Passport middleware.
  */
 router.post("/local/login", localAuth, (req, res) => {
-  // Passport populates req.user after successful authentication in localAuth
-  console.log("Login finalized, sending response to frontend");
-  const userResponse = {
-    _id: req.user._id,
-    email: req.user.email,
-    role: req.user.role || "User"
-  };
+  // 1. Manually save the session to ensure MongoDB is updated before we tell the frontend "Success"
+  req.session.save((err) => {
+    if (err) {
+      console.error("Session save error:", err);
+      return res.status(500).json({ message: "Internal server error during login" });
+    }
 
-  res.status(200).json({ 
-    message: "Logged in successfully", 
-    user: userResponse 
+    console.log("Session saved to DB. Sending response to frontend.");
+    
+    const userResponse = {
+      _id: req.user._id,
+      email: req.user.email,
+      role: req.user.role || "guest"
+    };
+
+    res.status(200).json({ 
+      message: "Logged in successfully", 
+      user: userResponse 
+    });
   });
 });
 
@@ -73,19 +81,18 @@ router.get("/google/login", passport.authenticate("google", {
  */
 router.get("/google/callback", 
   passport.authenticate("google", { 
-    // CHANGE THIS: Don't hardcode localhost
-    failureRedirect: process.env.NODE_ENV === "production" ? "/login" : "http://localhost:5173/login" 
+    failureRedirect: "/login" // Relative paths are safer
   }),
   (req, res) => {
     req.session.save((err) => {
       if (err) return res.redirect("/login");
       
-      // CHANGE THIS: Redirect to the production URL or relative path
-      const redirectUrl = process.env.NODE_ENV === "production" 
-        ? "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com/user" 
-        : "http://localhost:5173/user";
+      // Use a relative path if possible, or your S3 URL
+      const frontendUrl = process.env.NODE_ENV === "production" 
+        ? "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com" 
+        : "http://localhost:5173";
         
-      res.redirect(redirectUrl);
+      res.redirect(`${frontendUrl}/user`);
     });
   }
 );
