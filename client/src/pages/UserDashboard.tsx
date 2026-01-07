@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
  * We use _id to align with MongoDB's unique identifier.
  */
 interface User {
-  _id: string; 
+  _id: string;
   email: string;
   role?: string;
 }
@@ -28,21 +28,31 @@ export default function UserDashboard() {
    * If the backend returns 401 (Unauthorized), the user is kicked to the login page.
    */
   useEffect(() => {
-    fetch(`${baseUrl}/auth/need`, {
-      credentials: "include", // Essential for sending the 'sid' cookie to the server
-    })
-      .then((res) => {
-        if (res.status === 401) throw new Error("Unauthorized");
-        return res.json();
-      })
-      .then((data) => {
-        setUser(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        // Redirect to login if the session is missing or expired
-        navigate("/login");
-      });
+    let isMounted = true; // Guard to prevent state updates if component unmounts
+
+    const checkSession = async () => {
+      try {
+        const res = await fetch(`${baseUrl}/auth/need`, {
+          credentials: "include",
+        });
+
+        if (res.status === 401) {
+          if (isMounted) navigate("/login");
+          return;
+        }
+
+        const data = await res.json();
+        if (isMounted) {
+          setUser(data);
+          setLoading(false);
+        }
+      } catch (err) {
+        if (isMounted) navigate("/login");
+      }
+    };
+
+    checkSession();
+    return () => { isMounted = false; };
   }, [navigate, baseUrl]);
 
   /**
@@ -51,17 +61,15 @@ export default function UserDashboard() {
    */
   const handleLogout = async () => {
     try {
-      const response = await fetch(`${baseUrl}/auth/logout`, {
+      // FIX: Removed the starting slash from "/auth/logout" to prevent "//"
+      await fetch(`${baseUrl}/auth/logout`, {
         method: "GET",
         credentials: "include",
       });
-
-      if (response.ok) {
-        setUser(null);
-        navigate("/login");
-      }
+      setUser(null);
+      navigate("/login");
     } catch (err) {
-      console.error("Logout request failed", err);
+      console.error("Logout failed", err);
     }
   };
 
@@ -80,7 +88,7 @@ export default function UserDashboard() {
         <h1 className="text-3xl font-bold text-gray-800">Account Overview</h1>
         <p className="text-gray-600">Profile settings.</p>
       </header>
-      
+
       <div className="bg-white border border-gray-200 p-8 rounded-lg shadow-sm">
         <div className="space-y-4">
           <section>
@@ -100,10 +108,10 @@ export default function UserDashboard() {
             </p>
           </section>
         </div>
-        
+
         <div className="mt-10 pt-6 border-t border-gray-100">
-          <button 
-            onClick={handleLogout} 
+          <button
+            onClick={handleLogout}
             className="bg-red-50 text-red-600 border border-red-200 px-6 py-2 rounded-md font-medium hover:bg-red-600 hover:text-white transition-all duration-200"
           >
             Sign Out
