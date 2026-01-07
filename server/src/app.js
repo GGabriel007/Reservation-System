@@ -10,12 +10,9 @@ import path from "path";
 import adminRoutes from "./routes/admin.routes.js";
 
 const app = express();
-app.set("trust proxy", 1);
 
-/**
- * GLOBAL MIDDLEWARE
- * Configuration for cross-origin requests and body parsing.
- */
+// Required for AWS EC2/ALB to pass through headers
+app.set("trust proxy", 1);
 
 app.use(
   cors({
@@ -23,9 +20,8 @@ app.use(
       const allowedOrigins = [
         "http://localhost:5173",
         "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com",
-        "http://ec2-54-210-167-76.compute-1.amazonaws.com" // Added your EC2 address
+        "http://ec2-54-210-167-76.compute-1.amazonaws.com"
       ];
-
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -40,22 +36,17 @@ app.use(
 
 app.use(express.json());
 
-/**
- * SESSION MANAGEMENT
- * Persistent sessions stored in MongoDB to survive server restarts.
- */
-/** PASSPORT **/
 app.use(
   session({
     name: "sid",
-    secret: process.env.SESSION_SECRET || "super-secret", // Use an env var!
+    secret: process.env.SESSION_SECRET || "super-secret",
     resave: false,
     saveUninitialized: false,
     cookie: {
       httpOnly: true,
-    maxAge: 1000 * 60 * 60,
-    secure: false, 
-    sameSite: "lax",
+      maxAge: 1000 * 60 * 60,
+      secure: false, // Must be false for http://
+      sameSite: "lax", 
     },
     store: MongoStore.create({
       mongoUrl: process.env.NODE_ENV === "production" ? process.env.MONGO_URL : process.env.MONGO_LOCAL_URL,
@@ -67,20 +58,27 @@ app.use(
   })
 );
 
-/** DELETE AFTER PRODUCTION **/
-app.get("/", (req, res) => {
-  req.session.visited = true;
-  res.send("hello world testing");
-});
-
-/**
- * PASSPORT INITIALIZATION
- * Must be defined AFTER session middleware and BEFORE routes.
- */
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Placeholder for future administration features
+/** * 🔍 DEBUG MIDDLEWARE 
+ * This logs every request to your EC2 console so we can see the "Handshake"
+ */
+app.use((req, res, next) => {
+  console.log("--- New Request ---");
+  console.log(`Path: ${req.path}`);
+  console.log(`Session ID: ${req.sessionID}`);
+  console.log(`Is Authenticated: ${req.isAuthenticated()}`);
+  console.log(`User in Session: ${req.user ? req.user.email : "NONE"}`);
+  console.log("Cookies received:", req.headers.cookie || "NO COOKIES RECEIVED");
+  console.log("-------------------");
+  next();
+});
+
+app.get("/", (req, res) => {
+  res.send("Server is alive and logging.");
+});
+
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 
