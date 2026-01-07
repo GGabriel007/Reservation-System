@@ -73,6 +73,11 @@ export default function Navbar() {
             Admin
           </NavLink>
 
+          {/* Admin access (Visible logic can be added later based on user role) */}
+          <NavLink to="/adminPanel" className={linkClass}>
+            Admin Panel
+          </NavLink>
+
           {/* Logout Action */}
           <button 
             onClick={handleLogout} 
