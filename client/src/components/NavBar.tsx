@@ -10,8 +10,8 @@ export default function Navbar() {
 
   // Environment-based API selection for logout endpoint
   const baseUrl = import.meta.env.DEV
-    ? "http://localhost:5050"
-    : "http://ec2-54-210-167-76.compute-1.amazonaws.com:5050";
+    ? "http://localhost:8080"
+    : "http://liore.us-east-1.elasticbeanstalk.com";
 
   /**
    * Global Logout Handler

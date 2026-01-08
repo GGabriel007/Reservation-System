@@ -21,8 +21,8 @@ export default function Login() {
 
   // Environment-based API selection
   const baseUrl: string = import.meta.env.DEV
-    ? "http://localhost:5050"
-    : "http://ec2-54-210-167-76.compute-1.amazonaws.com:5050";
+    ? "http://localhost:8080"
+    : "http://liore.us-east-1.elasticbeanstalk.com";
 
   /**
    * Local Login Handler
@@ -36,9 +36,10 @@ export default function Login() {
     try {
       const response = await fetch(`${baseUrl}/auth/local/login`, {
         method: "POST",
+        credentials: "include", // Required to receive and store the 'sid' session cooki
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, password }),
-        credentials: "include", // Required to receive and store the 'sid' session cookie
+        
       });
 
       if (response.ok) {

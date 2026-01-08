@@ -6,12 +6,17 @@ import passport from "passport";
 import db from "./config/db.js";
 import "./auth/passport-config.js";
 import authRoutes from "./routes/auth.routes.js";
-import path from "path";
 import adminRoutes from "./routes/admin.routes.js";
+import path from "path";
+import { fileURLToPath } from "url";
+
+// --- ES MODULE FIX FOR __dirname ---
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
-// Required for AWS EC2/ALB to pass through headers
+// Required for AWS EC2/ALB to pass through headers (essential for cookies)
 app.set("trust proxy", 1);
 
 app.use(
@@ -19,9 +24,10 @@ app.use(
     origin: (origin, callback) => {
       const allowedOrigins = [
         "http://localhost:5173",
+        // Add your new Elastic Beanstalk URL here once created
         "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com",
-        "http://ec2-54-210-167-76.compute-1.amazonaws.com"
       ];
+      // When All-in-One is working, 'origin' will often be undefined for same-origin requests
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -45,7 +51,7 @@ app.use(
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
-      secure: false, // Must be false for http://
+      secure: false, // Set to true only if you have HTTPS/SSL configured later
       sameSite: "lax", 
     },
     store: MongoStore.create({
@@ -61,25 +67,35 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-/** * 🔍 DEBUG MIDDLEWARE 
- * This logs every request to your EC2 console so we can see the "Handshake"
- */
+/** DEBUG MIDDLEWARE */
 app.use((req, res, next) => {
   console.log("--- New Request ---");
   console.log(`Path: ${req.path}`);
   console.log(`Session ID: ${req.sessionID}`);
   console.log(`Is Authenticated: ${req.isAuthenticated()}`);
-  console.log(`User in Session: ${req.user ? req.user.email : "NONE"}`);
   console.log("Cookies received:", req.headers.cookie || "NO COOKIES RECEIVED");
   console.log("-------------------");
   next();
 });
 
-app.get("/", (req, res) => {
-  res.send("Server is alive and logging.");
-});
-
+// API Routes
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
+
+// --- ALL-IN-ONE FRONTEND SERVING ---
+
+// 1. Serve static files from the 'public' folder
+// This folder should be located at: server/src/public (if you use this path)
+// Note: If you put 'public' in the server root, use path.join(__dirname, '../public')
+app.use(express.static(path.join(__dirname, 'public')));
+
+/**
+ * 2. The "Catch-all" route (FIXED FOR EXPRESS 5)
+ * In Express 5, we use '*splat' instead of just '*'
+ * This sends the index.html for any request that isn't an API call.
+ */
+app.get('/*splat', (req, res) => {
+  res.sendFile(path.join(__dirname, '../dist', 'index.html'));
+});
 
 export default app;
