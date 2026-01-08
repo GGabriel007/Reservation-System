@@ -89,7 +89,7 @@ router.get("/google/callback",
       
       // Use a relative path if possible, or your S3 URL
       const frontendUrl = process.env.NODE_ENV === "production" 
-        ? "http://project-2-tioca-20251117-gg-sn.s3-website-us-east-1.amazonaws.com" 
+        ? "http://liore.us-east-1.elasticbeanstalk.com" 
         : "http://localhost:5173";
         
       res.redirect(`${frontendUrl}/user`);
