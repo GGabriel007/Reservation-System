@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { Hero, OrderBar } from "../components/pages/homePage/index";
+import { Hero } from "../components/pages/homePage/index";
 
 /**
  * Home Component
@@ -18,7 +18,7 @@ export default function Home() {
     ? "http://localhost:8080"
     : "http://liore.us-east-1.elasticbeanstalk.com";
 
-/**
+  /**
    * Backend Health Check
    * Pings the specific health endpoint of the API
    */
