@@ -15,17 +15,18 @@ export default function Home() {
     ? "http://localhost:8080"
     : "http://liore.us-east-1.elasticbeanstalk.com";
 
-  /**
+/**
    * Backend Health Check
-   * Pings the root endpoint of the API to verify server availability.
+   * Pings the specific health endpoint of the API
    */
   useEffect(() => {
-    fetch(baseUrl, {
+    // Change 'baseUrl' to '`${baseUrl}/api/health`'
+    fetch(`${baseUrl}/api/health`, {
       credentials: "include",
     })
       .then((response) => response.text())
       .then((data) => {
-        setServerStatus(data);
+        setServerStatus(data); // This will now show "Online and Connected!"
         setIsConnected(true);
       })
       .catch((error) => {

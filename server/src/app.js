@@ -82,6 +82,10 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 
+app.get("/api/health", (req, res) => {
+  res.send("Online and Connected!");
+});
+
 // --- ALL-IN-ONE FRONTEND SERVING ---
 const distPath = path.join(process.cwd(), 'client-build', 'dist');
 
