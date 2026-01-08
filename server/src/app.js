@@ -58,7 +58,7 @@ app.use(
       mongoUrl: process.env.NODE_ENV === "production" ? process.env.MONGO_URL : process.env.MONGO_LOCAL_URL,
       ttl: 14 * 24 * 60 * 60,
       mongoOptions: process.env.NODE_ENV === "production" ? {
-        tlsCAFile: path.join(process.cwd(), "src/global-bundle.pem")
+        tlsCAFile: path.join(process.cwd(), "global-bundle.pem")
       } : {}
     }),
   })
@@ -96,12 +96,12 @@ app.use(express.static(distPath));
  * In Express 5, we use '*splat' instead of just '*'
  * This sends the index.html for any request that isn't an API call.
  */
-app.get('/:splat*', (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'), (err) => {
-        if (err) {
-            console.error("Error sending index.html. Path tried:", path.join(distPath, 'index.html'));
-            res.status(500).send("Frontend files missing on server.");
-        }
-    });
+app.get('/:any*', (req, res) => {
+  res.sendFile(path.join(distPath, 'index.html'), (err) => {
+    if (err) {
+      console.error("ERROR: index.html not found at:", path.join(distPath, 'index.html'));
+      res.status(500).send("Frontend files are missing on the server. Check the build process.");
+    }
+  });
 });
 export default app;
