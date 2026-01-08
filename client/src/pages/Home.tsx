@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { Hero, OrderBar } from "../components/pages/homePage/index";
 
 /**
  * Home Component
@@ -7,7 +8,9 @@ import { Link } from "react-router-dom";
  * with the backend API to ensure the service is reachable.
  */
 export default function Home() {
-  const [serverStatus, setServerStatus] = useState<string>("Checking connection...");
+  const [serverStatus, setServerStatus] = useState<string>(
+    "Checking connection..."
+  );
   const [isConnected, setIsConnected] = useState<boolean | null>(null);
 
   // Environment-based API selection
@@ -39,11 +42,11 @@ export default function Home() {
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh] text-center px-4">
       {/* Hero Section */}
+      <Hero></Hero>
       <header className="max-w-2xl mb-12">
         <h1 className="text-5xl font-extrabold text-gray-900 tracking-tight mb-4">
           Home Page
         </h1>
-    
       </header>
 
       {/* Call to Action Buttons */}
@@ -65,14 +68,18 @@ export default function Home() {
       {/* Backend Status Badge (Helpful for Developers & Users) */}
       <footer className="mt-auto">
         <div className="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full border border-gray-200">
-          <span 
+          <span
             className={`w-2.5 h-2.5 rounded-full ${
-              isConnected === true ? "bg-green-500 animate-pulse" : 
-              isConnected === false ? "bg-red-500" : "bg-yellow-500"
+              isConnected === true
+                ? "bg-green-500 animate-pulse"
+                : isConnected === false
+                ? "bg-red-500"
+                : "bg-yellow-500"
             }`}
           ></span>
           <span className="text-xs font-medium text-gray-500 uppercase tracking-widest">
-            The backend says :D <span className="text-gray-700">{serverStatus}</span>
+            The backend says :D{" "}
+            <span className="text-gray-700">{serverStatus}</span>
           </span>
         </div>
       </footer>
