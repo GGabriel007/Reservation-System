@@ -96,12 +96,12 @@ app.use(express.static(distPath));
  * In Express 5, we use '*splat' instead of just '*'
  * This sends the index.html for any request that isn't an API call.
  */
-app.get('(.*)', (req, res) => {
-  res.sendFile(path.join(distPath, 'index.html'), (err) => {
-    if (err) {
-      console.error("ERROR: index.html not found at:", path.join(distPath, 'index.html'));
-      res.status(500).send("Frontend files are missing.");
-    }
-  });
+app.get(/.*/, (req, res) => {
+    res.sendFile(path.join(distPath, 'index.html'), (err) => {
+        if (err) {
+            console.error("ERROR: index.html not found at:", path.join(distPath, 'index.html'));
+            res.status(500).send("Frontend files missing. Check if client-build/dist exists.");
+        }
+    });
 });
 export default app;
