@@ -1,0 +1,72 @@
+name: Unified Build and Deploy
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+env:
+  VERSION: 1.0.${{ github.run_number }}
+  # Adjusted to match your EB Dashboard info
+  APP_NAME: "Liore-P"
+  ENV_NAME: "Liore-P-env"
+  S3_BUCKET: "elasticbeanstalk-us-east-1-397345411365"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20 # Stable LTS recommended
+
+      # --- STEP 1: BUILD FRONTEND ---
+      - name: Build Frontend (React)
+        working-directory: client
+        run: |
+          npm install
+          npm run build
+
+      # --- STEP 2: PREPARE BACKEND & MERGE ---
+      - name: Prepare Backend
+        working-directory: server
+        run: |
+          npm install --production
+          # Create the folder structure the server expects
+          mkdir -p client-build/dist
+          # Copy the build from the client directory to the server directory
+          cp -r ../client/dist/* client-build/dist/
+
+      # --- STEP 3: ZIP EVERYTHING ---
+      - name: Create Deployment Package
+        working-directory: server
+        run: |
+          # Zip everything inside the server folder
+          # Including src, client-build, package.json, Procfile, and .pem files
+          zip -r ../deploy.zip . -x "*.git*"
+
+      # --- STEP 4: AWS DEPLOY ---
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.ACCESS_KEY_P2 }}
+          aws-secret-access-key: ${{ secrets.SECRET_ACCESS_KEY_P2 }}
+          aws-region: us-east-1
+
+      - name: Upload to S3 and Deploy
+        run: |
+          aws s3 cp deploy.zip s3://$S3_BUCKET/${{ github.run_id }}-deploy.zip
+          
+          aws elasticbeanstalk create-application-version \
+            --application-name "$APP_NAME" \
+            --version-label "$VERSION" \
+            --source-bundle S3Bucket="$S3_BUCKET",S3Key="${{ github.run_id }}-deploy.zip"
+          
+          aws elasticbeanstalk update-environment \
+            --application-name "$APP_NAME" \
+            --environment-name "$ENV_NAME" \
+            --version-label "$VERSION"
