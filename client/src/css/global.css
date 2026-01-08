@@ -1,0 +1,124 @@
+/* Global Set Up*/
+@view-transition {
+  navigation: auto;
+}
+
+main {
+  min-height: 80vh;
+}
+
+/* Grid */
+display-grid,
+.grid {
+  display: grid;
+}
+
+layout-grid,
+.layout-grid,
+[class*="layout-grid"] {
+  display: grid;
+  gap: var(--layout-grid-gap);
+  grid-template-columns: var(--layout-grid-grid-columns);
+  grid-template-rows: auto;
+}
+
+layout-grid .layout-grid {
+  padding-inline: clamp(0.2rem, calc(0.2rem + ((1vw - 0.2rem) * 2.8571)), 1rem);
+}
+
+inner-grid,
+.inner-grid,
+[class*="inner-grid"] {
+  max-width: var(--layout-grid-inner-width);
+  margin: 0 auto;
+  display: block;
+}
+
+/* Flex */
+display-flex,
+.flex {
+  display: flex;
+}
+
+/* Buttons */
+.btn,
+.button,
+[class^="btn"],
+[class^="button"] {
+  padding: 0.25em 1.5em;
+  height: fit-content;
+  cursor: pointer;
+}
+
+.btn:hover,
+.button:hover,
+[class^="btn"]:hover,
+[class^="button"]:hover {
+  opacity: 0.85;
+}
+
+.btn-medium,
+.button-medium,
+[class^="btn-medium"],
+[class^="button-medium"] {
+  padding: 0.5em 1.25em;
+  height: fit-content;
+}
+
+.btn-primary,
+.button-primary {
+  background: var(--theme-primary);
+  color: var(--theme-accent);
+  border: 1px solid var(--theme-primary);
+  box-shadow: var(--light-grey) 0px 4px 4px 0px;
+}
+
+.btn-secondary,
+.button-secondary {
+  background: var(--theme-secondary);
+  color: var(--white);
+  border: 1px solid var(--theme-secondary);
+  box-shadow: var(--black) 0px 4px 4px 0px;
+}
+
+.btn-transparent,
+.button-transparent {
+  background: transparent;
+  color: var(--white);
+  border: 1px solid var(--theme-secondary);
+  box-shadow: var(--black) 0px 4px 4px 0px;
+}
+
+.btn-cancel,
+.button-cancel {
+  background: var(--white);
+  color: var(--black);
+  border: 1px solid transparent;
+  box-shadow: var(--light-grey) 0px 4px 4px 0px;
+}
+
+.btn-cancel:hover,
+.button-cancel:hover {
+  background-color: #e9e4dc;
+}
+
+.btn-warning,
+.button-warning {
+  background: var(--theme-warning);
+  color: var(--white);
+  border: 1px solid transparent;
+  box-shadow: var(--light-grey) 0px 4px 4px 0px;
+}
+
+.btn-accept,
+.button-accept {
+  background: var(--theme-accept);
+  color: var(--white);
+  border: 1px solid transparent;
+  box-shadow: var(--light-grey) 0px 4px 4px 0px;
+}
+
+.btn-accept:hover,
+.button-accept:hover {
+  background-color: #3c7d48;
+}

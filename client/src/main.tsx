@@ -1,19 +1,26 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import "./index.css";
+import "./css/index.css";
 import App from "./App";
-import { Home, Login, AdminDashboard, UserDashboard, Signup, AdminPanel } from "./pages/index";
+import {
+  Home,
+  Login,
+  AdminDashboard,
+  UserDashboard,
+  Signup,
+  AdminPanel,
+} from "./pages/index";
 
 /**
  * Defines the application's route structure.
- * We nest everything under "/" with <App /> as the element 
+ * We nest everything under "/" with <App /> as the element
  * so the Navbar is always visible.
  */
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,  
+    element: <App />,
     children: [
       {
         path: "/",
@@ -24,7 +31,7 @@ const router = createBrowserRouter([
         element: <Login />,
       },
       {
-        path: "/signup", //  
+        path: "/signup", //
         element: <Signup />,
       },
       {
@@ -38,7 +45,7 @@ const router = createBrowserRouter([
       {
         path: "/adminPanel",
         element: <AdminPanel />,
-      }
+      },
     ],
   },
 ]);

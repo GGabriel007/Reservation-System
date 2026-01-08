@@ -14,17 +14,17 @@ const db = (async () => {
 
   if (!isDev) {
     const caPath = path.resolve(__dirname, "../global-bundle.pem");
-    
+
     if (fs.existsSync(caPath)) {
-        options.tlsCAFile = caPath;
+      options.tlsCAFile = caPath;
     } else {
-        console.error("CRITICAL: Certificate not found at", caPath);
+      console.error("CRITICAL: Certificate not found at", caPath);
     }
   }
 
   try {
     await mongoose.connect(DB_URL, options);
-    console.log("CONNECTED TO DB 20251117");
+    console.log(`CONNECTED TO DB ${DB_URL}`);
   } catch (error) {
     console.error("DB CONNECTION ERROR:", error.message);
     process.exit(1);
