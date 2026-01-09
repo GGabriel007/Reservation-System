@@ -1,152 +1,91 @@
 import mongoose, { get } from "mongoose";
 import { Room } from "../models/room.model.js";
 
-export const UserRepo = {
+/**
+ * RoomRepository
+ * Direct database access for the Room collection.
+ * Includes population of Hotel data for detailed views.
+ */
+export const RoomRepository = {
+  
   /**
-   * Get all rooms
-   * @returns {Promise<Array>} Array of all room documents
+   * Get all active rooms
    */
-  getAllRooms: () => Room.find().populate("hotel"),
-
-  /**
-   * get room by room ID
-   * @param {Number} roomId - The room ID to search for
-   * @returns {Promise<Object>} Room document based on room number
-   */
-  getRoomById: (roomId) => {
-    return Room.findById(roomId).populate("hotel");
+  findAll: async () => {
+    // Note: Model middleware handles isDeleted: false
+    return await Room.find().populate("hotel");
   },
 
   /**
-   * Get rooms by room name
-   * @param {String} roomName - The room name to search for
-   * @returns {Promise<Array>} Array of room documents with the specified room name
+   * Get room by ID
    */
-  getRoomsByRoomName: (roomName) => {
-    return Room.find({ roomName: roomName }).populate("hotel");
+  findById: async (id) => {
+    return await Room.findById(id).populate("hotel");
   },
 
   /**
    * Get rooms by hotel ID
-   * @param {Number} hotelId - The hotel ID to search for
-   * @returns {Promise<Array>} Array of room documents for the specified hotel
+   * This is the "Key Attribute" from your checklist.
    */
-  getRoomsByHotelId: (hotelId) => {
-    return Room.find({ hotel: hotelId }).populate("hotel");
+  findByHotelId: async (hotelId) => {
+    return await Room.find({ hotel: hotelId }).populate("hotel");
   },
 
   /**
    * Create a new room
-   * @param {Object} roomData - The data for the new room
-   * @returns {Promise<Object>} Created room document
    */
-  createRoom: (roomData) => {
-    return Room.create(roomData);
+  create: async (roomData) => {
+    return await Room.create(roomData);
   },
 
   /**
    * Update room by ID
-   * @param {Number} roomId - The room ID to update
-   * @param {Object} updateData - The data to update the room with
-   * @returns {Promise<Object>} Updated room document
    */
-  updateRoomById: (roomId, updateData) => {
-    return Room.findByIdAndUpdate(roomId, updateData, {
+  update: async (id, updateData) => {
+    return await Room.findByIdAndUpdate(id, updateData, {
       new: true,
+      runValidators: true
     });
   },
 
   /**
-   * Update room amenities by ID
-   * @param {Number} roomId - The room ID to update
-   * @param {Array} amenities - The amenities to add to the room
-   * @returns {Promise<Object>} Updated room document
+   * Soft Delete room
+   * Requirements: Inventory management without losing historical data.
    */
-  appendRoomAmenitiesById: (roomId, amenities) => {
-    return Room.findByIdAndUpdate(
-      roomId,
-      { $push: { amenities: amenities } },
+  softDelete: async (id) => {
+    return await Room.findByIdAndUpdate(
+      id, 
+      { isDeleted: true }, 
       { new: true }
     );
   },
 
+  // --- ADVANCED FILTERING (For Search Page) ---
+
   /**
-   * Update room images by ID
-   * @param {Number} roomId - The room ID to update
-   * @param {Array} images - The images to add to the room
-   * @returns {Promise<Object>} Updated room document
+   * Filter by Type (single, double, suite)
    */
-  appendRoomImagesById: (roomId, images) => {
-    return Room.findByIdAndUpdate(
-      roomId,
-      { $push: { images: images } },
-      { new: true }
-    );
+  findByType: async (roomType) => {
+    return await Room.find({ roomType }).populate("hotel");
   },
 
   /**
-   * Delete room by ID
-   * @param {Number} roomId - The room ID to delete
-   * @returns {Promise<Object>} Deleted room document
+   * Filter by Price Range
+   * Uses basePrice to match your room.model.js
    */
-  deleteHotelById: (roomId) => {
-    return Room.findByIdAndDelete(roomId);
+  findByPriceRange: async (min, max) => {
+    return await Room.find({ 
+      basePrice: { $gte: min, $lte: max } 
+    }).populate("hotel");
   },
 
   /**
-   * Filter rooms by various criteria
-   * @param {Object} filters - The filter criteria
-   * @returns {Promise<Array>} Array of room documents matching the filters
+   * Filter by Occupancy
+   * Uses maxOccupancy to match your room.model.js
    */
-  filterByRoomType: (roomType) => {
-    return Room.find({ roomType: roomType });
-  },
-
-  /**
-   * Filter rooms by price range
-   * @param {Number} minPrice - Minimum price
-   * @param {Number} maxPrice - Maximum price
-   * @returns {Promise<Array>} Array of room documents within the price range
-   */
-  filterByPriceRange: (minPrice, maxPrice) => {
-    return Room.find({ price: { $gte: minPrice, $lte: maxPrice } });
-  },
-
-  /**
-   * Filter rooms by number of guests
-   * @param {Number} numGuests - Minimum number of guests
-   * @returns {Promise<Array>} Array of room documents that can accommodate the specified number of guests
-   */
-  filterByNumGuests: (numGuests) => {
-    return Room.find({ numGuests: { $gte: numGuests } });
-  },
-
-  /**
-   * Filter rooms by availability status
-   * @param {String} status - Availability status ('available', 'occupied', 'maintenance')
-   * @returns {Promise<Array>} Array of room documents matching the availability status
-   */
-  filterByAvailabilityStatus: (status) => {
-    return Room.find({ availabilityStatus: status });
-  },
-
-  /**
-   * Search rooms by name
-   * @param {String} searchCriteria - Search string for room name
-   * @returns {Promise<Array>} Array of room documents matching the search criteria
-   */
-  findRoomsBySearch: (searchCriteria) => {
-    return Room.find({
-      $or: [{ roomName: { $regex: searchCriteria, $options: "i" } }],
-    });
-  },
-
-  /**
-   * Get number of rooms by room name
-   * @param {String} roomName - The room name to search for
-   * @returns {Promise<Number>} Count of room documents with the specified room name
-   */
-  getNumberOfRoomsByRoomName: (roomName) => {
-    return Room.countDocuments({ roomName: roomName });
-  },
+  findByOccupancy: async (guests) => {
+    return await Room.find({ 
+      maxOccupancy: { $gte: guests } 
+    }).populate("hotel");
+  }
 };

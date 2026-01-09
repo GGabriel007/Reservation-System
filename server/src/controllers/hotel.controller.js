@@ -1,4 +1,4 @@
-import { HotelService } from "../services/hotelService.js";
+import { HotelService } from "../services/hotel.service.js";
 
 /**
  * HotelController

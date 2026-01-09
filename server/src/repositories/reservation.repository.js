@@ -4,63 +4,61 @@ import { Reservation } from "../models/reservation.model.js";
 export const ReservationRepo = {
   /**
    * Get all reservations
-   * @returns {Promise<Array>} Array of all reservation documents
+   * Includes populate so Admin can see Guest names and Hotel names.
    */
-  getAllReservations: () => Room.find(),
+  findAll: () => {
+    return Reservation.find()
+      .populate("userId", "name email")
+      .populate("roomId", "roomName")
+      .populate("hotelId", "name");
+  },
 
   /**
-   * get reservation by room number
-   * @param {Number} roomNumber - The room number to search for
-   * @returns {Promise<Array>} Resrvation document based on room number
+   * Get reservations by User ID
+   * Essential for the "My Bookings" page.
    */
-  getReservationsByRoomNumber: (roomNumber) => {
-    return Room.find({ RoomNumber: roomNumber });
+  findByUserId: (userId) => {
+    return Reservation.find({ userId })
+      .populate("roomId", "roomName")
+      .populate("hotelId", "name");
   },
 
-  /** get reservations by user id
-   * @param {ObjectId} userId - The user id to search for
-   * @returns {Promise<Array>} Array of Reservation documents based on user id
+  /**
+   * Get reservation by ID
+   * Note: We use the MongoDB _id for consistency.
    */
-  getReservationsByUserId: (userId) => {
-    return Reservation.find({ userId: userId });
+  findById: (id) => {
+    return Reservation.findById(id)
+      .populate("userId", "name email")
+      .populate("roomId")
+      .populate("hotelId");
   },
 
-  /** get reservation by reservation number
-   * @param {ObjectId} reservationNumber - The reservation number to search for
-   * @returns {Promise<Object>} Reservation document based on reservation number
+  /**
+   * Get reservations by Hotel (Manager View)
    */
-  getReservationByReservationNumber: (reservationNumber) => {
-    return Reservation.findOne({ reservationNumber: reservationNumber });
+  findByHotelId: (hotelId) => {
+    return Reservation.find({ hotelId })
+      .populate("userId", "name email")
+      .populate("roomId", "roomName");
   },
 
-  /** create new reservation
-   * @param {Object} reservationData - The data for the new reservation
-   * @returns {Promise<Object>} Created reservation document
+  /**
+   * Create new reservation
    */
-  createResrvation: (reservationData) => {
+  create: (reservationData) => {
     return Reservation.create(reservationData);
   },
 
-  /** update reservation by reservation number
-   * @param {ObjectId} reservationNumber - The reservation number to search for
-   * @param {Object} updateData - The data to update the reservation with
-   * @returns {Promise<Object>} Updated reservation document
+  /**
+   * Update Status (Soft Delete / Cancellation)
+   * Instead of deleting, we change status to 'cancelled'.
    */
-  updateReservation: (reservationNumber, updateData) => {
-    return Reservation.findOneAndUpdate(
-      { reservationNumber: reservationNumber },
-      updateData,
+  updateStatus: (id, status) => {
+    return Reservation.findByIdAndUpdate(
+      id,
+      { status },
       { new: true }
     );
-  },
-
-  /** delete reservation by reservation number
-   * @param {ObjectId} reservationNumber - The reservation number to search for
-   * @returns {Promise<Object>} Deleted reservation document
-   */
-  deleteReservation: (reservationNumber) => {
-    return Reservation.findOneAndDelete({
-      reservationNumber: reservationNumber,
-    });
-  },
+  }
 };
