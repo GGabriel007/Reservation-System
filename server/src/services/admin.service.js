@@ -1,33 +1,57 @@
-// server/src/services/adminService.js
-import { User } from "../models/user.model.js";
+import { AdminRepository } from "../repositories/admin.repository.js";
 
-export const getAllUsers = async () => {
-  // Find all users and exclude the password field
-  return await User.find({}, "-password");
-};
+/**
+ * AdminService
+ * Handles high-level business logic. 
+ * Now refactored to use AdminRepository for all database interactions.
+ */
+export const AdminService = {
 
-export const getUserStats = async () => {
-  const total = await User.countDocuments();
-  const google = await User.countDocuments({ loginMethod: "google" });
-  const local = await User.countDocuments({ loginMethod: "local" });
-  
-  return { total, google, local };
-};
+  /**
+   * Aggregates key metrics for the Admin Dashboard.
+   * Logic: Combines counts and revenue data into one object.
+   */
+  getSystemStats: async () => {
+    // We call the repository methods instead of the Models
+    const counts = await AdminRepository.getSystemCounts();
+    const revenue = await AdminRepository.getTotalRevenue();
 
-export const getUsers = async (req, res) => {
-  try {
-    const users = await adminService.getAllUsers();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching users" });
-  }
-};
+    return {
+      ...counts,
+      revenue
+    };
+  },
 
-export const getStats = async (req, res) => {
-  try {
-    const stats = await adminService.getUserStats();
-    res.status(200).json(stats);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching stats" });
+  /**
+   * Fetches all users for management.
+   */
+  getAllUsers: async () => {
+    return await AdminRepository.findAllUsers();
+  },
+
+  /**
+   * Business Logic: Update user role.
+   * Ensures that if a user is made a manager, a hotel ID is provided.
+   */
+  updateUserRole: async (userId, role, assignedHotelId = null) => {
+    // Business Rule: A manager MUST be assigned to a hotel
+    if (role === 'manager' && !assignedHotelId) {
+      throw new Error("Managers must be assigned to a specific hotel location.");
+    }
+
+    const updatedUser = await AdminRepository.updateUserRole(userId, role, assignedHotelId);
+    
+    if (!updatedUser) {
+      throw new Error("User not found or update failed.");
+    }
+
+    return updatedUser;
+  },
+
+  /**
+   * Fetches the global audit of all hotels and rooms.
+   */
+  getGlobalInventory: async () => {
+    return await AdminRepository.getGlobalInventoryAudit();
   }
 };

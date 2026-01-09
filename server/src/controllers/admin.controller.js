@@ -1,31 +1,64 @@
-import * as adminService from "../services/admin.service.js";
+import { AdminService } from "../services/admin.service.js";
 
-// AdminController.getUsers
-export const getUsers = async (req, res) => {
-  try {
-    const users = await adminService.getAllUsers();
-    res.status(200).json(users);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching users" });
-  }
-};
+/**
+ * AdminController
+ * High-level management operations for the entire platform.
+ */
+export const AdminController = {
 
-// MATCHES: AdminController.getStats
-export const getStats = async (req, res) => {
-  try {
-    const stats = await adminService.getUserStats();
-    res.status(200).json(stats);
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching stats" });
-  }
-};
+  // 1. SYSTEM-WIDE STATISTICS
+  // Powers the charts and "Total Revenue" cards on the Dashboard
+  getSystemStats: async (req, res) => {
+    try {
+      const stats = await AdminService.getSystemStats();
+      res.status(200).json(stats);
+    } catch (error) {
+      res.status(500).json({ 
+        message: "Error generating system report", 
+        error: error.message 
+      });
+    }
+  },
 
-// NEW: Added this so the route doesn't crash!
-export const getAllInventory = async (req, res) => {
-  try {
-    // For now, returning a placeholder until you have an Inventory model
-    res.status(200).json({ message: "Inventory data coming soon" });
-  } catch (error) {
-    res.status(500).json({ message: "Error fetching inventory" });
+  // USER MANAGEMENT
+  // Fetches everyone: Guests, Managers, and Admins
+  getAllUsers: async (req, res) => {
+    try {
+      const users = await AdminService.getAllUsers();
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching user database" });
+    }
+  },
+
+  // ROLE MANAGEMENT
+  // Allows Gabriel to promote a Guest to a Manager or Admin
+  updateUserRole: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { role, assignedHotel } = req.body; // assignedHotel is used if promoting to Manager
+      
+      const updatedUser = await AdminService.updateUserRole(id, role, assignedHotel);
+      res.status(200).json({ 
+        message: `User role updated to ${role}`, 
+        user: updatedUser 
+      });
+    } catch (error) {
+      res.status(400).json({ 
+        message: "Failed to update user role", 
+        error: error.message 
+      });
+    }
+  },
+
+  // GLOBAL INVENTORY AUDIT
+  // One view to see every hotel and every room currently in the system
+  getAllInventory: async (req, res) => {
+    try {
+      const inventory = await AdminService.getGlobalInventory();
+      res.status(200).json(inventory);
+    } catch (error) {
+      res.status(500).json({ message: "Error fetching global inventory audit" });
+    }
   }
 };

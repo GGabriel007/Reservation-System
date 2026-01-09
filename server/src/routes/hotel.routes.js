@@ -9,8 +9,8 @@ const router = Router();
  * PUBLIC ROUTES
  * Anyone (Guests) can view hotels and search for locations.
  */
-router.get("/", HotelController.getAllHotels);         // For the "Home Page" & "Room Listing"
-router.get("/:id", HotelController.getHotelById);      // For the "Room Details Page" 
+router.get("/", HotelController.getAllHotels);        
+router.get("/:id", HotelController.getHotelById);      
 
 /**
  * PROTECTED & AUTHORIZED ROUTES

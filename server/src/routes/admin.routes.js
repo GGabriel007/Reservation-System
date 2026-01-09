@@ -1,30 +1,39 @@
 import { Router } from "express";
-import * as AdminController from "../controllers/admin.controller.js";
-import ensureAuthenticated from "../middleware/authenticate.js";
-
+import { AdminController } from "../controllers/admin.controller.js";
+import { protect } from "../middleware/authMiddleware.js";
+import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = Router();
 
 /**
- * @route GET /admin
- * @desc Get all Admin users
- * @access Public
+ * ALL ADMIN ROUTES ARE PROTECTED
+ * Only users with the "admin" role can access this entire file.
  */
-router.get("/", AdminController.getAllInventory);
-
+router.use(protect);
+router.use(authorize("admin"));
 
 /**
- * @route   GET /admin/users
- * @desc    Fetch all registered users (for debugging/admin)
- * @access  Private (Authenticated)
+ * @route   GET /api/admin/stats
+ * @desc    Global dashboard stats (Total Revenue, Total Bookings, User counts)
  */
-router.get("/users", ensureAuthenticated, AdminController.getUsers);
-
+router.get("/stats", AdminController.getSystemStats);
 
 /**
- * @route   GET /admin/stats
- * @desc    Quick count of users by login method
+ * @route   GET /api/admin/users
+ * @desc    Manage the user database (View all staff and guests)
  */
-router.get("/stats", ensureAuthenticated, AdminController.getStats);
+router.get("/users", AdminController.getAllUsers);
+
+/**
+ * @route   PATCH /api/admin/users/:id/role
+ * @desc    Promote/Demote users (e.g., make a Guest a Manager)
+ */
+router.patch("/users/:id/role", AdminController.updateUserRole);
+
+/**
+ * @route   GET /api/admin/inventory
+ * @desc    Global inventory audit (All Hotels + All Rooms)
+ */
+router.get("/inventory", AdminController.getAllInventory);
 
 export default router;
