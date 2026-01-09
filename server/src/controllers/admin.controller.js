@@ -1,4 +1,4 @@
-import * as adminService from "../services/adminService.js";
+import * as adminService from "../services/admin.service.js";
 
 // AdminController.getUsers
 export const getUsers = async (req, res) => {

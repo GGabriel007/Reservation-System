@@ -1,38 +1,61 @@
-import mongoose, { get } from "mongoose";
 import { Hotel } from "../models/hotel.model.js";
 
-export const UserRepo = {
+/**
+ * HotelRepository
+ * Direct database access for the Hotel collection.
+ * Only CRUD operations happen here.
+ */
+export const HotelRepository = {
   /**
    * Get all Hotels
-   * @returns {Promise<Array>} Array of all Hotel documents
+   * Note: The 'pre-find' middleware in hotel.model.js 
+   * will automatically filter out isDeleted: true.
    */
-  getAllHotels: () => Hotel.find(),
-
-  /**
-   * get Hotel by Hotel name
-   * @param {Number} hotelName - The Hotel name to search for
-   * @returns {Promise<Object>} Hotel document based on Hotel number
-   */
-  getHotelByName: (hotelName) => {
-    return Hotel.findOne({ name: hotelName });
+  findAll: async () => {
+    return await Hotel.find();
   },
 
-  /**  * Update Hotel by Hotel name
-   * @param {String} hotelName - The name of the hotel to update
-   * @param {Object} updateData - The data to update the hotel with
-   * @returns {Promise<Object>} The updated hotel document
+  /**
+   * Find a specific hotel by its unique ID
    */
-  updateHotelByName: (hotelName, updateData) => {
-    return Hotel.findOneAndUpdate({ name: hotelName }, updateData, {
+  findById: async (id) => {
+    return await Hotel.findById(id);
+  },
+
+  /**
+   * Create a new hotel document
+   */
+  create: async (hotelData) => {
+    return await Hotel.create(hotelData);
+  },
+
+  /**
+   * Update a hotel by ID
+   * { new: true } returns the document AFTER the update is applied
+   */
+  update: async (id, updateData) => {
+    return await Hotel.findByIdAndUpdate(id, updateData, {
       new: true,
+      runValidators: true, // Ensures the update follows your Schema rules
     });
   },
 
-  /**  * Delete Hotel by Hotel name
-   * @param {String} hotelName - The name of the hotel to delete
-   * @returns {Promise<Object>} The deleted hotel document
+  /**
+   * Soft Delete a hotel
+   * Instead of removing from DB, we flip the isDeleted flag.
    */
-  deleteHotelByName: (hotelName) => {
-    return Hotel.findOneAndDelete({ name: hotelName });
+  softDelete: async (id) => {
+    return await Hotel.findByIdAndUpdate(
+      id, 
+      { isDeleted: true }, 
+      { new: true }
+    );
+  },
+
+  /**
+   * Optional: Search by Name (Useful for specific lookups)
+   */
+  findByName: async (hotelName) => {
+    return await Hotel.findOne({ name: hotelName });
   },
 };
