@@ -2,45 +2,73 @@ import mongoose from "mongoose";
 
 /**
  * Reservation Schema
- * Defines the structure of reservation documents in the MongoDB collection.
- * Fields:
- * - roomNumber: Reference to the reserved room (String, required)
- * - userId: Reference to the user who made the reservation (ObjectId, required)
- * - startTime: Start time of the reservation (Date, required)
- * - endTime: End time of the reservation (Date, required)
- * - status: Current status of the reservation (String, enum: ['pending', 'failed, 'confirmed', 'cancelled'], default: 'pending')
- * - reservationNumber: Unique identifier for the reservation (ObjectId, required, unique, auto-generated)
+ * The core transaction model linking Users, Rooms, and Hotels.
+ * * Fields:
+ * - userId: The guest who made the booking
+ * - roomId: The specific room being booked
+ * - hotelId: The hotel location (Crucial for Manager filtering)
+ * - checkIn / checkOut: The dates of the stay
+ * - totalAmount: The final price paid
+ * - status: 'pending', 'confirmed', 'cancelled', 'failed'
+ * - confirmationCode: Human-readable ID for guest lookups
  */
 const ReservationSchema = new mongoose.Schema({
-  roomNumber: {
-    type: String,
-    ref: "Room",
-    required: true,
-  },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
   },
-  startTime: {
+  roomId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Room",
+    required: true,
+  },
+  // CRITICAL: Links the booking to a location for Manager Dashboards
+  hotelId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Hotel",
+    required: true,
+  },
+  checkIn: {
     type: Date,
     required: true,
   },
-  endTime: {
+  checkOut: {
     type: Date,
+    required: true,
+  },
+  totalAmount: {
+    type: Number,
     required: true,
   },
   status: {
     type: String,
-    enum: ["pending", "failed", "confirmed", "cancelled"],
+    enum: ["pending", "confirmed", "cancelled", "failed"],
     default: "pending",
   },
-  reservationNumber: {
-    type: mongoose.Schema.Types.ObjectId,
-    required: true,
+  // Human-readable code for the "Check Reservation" page
+  // We can use a shorter string or the auto-generated _id
+  confirmationCode: {
+    type: String,
     unique: true,
-    auto: true,
+    default: function() {
+      return Math.random().toString(36).substring(2, 9).toUpperCase();
+    }
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  }
+}, { 
+  timestamps: true 
+});
+
+/**
+ * SOFT DELETION MIDDLEWARE
+ */
+ReservationSchema.pre(/^find/, function(next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
 });
 
 export const Reservation = mongoose.model("Reservation", ReservationSchema);

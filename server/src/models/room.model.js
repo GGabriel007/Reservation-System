@@ -2,38 +2,38 @@ import mongoose from "mongoose";
 
 /**
  * Room Schema
- * Defines the structure of room documents in the MongoDB collection.
- * Fields:
- * - roomName: Name of the room (String, required)
- * - roomType: Type of the room (String, enum: ['single', 'double', 'suite'], required)
- * - price: Price per night for the room (Number, required)
- * - numGuests: Maximum number of guests allowed in the room (Number, required)
- * - amenities: List of amenities available in the room (Array of Strings, optional)
- * - availabilityStatus: Current availability status of the room (String, enum: ['available', 'occupied', 'maintenance'], default: 'available')
- * - images: URLs of images of the room (Array of Strings, optional)
- * - hotel: Reference to the Hotel document this room belongs to (ObjectId, ref: 'Hotel', required)
+ * Defines the structure of room documents.
+ * Links to a specific Hotel and tracks pricing/capacity.
+ * * Fields:
+ * - roomName: Identifier for the room (e.g., "Room 302")
+ * - roomType: Enum category (single, double, suite)
+ * - basePrice: Cost per night (Requirement: pricing)
+ * - maxOccupancy: Max guests allowed (Requirement: capacity)
+ * - hotel: Reference to the parent Hotel document
+ * - isDeleted: Soft delete flag for inventory management
  */
 const RoomSchema = new mongoose.Schema({
   roomName: {
     type: String,
     required: true,
+    trim: true,
   },
   roomType: {
     type: String,
     enum: ["single", "double", "suite"],
     required: true,
   },
-  price: {
+  basePrice: {
     type: Number,
     required: true,
   },
-  numGuests: {
+  maxOccupancy: {
     type: Number,
     required: true,
   },
   amenities: {
     type: [String],
-    required: false,
+    default: [],
   },
   availabilityStatus: {
     type: String,
@@ -50,6 +50,20 @@ const RoomSchema = new mongoose.Schema({
     ref: "Hotel",
     required: true,
   },
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+}, { 
+  timestamps: true 
 });
 
-export const Room = mongoose.model("Reservation", RoomSchema);
+/**
+ * SOFT DELETION MIDDLEWARE
+ */
+RoomSchema.pre(/^find/, function(next) {
+  this.find({ isDeleted: { $ne: true } });
+  next();
+});
+
+export const Room = mongoose.model("Room", RoomSchema);
