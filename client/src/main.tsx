@@ -10,6 +10,7 @@ import {
   UserDashboard,
   Signup,
   AdminPanel,
+  CheckReservation,
 } from "./pages/index";
 
 /**
@@ -45,6 +46,10 @@ const router = createBrowserRouter([
       {
         path: "/adminPanel",
         element: <AdminPanel />,
+      },
+      {
+        path: "/check-reservation",
+        element: <CheckReservation />,
       },
     ],
   },

@@ -60,89 +60,58 @@ export default function Login() {
 
   return (
     <main className={styles.loginPage}>
-      <div className="w-full max-w-md bg-white p-8 border border-gray-200 rounded-xl shadow-sm">
-        <header className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Welcome</h1>
-          <p className="text-gray-500 mt-2">Log in</p>
-        </header>
-
-        {/* Success message from Signup page redirect */}
-        {signupSuccess && (
-          <div className="bg-green-50 text-green-700 p-3 rounded-md text-sm mb-6 border border-green-100">
-            Account created successfully! Please log in.
-          </div>
-        )}
-
-        {errorMessage && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm mb-6 border border-red-100">
-            {errorMessage}
-          </div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Email Address
+      <div className={styles["inner-grid"]}>
+        <h1>Welcome to Lioré</h1>
+        <h2>
+          Log In<span>* required</span>
+        </h2>
+        <div className="layout-grid">
+          {/* Success message from Signup page redirect */}
+          {signupSuccess && <p>Account created successfully! Please log in.</p>}
+          {errorMessage && <p>{errorMessage}</p>}
+          <form onSubmit={handleSubmit}>
+            <label className={styles.flex}>
+              Email Address *
+              <input
+                type="email"
+                placeholder="name@example.com"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
             </label>
-            <input
-              type="email"
-              className="border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-              placeholder="name@example.com"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
 
-          <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-gray-700">
-              Password
+            <label className={styles.flex}>
+              Password *
+              <input
+                type="password"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </label>
-            <input
-              type="password"
-              className="border border-gray-300 p-2.5 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none transition-all"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
 
-          <button
-            type="submit"
-            disabled={isSubmitting}
-            className={`w-full py-3 rounded-lg font-semibold text-white transition-all 
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className={`btn-primary btn-medium
               ${
                 isSubmitting
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 shadow-md"
               }`}
-          >
-            {isSubmitting ? "Logging in..." : "Login with Email"}
-          </button>
-        </form>
-
-        <div className="relative my-8">
-          <div className="absolute inset-0 flex items-center">
-            <span className="w-full border-t border-gray-200"></span>
-          </div>
+            >
+              {isSubmitting ? "Logging in..." : "Login with Email"}
+            </button>
+          </form>
+          <a className={styles.google} href={`${baseUrl}/auth/google/login`}>
+            Login with Google
+          </a>
         </div>
-
-        <a
-          href={`${baseUrl}/auth/google/login`}
-          className="flex items-center justify-center w-full py-2.5 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all gap-3"
-        >
-          Login with Google
-        </a>
-
-        <footer className="mt-8 text-center text-sm text-gray-600">
-          <Link
-            to="/signup"
-            className="text-blue-600 font-semibold hover:underline"
-          >
-            Sign up
-          </Link>
-        </footer>
+        <p>
+          Not yet a member? <Link to="/signup">Sign up</Link>
+        </p>
       </div>
     </main>
   );

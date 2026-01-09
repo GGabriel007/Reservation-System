@@ -1,0 +1,100 @@
+.signupPage {
+  background-image: url("/liore-transparent.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.inner-grid {
+  padding-block: 5em;
+}
+
+.signupPage form {
+  margin-block: 2em;
+}
+
+.signupPage h1 {
+  text-align: center;
+  font-weight: 600;
+  grid-column: span 12;
+}
+
+.signupPage h2 {
+  font-weight: 500;
+  grid-column: span 12;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.signupPage h2 span {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.signupPage form {
+  grid-column: span 6;
+  border-inline-end: 1px solid var(--black);
+}
+
+.flex {
+  display: flex;
+  flex-direction: column;
+  width: 60%;
+  gap: 10px;
+  margin-block-end: 40px;
+}
+
+.firstName,
+.lastName {
+  composes: flex;
+  width: 45%;
+  display: inline-flex;
+  margin-inline-end: 10px;
+}
+
+.signupPage form input {
+  padding: 0.5em 1em;
+}
+
+.google {
+  width: 60%;
+  display: flex;
+  grid-column: span 6;
+  margin-block: 4em;
+  padding: 0.5em 1em;
+  border: 1px solid var(--black);
+  height: fit-content;
+  color: var(--black);
+}
+
+.google:hover {
+  background-color: var(--light-grey);
+}
+
+@media screen and (max-width: 1024px) {
+  .signupPage form {
+    grid-column: span 3;
+  }
+  .flex {
+    margin-block-end: 20px;
+    width: 80%;
+  }
+
+  .firstName,
+  .lastName {
+    width: 80%;
+    display: flex;
+  }
+  .google {
+    grid-column: span 3;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .signupPage form {
+    border-inline-end: none;
+  }
+  .google {
+    margin: 0;
+  }
+}

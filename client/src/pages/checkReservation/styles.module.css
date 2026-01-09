@@ -1,0 +1,96 @@
+.checkReservationPage {
+  background-image: url("/liore-transparent.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+.inner-grid {
+  padding-block: 5em;
+}
+
+.checkReservationPage h1 {
+  text-align: center;
+  font-weight: 600;
+  grid-column: span 12;
+  margin-block-end: 20px;
+}
+
+.checkReservationPage h1 + p {
+  text-align: center;
+  grid-column: span 12;
+}
+
+.checkReservationPage h2 {
+  font-weight: 500;
+  grid-column: span 12;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.checkReservationPage h2 span {
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+.checkReservationPage form {
+  grid-column: span 12;
+  padding: 2em;
+  margin-block: 2em;
+  border: 1px solid var(--black);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px 10px;
+  justify-content: space-between;
+}
+
+.flex {
+  display: inline-flex;
+  flex-direction: column;
+  width: 45%;
+  gap: 10px;
+}
+
+.checkReservationPage form input {
+  padding: 0.5em 1em;
+}
+
+.checkReservationPage form p {
+  width: 100%;
+}
+
+.checkReservationPage form p:last-child {
+  margin-block-start: -40px;
+}
+
+.checkReservationPage form button {
+  margin-inline-start: auto;
+}
+
+.google {
+  width: 60%;
+  display: flex;
+  grid-column: span 6;
+  margin-block: 4em;
+  padding: 0.5em 1em;
+  border: 1px solid var(--black);
+  height: fit-content;
+  color: var(--black);
+}
+
+.google:hover {
+  background-color: var(--light-grey);
+}
+
+@media screen and (max-width: 768px) {
+  .checkReservationPage form {
+    gap: 10px 10px;
+  }
+  .flex {
+    width: 100%;
+  }
+  .checkReservationPage form p:last-child {
+    margin-block-start: 0;
+  }
+}
