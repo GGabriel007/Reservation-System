@@ -22,14 +22,12 @@ export default function AdminPanel() {
       try {
         const response = await fetch(`${baseUrl}/admin/users`, {
           method: "GET",
-          credentials: "include", // Required to send your session cookie
+          credentials: "include",
         });
 
-        if (!response.ok)
-          throw new Error("Failed to fetch users. Are you logged in?");
+        if (!response.ok) throw new Error("Unauthorized Access");
 
         const data = await response.json();
-        // Adjust this if your backend returns { users: [...] } instead of just [...]
         setUsers(Array.isArray(data) ? data : data.users);
       } catch (err: any) {
         setError(err.message);
@@ -41,49 +39,46 @@ export default function AdminPanel() {
     fetchUsers();
   }, [baseUrl]);
 
-  if (loading)
-    return <div className="p-8 text-center">Loading Database Data...</div>;
-  if (error)
-    return <div className="p-8 text-red-500 text-center">Error: {error}</div>;
+  if (loading) return <div className={styles.adminPanelPage}>Loading secure data...</div>;
+  if (error) return <div className={styles.adminPanelPage}>Error: {error}</div>;
 
   return (
     <main className={styles.adminPanelPage}>
-      <h1 className="text-3xl font-bold mb-6">Admin Dashboard</h1>
+      <header className={styles.headerArea}>
+        <h1>Lioré Administration</h1>
+        <p className={styles.statsText}>Managing {users.length} registered users</p>
+      </header>
 
-      <div className="bg-white border border-gray-200 rounded-lg shadow-sm overflow-hidden">
-        <div className="p-4 bg-gray-50 border-b border-gray-200">
-          <h2 className="text-lg font-semibold">
-            Registered Users ({users.length})
-          </h2>
+      <div className={styles.tableContainer}>
+        <div className={styles.tableHeader}>
+          <span>User Management Database</span>
+          {/* You could add a "Download CSV" or "Add User" button here later */}
         </div>
 
-        <table className="w-full text-left border-collapse">
+        <table className={styles.userTable}>
           <thead>
-            <tr className="bg-gray-100 text-sm uppercase text-gray-600">
-              <th className="p-4 border-b">ID</th>
-              <th className="p-4 border-b">Email</th>
-              <th className="p-4 border-b">Role</th>
-              <th className="p-4 border-b">Method</th>
+            <tr>
+              <th>Internal ID</th>
+              <th>Email Address</th>
+              <th>System Role</th>
+              <th>Auth Method</th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => (
-              <tr key={user._id} className="hover:bg-gray-50 transition-colors">
-                <td className="p-4 border-b text-xs text-gray-400">
-                  {user._id}
-                </td>
-                <td className="p-4 border-b font-medium">{user.email}</td>
-                <td className="p-4 border-b capitalize">{user.role}</td>
-                <td className="p-4 border-b">
-                  <span
-                    className={`px-2 py-1 rounded text-xs ${
-                      user.loginMethod === "google"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-green-100 text-green-700"
-                    }`}
-                  >
-                    {user.loginMethod}
+              <tr key={user._id} className={styles.userRow}>
+                <td className={styles.idCell}>{user._id.slice(-6)}...</td>
+                <td style={{ fontWeight: 500 }}>{user.email}</td>
+                <td>
+                  <span className={`${styles.roleBadge} ${user.role === 'admin' ? styles.roleAdmin : styles.roleGuest}`}>
+                    {user.role}
                   </span>
+                </td>
+                <td>
+                  <div className={styles.methodBadge}>
+                    <span className={`${styles.dot} ${user.loginMethod === 'google' ? styles.googleDot : styles.localDot}`}></span>
+                    {user.loginMethod}
+                  </div>
                 </td>
               </tr>
             ))}

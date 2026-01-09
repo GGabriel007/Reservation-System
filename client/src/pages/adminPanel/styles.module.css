@@ -1,0 +1,133 @@
+/* styles.module.css */
+:root {
+  --ebony: #121212;
+  --dark-green: #1B3022;
+  --vanilla: #F3E5AB;
+  --beige: #F5F5DC;
+  --silver: #C0C0C0;
+  --battleship-gray: #848884;
+  --dim-gray: #696969;
+}
+
+.adminPanelPage {
+  min-height: 100vh;
+  padding: 2em;
+  background-image: url("/liore-transparent.svg");
+  background-size: cover;
+  background-attachment: fixed;
+  color: var(--ebony);
+  font-family: 'Inter', sans-serif;
+}
+
+.headerArea {
+  margin-bottom: 3em;
+  border-bottom: 2px solid var(--dark-green);
+  padding-bottom: 1em;
+}
+
+.headerArea h1 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin: 0;
+  color: var(--dark-green);
+}
+
+.statsText {
+  color: var(--dim-gray);
+  font-size: 1rem;
+  margin-top: 0.5em;
+}
+
+.tableContainer {
+  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white to see background */
+  border: 1px solid var(--silver);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.tableHeader {
+  background-color: var(--dark-green);
+  color: var(--beige);
+  padding: 1.5em;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.userTable {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.userTable th {
+  background-color: var(--beige);
+  color: var(--dim-gray);
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 1px;
+  padding: 1.2em;
+  border-bottom: 2px solid var(--silver);
+}
+
+.userTable td {
+  padding: 1.2em;
+  border-bottom: 1px solid var(--beige);
+  font-size: 0.95rem;
+  vertical-align: middle;
+}
+
+.userRow:hover {
+  background-color: rgba(243, 229, 171, 0.3); /* Subtle Vanilla hover */
+  transition: background 0.2s ease;
+}
+
+.idCell {
+  font-family: monospace;
+  color: var(--battleship-gray);
+  font-size: 0.8rem;
+}
+
+.roleBadge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+/* Role Specific Colors */
+.roleAdmin {
+  background-color: var(--dark-green);
+  color: white;
+}
+
+.roleGuest {
+  background-color: var(--silver);
+  color: var(--ebony);
+}
+
+.methodBadge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+}
+
+.dot {
+  height: 8px;
+  width: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.googleDot { background-color: #4285F4; }
+.localDot { background-color: var(--dark-green); }
+
+@media screen and (max-width: 768px) {
+  .adminPanelPage { padding: 1em; }
+  .userTable th:nth-child(1), .userTable td:nth-child(1) { display: none; } /* Hide ID on mobile */
+}
