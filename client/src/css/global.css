@@ -3,6 +3,10 @@
   navigation: auto;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 main {
   min-height: 80vh;
 }

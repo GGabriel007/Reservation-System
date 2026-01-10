@@ -1,0 +1,56 @@
+.userDashboard > section {
+  margin-block: 3em;
+}
+
+.userDashboard h2 {
+  font-weight: 500;
+  margin-block-end: 1em;
+}
+
+.flex {
+  display: flex;
+  justify-content: space-between;
+}
+
+.current {
+  margin-block: 2em;
+}
+
+.currentDisplay {
+  height: 400px;
+  display: flex;
+  box-shadow: var(--light-grey) 0px 4px 10px 0px;
+}
+
+.currentDisplay img {
+  width: 50%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.userData {
+  width: 50%;
+  padding: 1em;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 4fr;
+  height: 100%;
+}
+
+.userData h3 {
+  font-weight: 500;
+  font-size: 1.25em;
+  grid-column: span 2;
+}
+
+.userDataDetail {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.userPreference {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}

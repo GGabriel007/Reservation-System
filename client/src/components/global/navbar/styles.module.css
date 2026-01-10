@@ -1,5 +1,6 @@
 nav {
   background-color: var(--theme-primary);
+  height: 56px;
 }
 
 nav a {

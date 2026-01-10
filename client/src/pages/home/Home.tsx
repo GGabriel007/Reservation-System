@@ -41,26 +41,67 @@ export default function Home() {
 
   return (
     <main className={styles.mainPage}>
-      <div className="inner-grid">
-        <Hero></Hero>
-        <h1>Home Page</h1>
-
-        {/* Backend Status Badge (Helpful for Developers & Users) */}
-        <div>
-          <span
-            className={`w-2.5 h-2.5 rounded-full ${
-              isConnected === true
-                ? "bg-green-500 animate-pulse"
-                : isConnected === false
-                ? "bg-red-500"
-                : "bg-yellow-500"
-            }`}
-          ></span>
-          <span>
-            The backend says :D <span>{serverStatus}</span>
-          </span>
+      <Hero></Hero>
+      <section className={styles["bg-beige"]}>
+        <div className={styles["inner-grid"]}>
+          <h2>Your new home with Lioré </h2>
+          <p>
+            Welcome to Lioré. We deliver the best hotel in town. ranging from
+            the suit to the garden house suit and local loves it.
+          </p>
         </div>
-      </div>
+      </section>
+      <section className={styles["stay-with-us"]} id="stay-with-us">
+        <div className={styles["inner-grid"]}>
+          <div className="layout-grid">
+            <div className={styles["col-left"]}>
+              <h2>Stay with us</h2>
+              <p>
+                Whether you're here for work or play, our fabulous suites and
+                rooms provide the perfect backdrop for an unforgettable stay
+              </p>
+              <button className="btn-secondary">Book a Room</button>
+            </div>
+            <img
+              src="homepage-stay-with-us.jpg"
+              alt=""
+              className={styles["col-right"]}
+            />
+          </div>
+        </div>
+      </section>
+      <section className={styles["bg-beige"]}>
+        <div className={styles["inner-grid"]}>
+          <h2 className={styles.quote}>
+            “Where there is history, there are always stories.”
+          </h2>
+        </div>
+      </section>
+      <section className={styles["dine"]} id="dine">
+        <div className={styles["inner-grid"]}>
+          <div className="layout-grid">
+            <div className={styles["col-left"]}>
+              <h2>Delicious Dining</h2>
+              <p>
+                Embark on an exquisite culinary adventure where refined flavors,
+                artful presentation, and inspired craftsmanship come together to
+                create an unforgettable dining experience.
+              </p>
+              <button className="btn-secondary">Discover</button>
+              <img src="/dine1.jpg" alt="" />
+            </div>
+            <div className={styles["col-right"]}>
+              <img src="/dine2.jpg" alt="" />
+              <h2>From the Source</h2>
+              <p>
+                More than a restaurant: it is the beating heart of our hotel and
+                the city that surrounds it. A place to share happy memories and
+                delicious delights. 
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
