@@ -64,19 +64,19 @@ export default function UserDashboard() {
    * Session Termination
    * Communicates with the backend to destroy the session and clear local user state.
    */
-  const handleLogout = async () => {
-    try {
-      // FIX: Removed the starting slash from "/auth/logout" to prevent "//"
-      await fetch(`${baseUrl}/auth/logout`, {
-        method: "GET",
-        credentials: "include",
-      });
-      setUser(null);
-      navigate("/login");
-    } catch (err) {
-      console.error("Logout failed", err);
-    }
-  };
+  // const handleLogout = async () => {
+  //   try {
+  //     // FIX: Removed the starting slash from "/auth/logout" to prevent "//"
+  //     await fetch(`${baseUrl}/auth/logout`, {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
+  //     setUser(null);
+  //     navigate("/login");
+  //   } catch (err) {
+  //     console.error("Logout failed", err);
+  //   }
+  // };
 
   // Prevent flashing of dashboard content before authentication check completes
   if (loading) {

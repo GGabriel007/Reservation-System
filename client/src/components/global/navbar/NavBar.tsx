@@ -44,8 +44,8 @@ export default function Navbar() {
    * React Router's NavLink provides an 'isActive' boolean.
    * This function ensures the user knows exactly which page they are currently viewing.
    */
-  const linkClass = ({ isActive }: { isActive: boolean }) =>
-    isActive ? styles.active : "";
+  // const linkClass = ({ isActive }: { isActive: boolean }) =>
+  //   isActive ? styles.active : "";
 
   return (
     <header>
@@ -60,13 +60,9 @@ export default function Navbar() {
           <div className={styles.navlinks}>
             {currentPath === "/" && (
               <>
-                <HashLink to="/#stay-with-us" className={linkClass}>
-                  Stay
-                </HashLink>
+                <HashLink to="/#stay-with-us">Stay</HashLink>
 
-                <HashLink to="/#dine" className={linkClass}>
-                  Dinning
-                </HashLink>
+                <HashLink to="/#dine">Dinning</HashLink>
               </>
             )}
 

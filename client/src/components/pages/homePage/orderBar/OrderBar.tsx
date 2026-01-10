@@ -45,7 +45,9 @@ export default function OrderBar() {
   const [children, setChildren] = useState<number>(0);
   const [bed, setBed] = useState<number>(0);
 
-  const handleGuestButtonClick = (event: MouseEvent) => {
+  const handleGuestButtonClick = (
+    event: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     const bubble = document.querySelector("[class*=bubble]") as HTMLElement;
     if (bubble) {
       const guest = document.querySelector("[class*=guest]") as HTMLElement;
@@ -69,22 +71,23 @@ export default function OrderBar() {
       <div className={styles["inner-grid"]}>
         <DatePicker
           selected={selectedDate}
-          onChange={(date) => setStartDate(date)}
+          onChange={(date: any) => setStartDate(date)}
           customInput={<CustomInputButton className={styles.startDate} />}
           className={styles["datepicker-container"]}
           selectsStart
           startDate={selectedDate}
           endDate={endDate}
+          maxDate={endDate || new Date(2026, 12, 31)}
         />
         <DatePicker
           selected={endDate}
-          onChange={(date) => setEndDate(date)}
+          onChange={(date: any) => setEndDate(date)}
           customInput={<CustomInputButton2 className={styles.endDate} />}
           className={styles["datepicker-container"]}
           selectsEnd
           startDate={selectedDate}
           endDate={endDate}
-          minDate={selectedDate}
+          minDate={selectedDate || new Date()}
         />
         <button className={styles.guest} onClick={handleGuestButtonClick}>
           Guests

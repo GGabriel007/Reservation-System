@@ -37,6 +37,8 @@ export default function Home() {
         setServerStatus("Server is currently unreachable.");
         setIsConnected(false);
       });
+    console.log(serverStatus);
+    console.log(isConnected);
   }, [baseUrl]);
 
   return (
