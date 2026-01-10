@@ -67,6 +67,30 @@ export const ReservationService = {
     return await ReservationRepository.updateStatus(id, "cancelled");
   },
 
+  lookupReservation: async (confirmationCode, lastName, email) => {
+    // Fetch the reservation using the new repository method
+    const reservation = await ReservationRepository.findByCodeWithUser(confirmationCode);
+
+    // If no reservation matches that code
+    if (!reservation) {
+      throw new Error("No reservation found with that confirmation code");
+    }
+
+    // The 'userId' field is now a full User object thanks to .populate()
+    const guest = reservation.userId;
+
+    // Case-insensitive comparison
+    const isEmailMatch = guest.email.toLowerCase() === email.toLowerCase();
+    const isLastNameMatch = guest.lastName.toLowerCase() === lastName.toLowerCase();
+
+    if (!isEmailMatch || !isLastNameMatch) {
+      throw new Error("The details provided do not match our records.");
+    }
+
+    // If everything matches, return the reservation
+    return reservation;
+  },
+
   getReservationsByUser: async (userId) => {
     return await ReservationRepository.findByUserId(userId);
   },

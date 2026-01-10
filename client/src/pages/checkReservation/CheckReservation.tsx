@@ -1,18 +1,16 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./styles.module.css";
-/**
- * Check for Reservation Page Component
- * for users to check reservation using their reservation number
- */
+
 export default function CheckReservation() {
   const [reservationNumber, setReservationNumber] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
+  const [email, setEmail] = useState<string>(""); // Added Email state
   const [errorMessage, setErrorMessage] = useState<string>("");
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const navigate = useNavigate();
-  // Environment-based API selection
+
   const baseUrl: string = import.meta.env.DEV
     ? "http://localhost:8080"
     : "http://liore.us-east-1.elasticbeanstalk.com";
@@ -22,23 +20,29 @@ export default function CheckReservation() {
     setErrorMessage("");
     setIsSubmitting(true);
 
+    // Convert inputs into Query Parameters for the GET request
+    const params = new URLSearchParams({
+      confirmationCode: reservationNumber,
+      lastName: lastName,
+      email: email
+    });
+
     try {
-      const response = await fetch(`${baseUrl}/reservation`, {
+      const response = await fetch(`${baseUrl}/reservations/lookup?${params.toString()}`, {
         method: "GET",
-        credentials: "include", // Required to receive and store the 'sid' session cooki
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ reservationNumber, lastName }),
+        credentials: "include",
       });
+
       if (response.ok) {
-        navigate("/user");
+        const reservationData = await response.json();
+        // Navigate to your "foundReservation" page and pass the data via state
+        navigate("/found-reservation", { state: { reservation: reservationData } });
       } else {
-        const errorData = await response
-          .json()
-          .catch(() => ({ message: "Invalid credentials" }));
-        setErrorMessage(errorData.message || "Login failed");
+        const errorData = await response.json().catch(() => ({ message: "Reservation not found" }));
+        setErrorMessage(errorData.message || "Could not find a reservation with those details.");
       }
     } catch (error) {
-      console.error("Login network error:", error);
+      console.error("Lookup error:", error);
       setErrorMessage("Could not connect to the server.");
     } finally {
       setIsSubmitting(false);
@@ -49,20 +53,20 @@ export default function CheckReservation() {
     <main className={styles.checkReservationPage}>
       <div className={styles["inner-grid"]}>
         <h1>Welcome to Lioré</h1>
-        <p>Thank you for booking your stay with us </p>
+        <p>Thank you for booking your stay with us</p>
         <div className="layout-grid">
-          {errorMessage && <p>{errorMessage}</p>}
+          {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
 
-          {/* Success message from Signup page redirect */}
-          <form onSubmit={handleSubmit}>
+          <form onSubmit={handleSubmit} className={styles.formContainer}>
             <h2>
-              Enter your reservation number<span>* required</span>
+              Look up your stay <span>* required</span>
             </h2>
+
             <label className={styles.flex}>
-              Reservation Number *
+              Confirmation Number *
               <input
                 type="text"
-                placeholder="1FSDIE239"
+                placeholder="e.g. 8220YOU"
                 value={reservationNumber}
                 onChange={(e) => setReservationNumber(e.target.value)}
                 required
@@ -73,9 +77,20 @@ export default function CheckReservation() {
               Last Name *
               <input
                 type="text"
-                placeholder="Last Name"
+                placeholder="e.g. Smith"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                required
+              />
+            </label>
+
+            <label className={styles.flex}>
+              Email Address *
+              <input
+                type="email"
+                placeholder="e.g. guest@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
               />
             </label>
@@ -83,23 +98,15 @@ export default function CheckReservation() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`btn-primary btn-medium
-              ${
-                isSubmitting
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-blue-600 hover:bg-blue-700 shadow-md"
-              }`}
+              className={styles.submitBtn}
             >
-              {isSubmitting
-                ? "Looking for reservation..."
-                : "Look for reservation"}
+              {isSubmitting ? "Searching..." : "Find Reservation"}
             </button>
-            <p>
-              Have an account with us? <Link to="/login">Sign In</Link>
-            </p>
-            <p>
-              Want to join as a member? <Link to="/signup">Sign Up</Link>
-            </p>
+
+            <div className={styles.links}>
+              <p>Have an account? <Link to="/login">Sign In</Link></p>
+              <p>Want to join? <Link to="/signup">Sign Up</Link></p>
+            </div>
           </form>
         </div>
       </div>

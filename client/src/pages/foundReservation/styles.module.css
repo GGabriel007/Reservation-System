@@ -1,0 +1,63 @@
+.mainPage {
+  padding: 4rem 1rem;
+  background-color: #f9f9f9;
+  min-height: 100vh;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.detailsCard {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.statusBadge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  background: #eee;
+}
+
+/* Example coloring based on status */
+.statusBadge[data-status="confirmed"] { background: #e6f4ea; color: #1e7e34; }
+.statusBadge[data-status="pending"] { background: #fff4e5; color: #b7791f; }
+.statusBadge[data-status="cancelled"] { background: #fdecea; color: #d93025; }
+
+.infoRow {
+  display: flex;
+  justify-content: space-between;
+  margin: 1rem 0;
+}
+
+.dateGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  background: #fcfcfc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1.5rem 0;
+}
+
+.label { font-size: 0.75rem; color: #666; text-transform: uppercase; margin-bottom: 0.25rem; }
+.value { font-size: 1.1rem; font-weight: 500; }
+.price { font-size: 1.5rem; color: #1a1a1a; }
+
+.homeBtn {
+  display: block;
+  text-align: center;
+  margin-top: 2rem;
+  color: #c5a059; /* Your gold brand color */
+  text-decoration: none;
+  font-weight: 500;
+}

@@ -79,6 +79,30 @@ export const ReservationController = {
     }
   },
 
+  getReservationByLookup: async (req, res) => {
+    try {
+      // Data comes from the URL: /api/reservations/lookup?confirmationCode=XXX&lastName=YYY&email=ZZZ
+      const { confirmationCode, lastName, email } = req.query;
+
+      if (!confirmationCode || !lastName || !email) {
+        return res.status(400).json({ message: "All search fields are required" });
+      }
+
+      const reservation = await ReservationService.lookupReservation(
+        confirmationCode, 
+        lastName, 
+        email
+      );
+      
+      // Success! Send the reservation data back to the frontend
+      res.status(200).json(reservation);
+    } catch (error) {
+      // Distinguish between "Not Found" and "Wrong Details" for better UX
+      const status = error.message.includes("not match") ? 401 : 404;
+      res.status(status).json({ message: error.message });
+    }
+  },
+
   // UPDATE STATUS (ADMIN/MANAGER)
   updateStatus: async (req, res) => {
     try {

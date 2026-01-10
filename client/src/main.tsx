@@ -11,7 +11,10 @@ import {
   Signup,
   AdminPanel,
   CheckReservation,
+  Checkout,
   BookRoom,
+  RoomListing,
+  FoundReservation,
 } from "./pages/index";
 
 /**
@@ -55,6 +58,18 @@ const router = createBrowserRouter([
       {
         path: "/bookroom",
         element: <BookRoom />,
+      },
+      {
+        path: "/roomlisting",
+        element: <RoomListing />,
+      },
+      {
+        path: "/checkout/:roomId",
+        element: <Checkout />,
+      },
+      {
+        path: "/found-reservation",
+        element: <FoundReservation />,
       },
     ],
   },

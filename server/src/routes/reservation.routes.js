@@ -17,6 +17,7 @@ const router = Router();
  * PROTECTED ROUTES
  * All reservation actions require the user to be logged in.
  */
+router.get("/lookup", ReservationController.getReservationByLookup);
 router.use(protect); 
 
 // GUEST ACTIONS

@@ -45,12 +45,47 @@
   justify-content: space-between;
 }
 
+.errorText {
+  color: #d9534f;
+  background: #f9ebeb;
+  padding: 1rem;
+  border-radius: 4px;
+  grid-column: span 12;
+  text-align: center;
+}
+
 .flex {
   display: inline-flex;
   flex-direction: column;
-  width: 45%;
+  /* Adjust width to accommodate 3 items in a row or 2+1 */
+  width: 30%; 
+  min-width: 250px;
   gap: 10px;
 }
+
+.submitBtn {
+  margin-top: 1rem;
+  padding: 0.8rem 2rem;
+  background-color: #1a56db;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.submitBtn:disabled {
+  background-color: #9ca3af;
+}
+
+.links {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
 
 .checkReservationPage form input {
   padding: 0.5em 1em;

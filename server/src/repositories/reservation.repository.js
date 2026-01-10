@@ -60,5 +60,13 @@ export const ReservationRepository = {
       { status },
       { new: true }
     );
-  }
+  },
+
+  findByCodeWithUser: async (code) => {
+    // This finds the reservation and "joins" the User document
+    return await Reservation.findOne({ 
+      confirmationCode: code.toUpperCase(),
+      isDeleted: { $ne: true } 
+    }).populate("userId");
+  },
 };
