@@ -73,4 +73,8 @@ const userSchema = new mongoose.Schema({
   },
 });
 
+userSchema.pre(/^find/, function() {
+  this.where({ isDeleted: { $ne: true } });
+});
+
 export const User = mongoose.model("User", userSchema);

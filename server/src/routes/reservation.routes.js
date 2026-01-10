@@ -3,6 +3,14 @@ import { ReservationController } from "../controllers/reservation.controller.js"
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 
+console.log("DEBUG - protect:", typeof protect);
+console.log("DEBUG - authorize:", typeof authorize);
+console.log("DEBUG - Controller Object:", typeof ReservationController);
+if (ReservationController) {
+    console.log("DEBUG - getMyReservations:", typeof ReservationController.getMyReservations);
+    console.log("DEBUG - getAllReservations:", typeof ReservationController.getAllReservations);
+}
+
 const router = Router();
 
 /**

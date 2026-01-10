@@ -1,7 +1,7 @@
 import mongoose, { get } from "mongoose";
 import { Reservation } from "../models/reservation.model.js";
 
-export const ReservationRepo = {
+export const ReservationRepository = {
   /**
    * Get all reservations
    * Includes populate so Admin can see Guest names and Hotel names.

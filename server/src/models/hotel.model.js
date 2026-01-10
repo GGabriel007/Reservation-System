@@ -56,9 +56,8 @@ const HotelSchema = new mongoose.Schema({
  * This automatically filters out hotels marked as 'isDeleted'
  * so they don't show up in your "Listing" or "Search" results.
  */
-HotelSchema.pre(/^find/, function(next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
+HotelSchema.pre(/^find/, function() {
+  this.where({ isDeleted: { $ne: true } });
 });
 
 export const Hotel = mongoose.model("Hotel", HotelSchema);

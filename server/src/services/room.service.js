@@ -38,15 +38,17 @@ export const RoomService = {
    * Ensures data is formatted correctly before saving.
    */
   createRoom: async (roomData) => {
-    // Logic: Ensure price is not negative
-    if (roomData.basePrice < 0) {
-      throw new Error("Base price cannot be negative");
+    // 1. Handle price check (checking both 'price' and 'basePrice' to be safe)
+    const priceToCheck = roomData.basePrice ?? roomData.price;
+    if (priceToCheck !== undefined && priceToCheck < 0) {
+      throw new Error("Price cannot be negative");
     }
 
-    // Logic: Ensure room name is cleaned up
+    // 2. Defensive Formatting: 
+    // We check if roomName exists before trimming to avoid the crash
     const formattedData = {
       ...roomData,
-      roomName: roomData.roomName.trim()
+      roomName: roomData.roomName ? roomData.roomName.trim() : `Room ${roomData.roomNumber}`
     };
 
     return await RoomRepository.create(formattedData);

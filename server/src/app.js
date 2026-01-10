@@ -9,6 +9,10 @@ import authRoutes from "./routes/auth.routes.js";
 import adminRoutes from "./routes/admin.routes.js";
 import path from "path";
 import { fileURLToPath } from "url";
+import hotelRoutes from "./routes/hotel.routes.js";
+import roomRoutes from "./routes/room.routes.js";
+import reservationRoutes from "./routes/reservation.routes.js";
+import transactionRoutes from "./routes/transaction.routes.js";
 
 // --- ES MODULE FIX FOR __dirname ---
 const __filename = fileURLToPath(import.meta.url);
@@ -81,6 +85,10 @@ app.use((req, res, next) => {
 // API Routes
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
+app.use("/hotels", hotelRoutes);      
+app.use("/rooms", roomRoutes);        
+app.use("/reservations", reservationRoutes); 
+app.use("/transactions", transactionRoutes); 
 
 app.get("/api/health", (req, res) => {
   res.send("Online and Connected!");
@@ -108,4 +116,6 @@ app.get(/.*/, (req, res) => {
         }
     });
 });
+
+
 export default app;

@@ -63,9 +63,8 @@ const TransactionSchema = new mongoose.Schema({
  * SOFT DELETION MIDDLEWARE
  * Transactions should rarely be deleted, but this keeps the logic consistent.
  */
-TransactionSchema.pre(/^find/, function(next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
+TransactionSchema.pre(/^find/, function() {
+  this.where({ isDeleted: { $ne: true } });
 });
 
 export const Transaction = mongoose.model("Transaction", TransactionSchema);

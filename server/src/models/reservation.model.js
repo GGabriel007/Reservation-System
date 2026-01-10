@@ -66,9 +66,8 @@ const ReservationSchema = new mongoose.Schema({
 /**
  * SOFT DELETION MIDDLEWARE
  */
-ReservationSchema.pre(/^find/, function(next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
+ReservationSchema.pre(/^find/, function() {
+  this.where({ isDeleted: { $ne: true } });
 });
 
 export const Reservation = mongoose.model("Reservation", ReservationSchema);

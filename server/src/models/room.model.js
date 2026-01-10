@@ -61,9 +61,8 @@ const RoomSchema = new mongoose.Schema({
 /**
  * SOFT DELETION MIDDLEWARE
  */
-RoomSchema.pre(/^find/, function(next) {
-  this.find({ isDeleted: { $ne: true } });
-  next();
+RoomSchema.pre(/^find/, function() {
+  this.where({ isDeleted: { $ne: true } });
 });
 
 export const Room = mongoose.model("Room", RoomSchema);

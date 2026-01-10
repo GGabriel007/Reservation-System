@@ -9,7 +9,7 @@ export const ReservationController = {
   // CREATE RESERVATION
   createReservation: async (req, res) => {
     try {
-      // We take the userId directly from the authenticated token for security
+      // Take the userId directly from the authenticated token for security
       const reservationData = {
         ...req.body,
         userId: req.user.id 
@@ -25,6 +25,7 @@ export const ReservationController = {
   // GET GUEST'S OWN BOOKINGS
   getMyReservations: async (req, res) => {
     try {
+      // Call getReservationsByUser instead of getAllReservations
       const reservations = await ReservationService.getReservationsByUser(req.user.id);
       res.status(200).json(reservations);
     } catch (error) {
