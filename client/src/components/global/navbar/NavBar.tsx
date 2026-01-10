@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation } from "react-router-dom";
+import { HashLink } from "react-router-hash-link";
 import styles from "./styles.module.css";
 
 /**
@@ -36,6 +37,8 @@ export default function Navbar() {
   //   }
   // };
 
+  const location = useLocation();
+  const currentPath = location.pathname;
   /**
    * Dynamic Styling Helper
    * React Router's NavLink provides an 'isActive' boolean.
@@ -55,13 +58,17 @@ export default function Navbar() {
 
           {/* Navigation Links */}
           <div className={styles.navlinks}>
-            <NavLink to="/stay" className={linkClass}>
-              Stay
-            </NavLink>
+            {currentPath === "/" && (
+              <>
+                <HashLink to="/#stay-with-us" className={linkClass}>
+                  Stay
+                </HashLink>
 
-            <NavLink to="/dinning" className={linkClass}>
-              Dinning
-            </NavLink>
+                <HashLink to="/#dine" className={linkClass}>
+                  Dinning
+                </HashLink>
+              </>
+            )}
 
             <NavLink to="/login" className="btn-transparent">
               Sign In
@@ -69,7 +76,7 @@ export default function Navbar() {
 
             {/* Admin access (Visible logic can be added later based on user role) */}
             <NavLink to="/bookroom" className="btn-secondary">
-              Book
+              Book Now
             </NavLink>
           </div>
         </div>

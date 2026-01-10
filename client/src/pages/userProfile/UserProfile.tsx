@@ -5,9 +5,11 @@ import styles from "./styles.module.css";
  */
 export default function UserProfile() {
   return (
-    <main className={styles.mainPage}>
+    <main className={styles.userProfile}>
       <div className="inner-grid">
-        <div className="layout-grid"></div>
+        <div className="layout-grid">
+          <h2>Welcome back to Lioré, Jessica</h2>
+        </div>
       </div>
     </main>
   );

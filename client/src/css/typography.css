@@ -65,5 +65,5 @@
 
 html {
   font-family: "Montserrat";
-  font-size: calc(0.875rem + ((1vw - 7.68px) * 0.5208));
+  font-size: clamp(14px, calc(0.875rem + ((1vw - 7.68px) * 0.5208)), 20px);
 }

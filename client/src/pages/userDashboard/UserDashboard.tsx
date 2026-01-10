@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
+import { Visit } from "../../components/pages/userDashboardPage/index";
 
 /**
  * User Interface
@@ -11,6 +12,7 @@ interface User {
   _id: string;
   email: string;
   role?: string;
+  firstName?: string;
 }
 
 export default function UserDashboard() {
@@ -85,50 +87,65 @@ export default function UserDashboard() {
     );
   }
 
+  const userData = {
+    reservationNumber: [123, 144],
+    roomList: ["one", "two"],
+  };
+
+  const roomData = {
+    roomName: "Fairmont Resort",
+    reservationNumber: "A1002933843",
+    checkIn: "12/18/2025",
+    checkOut: "12/19/2025",
+    room: 1,
+    adults: 1,
+    children: 2,
+    beds: 1,
+    specialRequest: "",
+  };
+
   return (
-    <main className={styles.userDashboardPage}>
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800">Account Overview</h1>
-        <p className="text-gray-600">Profile settings.</p>
-      </header>
-
-      <div className="bg-white border border-gray-200 p-8 rounded-lg shadow-sm">
-        <div className="space-y-4">
-          <section>
-            <label className="block text-sm font-semibold text-gray-500 uppercase">
-              Email Address
-            </label>
-            <p className="text-lg text-gray-900">{user?.email}</p>
-          </section>
-
-          <section>
-            <label className="block text-sm font-semibold text-gray-500 uppercase">
-              Database Identifier
-            </label>
-            <p className="text-sm font-mono text-gray-700 bg-gray-50 p-2 rounded">
-              {user?._id}
-            </p>
-          </section>
-
-          <section>
-            <label className="block text-sm font-semibold text-gray-500 uppercase">
-              Account Role
-            </label>
-            <p className="inline-block px-3 py-1 text-xs font-bold tracking-wide text-blue-700 bg-blue-100 rounded-full uppercase">
-              {user?.role || "Guest"}
-            </p>
-          </section>
+    <main className={styles.userDashboard}>
+      <section className="inner-grid">
+        <div className={styles.flex}>
+          <h2>Welcome back to Lioré, {user?.firstName}</h2>
+          <button className="btn-secondary btn-medium">Vew Profile</button>
         </div>
-
-        <div className="mt-10 pt-6 border-t border-gray-100">
-          <button
-            onClick={handleLogout}
-            className="bg-red-50 text-red-600 border border-red-200 px-6 py-2 rounded-md font-medium hover:bg-red-600 hover:text-white transition-all duration-200"
-          >
-            Sign Out
-          </button>
-        </div>
-      </div>
+        <section className={styles.current}>
+          <h2>Current Visit</h2>
+          <section className={styles.currentDisplay}>
+            <img src="/burmont-suit.jpg" alt="" />
+            <div className={styles.userData}>
+              <h3>{roomData.roomName}</h3>
+              <div className={styles.userDataDetail}>
+                <div>
+                  <h4>reservation number:</h4>
+                  <p>{roomData.reservationNumber}</p>
+                </div>
+                <div>
+                  <h4>check in:</h4>
+                  <p>{roomData.checkIn}</p>
+                </div>
+                <div>
+                  <h4>check out:</h4>
+                  <p>{roomData.checkOut}</p>
+                </div>
+              </div>
+              <div className={styles.userPreference}>
+                <h4>Preference: </h4>
+                <p>{roomData.room} room</p>
+                <p>
+                  {roomData.adults} adult, {roomData.children} Children
+                </p>
+                <p>{roomData.beds} beds</p>
+                {roomData.specialRequest && <p>{roomData.specialRequest}</p>}
+              </div>
+            </div>
+          </section>
+        </section>
+        <Visit timeline="past" userData={userData}></Visit>
+        <Visit timeline="future" userData={userData}></Visit>
+      </section>
     </main>
   );
 }
