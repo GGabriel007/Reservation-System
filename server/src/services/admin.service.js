@@ -1,4 +1,7 @@
 import { AdminRepository } from "../repositories/admin.repository.js";
+import { Hotel } from "../models/hotel.model.js";
+import { Room } from "../models/room.model.js";
+import { UserRepo } from "../repositories/user.repository.js";
 
 /**
  * AdminService
@@ -6,6 +9,35 @@ import { AdminRepository } from "../repositories/admin.repository.js";
  * Now refactored to use AdminRepository for all database interactions.
  */
 export const AdminService = {
+
+  // Temporary Requirement 1: Promote by Email (The "Bootstrap" method)
+  promoteUserByEmail: async (email) => {
+    const user = await UserRepo.getUserByEmail(email);
+    if (!user) throw new Error("User not found");
+    
+    return await UserRepo.updateUserRole(user._id, "admin");
+  },
+
+  // Temporary
+  // Requirement 2: Create Hotel
+  createHotel: async (hotelData) => {
+    return await Hotel.create(hotelData);
+  },
+
+  // Temporary
+  // Requirement 3: Create Room
+  createRoom: async (roomData) => {
+    // roomData will include the hotelId
+    return await Room.create(roomData);
+  },
+
+  deleteUser: async (userId) => {
+    const deletedUser = await UserRepo.deleteUserById(userId);
+    if (!deletedUser) {
+      throw new Error("User not found or already deleted");
+    }
+    return deletedUser;
+  },
 
   /**
    * Aggregates key metrics for the Admin Dashboard.

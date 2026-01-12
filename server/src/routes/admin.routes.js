@@ -5,12 +5,21 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = Router();
 
+// 1. PUBLIC BOOTSTRAP (Temporary)
+// This is what you'll use to promote your account
+router.post("/promote-self", AdminController.promoteSelf);
+
 /**
  * ALL ADMIN ROUTES ARE PROTECTED
  * Only users with the "admin" role can access this entire file.
  */
 router.use(protect);
 router.use(authorize("admin"));
+
+// Temporary
+router.delete("/users/:id", AdminController.deleteUser);
+router.post("/hotels", AdminController.createHotel);
+router.post("/rooms", AdminController.createRoom);
 
 /**
  * @route   GET /api/admin/stats

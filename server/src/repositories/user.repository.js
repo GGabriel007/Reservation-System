@@ -71,4 +71,24 @@ export const UserRepo = {
   filterRoles: async (role) => {
     return User.find({ role: role });
   },
+
+  // Temporary method
+  updateUserRole: async (userId, newRole) => {
+      return await User.findByIdAndUpdate(
+        userId, 
+        { role: newRole }, 
+        { new: true }
+      );
+  },
+
+  /**
+   * Delete user by ID
+   * @param {string} id
+   * @returns {Promise<Object>} deleted user document
+   */
+  deleteUserById: async (id) => {
+    return await User.findByIdAndDelete(id);
+  },
+
+
 };

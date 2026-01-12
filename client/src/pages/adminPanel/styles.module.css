@@ -1,133 +1,180 @@
-/* styles.module.css */
-:root {
-  --ebony: #121212;
-  --dark-green: #1B3022;
-  --vanilla: #F3E5AB;
-  --beige: #F5F5DC;
-  --silver: #C0C0C0;
-  --battleship-gray: #848884;
-  --dim-gray: #696969;
-}
-
+/* Container */
 .adminPanelPage {
-  min-height: 100vh;
-  padding: 2em;
-  background-image: url("/liore-transparent.svg");
-  background-size: cover;
-  background-attachment: fixed;
-  color: var(--ebony);
+  padding: 40px 20px;
+  max-width: 1000px;
+  margin: 0 auto;
   font-family: 'Inter', sans-serif;
+  color: #333;
 }
 
+/* Header */
 .headerArea {
-  margin-bottom: 3em;
-  border-bottom: 2px solid var(--dark-green);
-  padding-bottom: 1em;
+  margin-bottom: 40px;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 20px;
 }
 
 .headerArea h1 {
-  font-size: 2.5rem;
-  font-weight: 600;
+  font-size: 2rem;
   margin: 0;
-  color: var(--dark-green);
+  color: #1a1a1a;
 }
 
 .statsText {
-  color: var(--dim-gray);
-  font-size: 1rem;
-  margin-top: 0.5em;
+  color: #666;
+  font-size: 0.9rem;
 }
 
-.tableContainer {
-  background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white to see background */
-  border: 1px solid var(--silver);
+/* Section Cards */
+.adminSection {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  max-width: 1200px;
-  margin: 0 auto;
+  padding: 24px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+}
+
+.sectionHeader {
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+  color: #c5a059; /* Brand Gold */
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* Forms */
+.adminForm, .adminFormGrid {
+  display: flex;
+  gap: 12px;
+}
+
+.adminFormGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr; /* Two column layout */
+}
+
+/* Make textarea and select span full width if needed */
+.adminFormGrid textarea, .adminFormGrid select:first-child {
+  grid-column: span 2;
+}
+
+input, select, textarea {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 0.95rem;
+  width: 100%;
+}
+
+input:focus {
+  outline: none;
+  border-color: #c5a059;
+}
+
+/* Buttons */
+.promoteBtn, .createBtn {
+  padding: 12px 24px;
+  background: #1a1a1a;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.createBtn {
+  background: #c5a059;
+  grid-column: span 2;
+}
+
+.promoteBtn:hover, .createBtn:hover {
+  opacity: 0.9;
+}
+
+/* Feedback & Errors */
+.feedbackText {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.unauthorizedError {
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  color: #c53030;
+}
+
+/* User Table */
+.tableContainer {
+  margin-top: 40px;
+  overflow-x: auto;
 }
 
 .tableHeader {
-  background-color: var(--dark-green);
-  color: var(--beige);
-  padding: 1.5em;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  font-weight: 600;
+  padding: 12px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-bottom: none;
 }
 
 .userTable {
   width: 100%;
   border-collapse: collapse;
+  background: white;
+  border: 1px solid #e0e0e0;
+}
+
+.userTable th, .userTable td {
+  padding: 15px;
   text-align: left;
+  border-bottom: 1px solid #eee;
 }
 
 .userTable th {
-  background-color: var(--beige);
-  color: var(--dim-gray);
+  background: #fcfcfc;
+  font-size: 0.85rem;
+  color: #888;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 1px;
-  padding: 1.2em;
-  border-bottom: 2px solid var(--silver);
-}
-
-.userTable td {
-  padding: 1.2em;
-  border-bottom: 1px solid var(--beige);
-  font-size: 0.95rem;
-  vertical-align: middle;
-}
-
-.userRow:hover {
-  background-color: rgba(243, 229, 171, 0.3); /* Subtle Vanilla hover */
-  transition: background 0.2s ease;
 }
 
 .idCell {
   font-family: monospace;
-  color: var(--battleship-gray);
-  font-size: 0.8rem;
+  color: #999;
 }
 
+/* Badges */
 .roleBadge {
-  padding: 4px 12px;
-  border-radius: 20px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.deleteBtn {
+  padding: 6px 12px;
+  background-color: transparent;
+  color: #d32f2f;
+  border: 1px solid #d32f2f;
+  border-radius: 4px;
+  cursor: pointer;
   font-size: 0.8rem;
   font-weight: 600;
-  text-transform: capitalize;
+  transition: all 0.2s;
 }
 
-/* Role Specific Colors */
-.roleAdmin {
-  background-color: var(--dark-green);
+.deleteBtn:hover {
+  background-color: #d32f2f;
   color: white;
 }
 
-.roleGuest {
-  background-color: var(--silver);
-  color: var(--ebony);
-}
-
-.methodBadge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 0.85rem;
-}
-
-.dot {
-  height: 8px;
-  width: 8px;
-  border-radius: 50%;
-  display: inline-block;
-}
-
-.googleDot { background-color: #4285F4; }
-.localDot { background-color: var(--dark-green); }
-
-@media screen and (max-width: 768px) {
-  .adminPanelPage { padding: 1em; }
-  .userTable th:nth-child(1), .userTable td:nth-child(1) { display: none; } /* Hide ID on mobile */
-}
+.roleAdmin { background: #e3f2fd; color: #1976d2; }
+.roleGuest { background: #f5f5f5; color: #616161; }
