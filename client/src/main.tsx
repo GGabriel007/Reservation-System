@@ -14,6 +14,9 @@ import {
   BookRoom,
 } from "./pages/index";
 
+import { Provider } from "react-redux";
+import { store } from "@/redux/store"; // Import your configured Redux store
+
 /**
  * Defines the application's route structure.
  * We nest everything under "/" with <App /> as the element
@@ -62,6 +65,8 @@ const router = createBrowserRouter([
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
-    <RouterProvider router={router} />
+    <Provider store={store}>
+      <RouterProvider router={router} />
+    </Provider>
   </StrictMode>
 );

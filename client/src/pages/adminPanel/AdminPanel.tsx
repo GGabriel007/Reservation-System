@@ -28,6 +28,7 @@ export default function AdminPanel() {
         if (!response.ok) throw new Error("Unauthorized Access");
 
         const data = await response.json();
+        console.log(data);
         setUsers(Array.isArray(data) ? data : data.users);
       } catch (err: any) {
         setError(err.message);
@@ -39,14 +40,17 @@ export default function AdminPanel() {
     fetchUsers();
   }, [baseUrl]);
 
-  if (loading) return <div className={styles.adminPanelPage}>Loading secure data...</div>;
+  if (loading)
+    return <div className={styles.adminPanelPage}>Loading secure data...</div>;
   if (error) return <div className={styles.adminPanelPage}>Error: {error}</div>;
 
   return (
     <main className={styles.adminPanelPage}>
       <header className={styles.headerArea}>
         <h1>Lioré Administration</h1>
-        <p className={styles.statsText}>Managing {users.length} registered users</p>
+        <p className={styles.statsText}>
+          Managing {users.length} registered users
+        </p>
       </header>
 
       <div className={styles.tableContainer}>
@@ -70,13 +74,25 @@ export default function AdminPanel() {
                 <td className={styles.idCell}>{user._id.slice(-6)}...</td>
                 <td style={{ fontWeight: 500 }}>{user.email}</td>
                 <td>
-                  <span className={`${styles.roleBadge} ${user.role === 'admin' ? styles.roleAdmin : styles.roleGuest}`}>
+                  <span
+                    className={`${styles.roleBadge} ${
+                      user.role === "admin"
+                        ? styles.roleAdmin
+                        : styles.roleGuest
+                    }`}
+                  >
                     {user.role}
                   </span>
                 </td>
                 <td>
                   <div className={styles.methodBadge}>
-                    <span className={`${styles.dot} ${user.loginMethod === 'google' ? styles.googleDot : styles.localDot}`}></span>
+                    <span
+                      className={`${styles.dot} ${
+                        user.loginMethod === "google"
+                          ? styles.googleDot
+                          : styles.localDot
+                      }`}
+                    ></span>
                     {user.loginMethod}
                   </div>
                 </td>
