@@ -13,11 +13,39 @@ import mongoose from "mongoose";
  * - confirmationCode: Human-readable ID for guest lookups
  */
 const ReservationSchema = new mongoose.Schema({
-  userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: false },
+
+  guestFirstName: { 
+    type: String, 
+    trim: true, 
+    required: function() { return !this.userId; } 
   },
+  guestLastName: { 
+    type: String, 
+    trim: true, 
+    required: function() { return !this.userId; } 
+  },
+  guestEmail: { 
+    type: String, 
+    lowercase: true, 
+    trim: true, 
+    required: function() { return !this.userId; } 
+  },
+  guestPhone: { 
+    type: String, 
+    trim: true, 
+    required: function() { return !this.userId; } 
+  },
+  guestAddress: {
+    country: { type: String, default: "USA" },
+    city: { type: String, trim: true },
+    zipCode: { type: String, trim: true }
+  },
+  adults: { type: Number, default: 1 },
+  children: { type: Number, default: 0 },
+  bedPreference: { type: String, default: "Not Specified" },
+  specialRequests: { type: String, default: "" },
+
   roomId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Room",
@@ -37,31 +65,28 @@ const ReservationSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
-  totalAmount: {
-    type: Number,
-    required: true,
+
+  // FINANCIAL DATA (From Figma Price Details Box)
+  roomPrice: { type: Number, required: true }, 
+  tax: { type: Number, default: 0 },
+  fees: { type: Number, default: 0 },
+  totalAmount: { type: Number, required: true }, 
+
+  // PAYMENT & STATUS (Security Note: We store Cardholder Name, but NOT full card number)
+  paymentInfo: {
+    cardHolderName: { type: String, trim: true },
+    lastFour: { type: String, trim: true } // Storing only the last 4 digits is standard for reference
   },
-  status: {
-    type: String,
-    enum: ["pending", "confirmed", "cancelled", "failed"],
-    default: "pending",
-  },
-  // Human-readable code for the "Check Reservation" page
-  // We can use a shorter string or the auto-generated _id
+  newsletterSubscription: { type: Boolean, default: false },
+
+  status: { type: String, enum: ["pending", "confirmed", "cancelled", "failed"], default: "confirmed" },
   confirmationCode: {
     type: String,
     unique: true,
-    default: function() {
-      return Math.random().toString(36).substring(2, 9).toUpperCase();
-    }
+    default: () => Math.random().toString(36).substring(2, 9).toUpperCase()
   },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  }
-}, { 
-  timestamps: true 
-});
+  isDeleted: { type: Boolean, default: false }
+}, { timestamps: true });
 
 /**
  * SOFT DELETION MIDDLEWARE

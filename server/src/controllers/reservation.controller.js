@@ -2,17 +2,60 @@ import { ReservationService } from "../services/reservation.service.js";
 
 /**
  * ReservationController
- * Manages the lifecycle of a booking from creation to cancellation.
+ * Updated to handle the expanded Lioré checkout data.
  */
 export const ReservationController = {
 
-  // CREATE RESERVATION
+  // CREATE RESERVATION (Supports Guest & User)
   createReservation: async (req, res) => {
     try {
-      // Take the userId directly from the authenticated token for security
+      const {
+        firstName, lastName, email, phone, // Box 1: Guest Info
+        country, city, zipCode,           // Box 1: Address
+        nameOnCard, cardNumber,           // Box 1: Payment
+        newsletter,                       // Box 3: Acknowledgment
+        roomId, hotelId, checkIn, checkOut,
+        roomPrice, tax, fees, totalAmount
+      } = req.body;
+
       const reservationData = {
-        ...req.body,
-        userId: req.user.id 
+        // 1. Identity
+        userId: req.user ? req.user.id : null,
+        guestFirstName: firstName,
+        guestLastName: lastName,
+        guestEmail: email,
+        guestPhone: phone,
+
+        // 2. Structured Address
+        guestAddress: {
+          country: country || "USA",
+          city,
+          zipCode
+        },
+
+        // 3. Stay & Room info
+        roomId,
+        hotelId,
+        checkIn,
+        checkOut,
+
+        // 4. Financials
+        roomPrice,
+        tax,
+        fees,
+        totalAmount,
+
+        // 5. Payment Reference (Security: Only store cardholder name and last 4)
+        paymentInfo: {
+          cardHolderName: nameOnCard,
+          lastFour: cardNumber ? cardNumber.slice(-4) : null
+        },
+
+        // 6. Preferences
+        newsletterSubscription: newsletter === true || newsletter === 'true',
+        
+        // Pass the rest (adults, children, etc.)
+        ...req.body
       };
       
       const newReservation = await ReservationService.createReservation(reservationData);
@@ -21,6 +64,8 @@ export const ReservationController = {
       res.status(400).json({ message: "Booking failed", error: error.message });
     }
   },
+
+
 
   // GET GUEST'S OWN BOOKINGS
   getMyReservations: async (req, res) => {
@@ -39,7 +84,11 @@ export const ReservationController = {
       const reservation = await ReservationService.getReservationById(req.params.id);
       
       // Basic security check: Only the owner or staff can see details
-      if (req.user.role === 'guest' && reservation.userId.toString() !== req.user.id) {
+      // Updated to check guestEmail for non-logged-in users
+      const isOwner = req.user && (reservation.userId?.toString() === req.user.id || reservation.guestEmail === req.user.email);
+      const isStaff = req.user && (req.user.role === 'admin' || req.user.role === 'manager');
+
+      if (!isOwner && !isStaff) {
         return res.status(403).json({ message: "Unauthorized access to this booking" });
       }
 
@@ -49,13 +98,43 @@ export const ReservationController = {
     }
   },
 
-  // CANCEL RESERVATION
+  // CANCEL RESERVATION (Dual-Path)
   cancelReservation: async (req, res) => {
     try {
-      const cancelled = await ReservationService.cancelReservation(req.params.id, req.user.id, req.user.role);
+      // Path A: Logged in User
+      if (req.user) {
+        const cancelled = await ReservationService.cancelReservation(req.params.id, req.user.id, req.user.role);
+        return res.status(200).json({ message: "Reservation cancelled", data: cancelled });
+      }
+
+      // Path B: Anonymous Guest (Needs confirmation details in req.body)
+      const { confirmationCode, email } = req.body;
+      if (!confirmationCode || !email) {
+        return res.status(400).json({ message: "Confirmation code and email required to cancel as guest." });
+      }
+
+      const cancelled = await ReservationService.cancelReservationByGuest(req.params.id, confirmationCode, email);
       res.status(200).json({ message: "Reservation cancelled successfully", data: cancelled });
     } catch (error) {
       res.status(400).json({ message: "Cancellation failed", error: error.message });
+    }
+  },
+
+  // MODIFY RESERVATION 
+  modifyReservation: async (req, res) => {
+    try {
+      const reservationId = req.params.id;
+      const updates = req.body; // e.g., { startDate, endDate, roomType }
+
+      // Security Check
+      if (!req.user && (!updates.confirmationCode || !updates.email)) {
+        return res.status(401).json({ message: "Authentication or Confirmation details required to modify." });
+      }
+
+      const updated = await ReservationService.modifyReservation(reservationId, updates, req.user);
+      res.status(200).json({ message: "Reservation updated successfully", data: updated });
+    } catch (error) {
+      res.status(400).json({ message: "Modification failed", error: error.message });
     }
   },
 
@@ -79,25 +158,22 @@ export const ReservationController = {
     }
   },
 
+  // GUEST LOOKUP
   getReservationByLookup: async (req, res) => {
     try {
-      // Data comes from the URL: /api/reservations/lookup?confirmationCode=XXX&lastName=YYY&email=ZZZ
       const { confirmationCode, lastName, email } = req.query;
-
       if (!confirmationCode || !lastName || !email) {
         return res.status(400).json({ message: "All search fields are required" });
       }
 
       const reservation = await ReservationService.lookupReservation(
-        confirmationCode, 
+        confirmationCode.toUpperCase(), 
         lastName, 
-        email
+        email.toLowerCase()
       );
       
-      // Success! Send the reservation data back to the frontend
       res.status(200).json(reservation);
     } catch (error) {
-      // Distinguish between "Not Found" and "Wrong Details" for better UX
       const status = error.message.includes("not match") ? 401 : 404;
       res.status(status).json({ message: error.message });
     }

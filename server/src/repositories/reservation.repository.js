@@ -52,7 +52,6 @@ export const ReservationRepository = {
 
   /**
    * Update Status (Soft Delete / Cancellation)
-   * Instead of deleting, we change status to 'cancelled'.
    */
   updateStatus: (id, status) => {
     return Reservation.findByIdAndUpdate(
@@ -68,5 +67,31 @@ export const ReservationRepository = {
       confirmationCode: code.toUpperCase(),
       isDeleted: { $ne: true } 
     }).populate("userId");
+  },
+
+  /**
+   * FIND BY LOOKUP
+   * This handles the core requirement: Guest lookup without a userId.
+   */
+  findForGuestLookup: (code) => {
+    return Reservation.findOne({ 
+      confirmationCode: code.toUpperCase(),
+      isDeleted: { $ne: true } 
+    })
+    .populate("userId", "name email lastName") // If it's a member
+    .populate("roomId", "roomName")
+    .populate("hotelId", "name");
+  },
+
+  /**
+   * UPDATE RESERVATION
+   * "Modify Reservation" task.
+   */
+  update: (id, updateData) => {
+    return Reservation.findByIdAndUpdate(
+      id,
+      { $set: updateData },
+      { new: true, runValidators: true }
+    );
   },
 };

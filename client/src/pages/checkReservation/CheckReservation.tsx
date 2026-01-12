@@ -1,51 +1,36 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./styles.module.css";
+// Import the lazy hook from your apiSlice
+import { useLazyLookupReservationQuery } from "@/redux/features/api/apiSlice";
 
 export default function CheckReservation() {
   const [reservationNumber, setReservationNumber] = useState<string>("");
   const [lastName, setLastName] = useState<string>("");
-  const [email, setEmail] = useState<string>(""); // Added Email state
-  const [errorMessage, setErrorMessage] = useState<string>("");
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [email, setEmail] = useState<string>("");
 
   const navigate = useNavigate();
 
-  const baseUrl: string = import.meta.env.DEV
-    ? "http://localhost:8080"
-    : "http://liore.us-east-1.elasticbeanstalk.com";
+  // Initialize the RTK Query hook
+  // "trigger" is the function we call, and the object gives us status info
+  const [triggerLookup, { isLoading, isError, error }] = useLazyLookupReservationQuery();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setErrorMessage("");
-    setIsSubmitting(true);
-
-    // Convert inputs into Query Parameters for the GET request
-    const params = new URLSearchParams({
-      confirmationCode: reservationNumber,
-      lastName: lastName,
-      email: email
-    });
 
     try {
-      const response = await fetch(`${baseUrl}/reservations/lookup?${params.toString()}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      // Trigger the lookup using the RTK hook
+      const reservationData = await triggerLookup({
+        confirmationCode: reservationNumber,
+        lastName,
+        email,
+      }).unwrap(); // .unwrap() allows us to catch errors in the try/catch block
 
-      if (response.ok) {
-        const reservationData = await response.json();
-        // Navigate to your "foundReservation" page and pass the data via state
-        navigate("/found-reservation", { state: { reservation: reservationData } });
-      } else {
-        const errorData = await response.json().catch(() => ({ message: "Reservation not found" }));
-        setErrorMessage(errorData.message || "Could not find a reservation with those details.");
-      }
-    } catch (error) {
-      console.error("Lookup error:", error);
-      setErrorMessage("Could not connect to the server.");
-    } finally {
-      setIsSubmitting(false);
+      // Success: Navigate and pass data
+      navigate("/found-reservation", { state: { reservation: reservationData } });
+    } catch (err: any) {
+      // RTK Query errors are handled here automatically
+      console.error("Lookup failed:", err);
     }
   };
 
@@ -55,7 +40,14 @@ export default function CheckReservation() {
         <h1>Welcome to Lioré</h1>
         <p>Thank you for booking your stay with us</p>
         <div className="layout-grid">
-          {errorMessage && <p className={styles.errorText}>{errorMessage}</p>}
+          
+          {/* Displaying errors from the RTK hook */}
+          {isError && (
+            <p className={styles.errorText}>
+              {/* @ts-ignore */}
+              {error?.data?.message || "Could not find a reservation with those details."}
+            </p>
+          )}
 
           <form onSubmit={handleSubmit} className={styles.formContainer}>
             <h2>
@@ -97,10 +89,10 @@ export default function CheckReservation() {
 
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isLoading} // Use isLoading from the hook
               className={styles.submitBtn}
             >
-              {isSubmitting ? "Searching..." : "Find Reservation"}
+              {isLoading ? "Searching..." : "Submit"}
             </button>
 
             <div className={styles.links}>

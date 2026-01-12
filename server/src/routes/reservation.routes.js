@@ -9,6 +9,8 @@ const router = Router();
 // Anyone can look up a reservation with a confirmation code
 router.get("/lookup", ReservationController.getReservationByLookup);
 
+// Cancel a reservation
+router.patch("/:id/cancel", ReservationController.cancelReservation);
 
 // --- 2. THE SECURITY GATE ---
 // Everything below this line requires a valid login session
@@ -29,9 +31,6 @@ router.get("/all", authorize('admin'), ReservationController.getAllReservations)
 // Get specific reservation details
 // Note: ReservationController.getReservationById should handle the logic
 router.get("/:id", ReservationController.getReservationById);
-
-// Cancel a reservation
-router.patch("/:id/cancel", ReservationController.cancelReservation);
 
 // Manager/Admin: View all reservations for a specific hotel location
 router.get(
