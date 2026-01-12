@@ -3,53 +3,44 @@ import { ReservationController } from "../controllers/reservation.controller.js"
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
 
-console.log("DEBUG - protect:", typeof protect);
-console.log("DEBUG - authorize:", typeof authorize);
-console.log("DEBUG - Controller Object:", typeof ReservationController);
-if (ReservationController) {
-    console.log("DEBUG - getMyReservations:", typeof ReservationController.getMyReservations);
-    console.log("DEBUG - getAllReservations:", typeof ReservationController.getAllReservations);
-}
-
 const router = Router();
 
-/**
- * PROTECTED ROUTES
- * All reservation actions require the user to be logged in.
- */
+// --- 1. PUBLIC ROUTES ---
+// Anyone can look up a reservation with a confirmation code
 router.get("/lookup", ReservationController.getReservationByLookup);
+
+
+// --- 2. THE SECURITY GATE ---
+// Everything below this line requires a valid login session
 router.use(protect); 
 
-// GUEST ACTIONS
-// Create a new booking
-router.post("/", ReservationController.createReservation);
+
+// --- 3. STATIC ROUTES (Must come BEFORE dynamic /:id routes) ---
 
 // View "My Bookings" history
 router.get("/my-bookings", ReservationController.getMyReservations);
 
-// Get specific reservation details (for the confirmation page)
+// Admin: View every single reservation in the system
+router.get("/all", authorize('admin'), ReservationController.getAllReservations);
+
+
+// --- 4. DYNAMIC ROUTES (Using Parameters) ---
+
+// Get specific reservation details
+// Note: ReservationController.getReservationById should handle the logic
 router.get("/:id", ReservationController.getReservationById);
 
-// Cancel a reservation (Soft Delete or Status update)
+// Cancel a reservation
 router.patch("/:id/cancel", ReservationController.cancelReservation);
 
-
-// STAFF & ADMIN ACTIONS
-// Global Admin: View every single reservation in the system
-router.get(
-  "/", 
-  authorize("admin"), 
-  ReservationController.getAllReservations
-);
-
-// Manager: View all reservations for their specific hotel location
+// Manager/Admin: View all reservations for a specific hotel location
 router.get(
   "/hotel/:hotelId", 
   authorize("admin", "manager"), 
   ReservationController.getReservationsByHotel
 );
 
-// Manager/Admin: Manually update booking status (e.g., 'confirmed' to 'checked-in')
+// Manager/Admin: Manually update booking status
 router.patch(
   "/:id/status", 
   authorize("admin", "manager"), 

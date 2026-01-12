@@ -3,7 +3,7 @@ import passport from "passport";
 import bcrypt from "bcrypt";
 import { User } from "../models/user.model.js"; 
 import localAuth from "../auth/passport-middleware/localAuth.js"; 
-import ensureAuthenticated from "../middleware/authenticate.js"; 
+import { protect } from "../middleware/authMiddleware.js"; 
 
 const router = Router();
 
@@ -101,7 +101,7 @@ router.get("/google/callback",
  * @route   GET /auth/need
  * @desc    Identity check route. Returns authenticated user data.
  */
-router.get("/need", ensureAuthenticated, (req, res) => {
+router.get("/need", protect, (req, res) => {
   res.send(req.user);
 });
 

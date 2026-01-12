@@ -9,7 +9,15 @@ export const protect = (req, res, next) => {
     return next();
   }
   
-  // Placeholder logic: If you want to bypass security during development, 
-  // you could just call next(). For now, let's keep it safe:
-  res.status(401).json({ message: "Not authorized, please login" });
+  /**
+   * Return a 401 Unauthorized status with login options.
+   * This allows the React frontend to redirect the user correctly.
+   */
+  return res.status(401).json({ 
+    message: "Unauthorized: Please log in to access this resource.",
+    loginOptions: {
+      google: "/auth/google/login",
+      local: "/auth/local/login"
+    }
+  });
 };
