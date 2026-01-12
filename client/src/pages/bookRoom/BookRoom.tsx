@@ -39,6 +39,9 @@ export default function BookRoom() {
     };
 
     fetchUsers();
+    console.log(users);
+    console.log(error);
+    console.log(loading);
   }, []);
   return (
     <main className={styles.mainPage}>
