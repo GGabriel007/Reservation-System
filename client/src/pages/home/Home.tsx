@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Hero } from "../../components/pages/homePage/index";
+import { Hero } from "@/components/pages/homePage/index";
 import styles from "./styles.module.css";
 
 /**

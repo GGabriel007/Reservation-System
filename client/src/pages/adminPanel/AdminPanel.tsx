@@ -14,32 +14,33 @@ interface Hotel {
 }
 
 export default function AdminPanel() {
-
   const handleDeleteUser = async (userId: string, userEmail: string) => {
-  // Security check: Don't let the admin accidentally delete themselves!
-  // (Assuming you have access to the current logged-in user's email)
-  
-  const confirmDelete = window.confirm(`Are you sure you want to permanently delete ${userEmail}?`);
-  
-  if (confirmDelete) {
-    try {
-      const response = await fetch(`${baseUrl}/admin/users/${userId}`, {
-        method: "DELETE",
-        credentials: "include",
-      });
+    // Security check: Don't let the admin accidentally delete themselves!
+    // (Assuming you have access to the current logged-in user's email)
 
-      if (response.ok) {
-        // Remove the user from local state so they "vanish" from the table
-        setUsers(users.filter(user => user._id !== userId));
-        alert("User removed from system.");
-      } else {
-        alert("Failed to delete user. They may have active reservations.");
+    const confirmDelete = window.confirm(
+      `Are you sure you want to permanently delete ${userEmail}?`
+    );
+
+    if (confirmDelete) {
+      try {
+        const response = await fetch(`${baseUrl}/admin/users/${userId}`, {
+          method: "DELETE",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          // Remove the user from local state so they "vanish" from the table
+          setUsers(users.filter((user) => user._id !== userId));
+          alert("User removed from system.");
+        } else {
+          alert("Failed to delete user. They may have active reservations.");
+        }
+      } catch (err) {
+        alert("Error connecting to server.");
       }
-    } catch (err) {
-      alert("Error connecting to server.");
     }
-  }
-};
+  };
 
   // --- STATE: Existing User Management ---
   const [users, setUsers] = useState<User[]>([]);
@@ -97,7 +98,6 @@ export default function AdminPanel() {
           const hotelData = await hotelRes.json();
           setHotels(hotelData);
         }
-
       } catch (err: any) {
         setError(err.message);
       } finally {
@@ -122,7 +122,9 @@ export default function AdminPanel() {
       });
       const data = await response.json();
       if (response.ok) {
-        setPromoMessage("SUCCESS! Now log out and log back in to refresh your role.");
+        setPromoMessage(
+          "SUCCESS! Now log out and log back in to refresh your role."
+        );
       } else {
         setPromoMessage(data.message || "Promotion failed.");
       }
@@ -178,7 +180,8 @@ export default function AdminPanel() {
     }
   };
 
-  if (loading) return <div className={styles.adminPanelPage}>Loading Admin Suite...</div>;
+  if (loading)
+    return <div className={styles.adminPanelPage}>Loading Admin Suite...</div>;
 
   return (
     <main className={styles.adminPanelPage}>
@@ -189,7 +192,9 @@ export default function AdminPanel() {
 
       {/* SECTION 1: SYSTEM BOOTSTRAP (Promotion) */}
       <section className={styles.adminSection}>
-        <div className={styles.sectionHeader}>1. Role Promotion (Bootstrap)</div>
+        <div className={styles.sectionHeader}>
+          1. Role Promotion (Bootstrap)
+        </div>
         <form onSubmit={handlePromote} className={styles.adminForm}>
           <input
             type="email"
@@ -198,7 +203,9 @@ export default function AdminPanel() {
             onChange={(e) => setPromoEmail(e.target.value)}
             required
           />
-          <button type="submit" className={styles.promoteBtn}>Make Admin</button>
+          <button type="submit" className={styles.promoteBtn}>
+            Make Admin
+          </button>
         </form>
         {promoMessage && <p className={styles.feedbackText}>{promoMessage}</p>}
       </section>
@@ -206,50 +213,131 @@ export default function AdminPanel() {
       {error ? (
         <div className={styles.unauthorizedError}>
           <h2>{error}</h2>
-          <p>Please use the Promotion tool above, then log out and log back in.</p>
+          <p>
+            Please use the Promotion tool above, then log out and log back in.
+          </p>
         </div>
       ) : (
         <>
           {/* SECTION 2: HOTEL CREATION */}
           <section className={styles.adminSection}>
-            <div className={styles.sectionHeader}>2. Create New Hotel Property</div>
+            <div className={styles.sectionHeader}>
+              2. Create New Hotel Property
+            </div>
             <form onSubmit={handleCreateHotel} className={styles.adminFormGrid}>
-              <input type="text" placeholder="Hotel Name" required
-                onChange={(e) => setHotelData({ ...hotelData, name: e.target.value })} />
-              <input type="text" placeholder="Street Address" required
-                onChange={(e) => setHotelData({ ...hotelData, street: e.target.value })} />
-              <input type="text" placeholder="City" required
-                onChange={(e) => setHotelData({ ...hotelData, city: e.target.value })} />
-              <input type="text" placeholder="State" required
-                onChange={(e) => setHotelData({ ...hotelData, state: e.target.value })} />
-              <input type="text" placeholder="Zip Code" required
-                onChange={(e) => setHotelData({ ...hotelData, zipCode: e.target.value })} />
-              <textarea placeholder="Property Description"
-                onChange={(e) => setHotelData({ ...hotelData, description: e.target.value })} />
-              <button type="submit" className={styles.createBtn}>Create Hotel</button>
+              <input
+                type="text"
+                placeholder="Hotel Name"
+                required
+                onChange={(e) =>
+                  setHotelData({ ...hotelData, name: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Street Address"
+                required
+                onChange={(e) =>
+                  setHotelData({ ...hotelData, street: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                placeholder="City"
+                required
+                onChange={(e) =>
+                  setHotelData({ ...hotelData, city: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                placeholder="State"
+                required
+                onChange={(e) =>
+                  setHotelData({ ...hotelData, state: e.target.value })
+                }
+              />
+              <input
+                type="text"
+                placeholder="Zip Code"
+                required
+                onChange={(e) =>
+                  setHotelData({ ...hotelData, zipCode: e.target.value })
+                }
+              />
+              <textarea
+                placeholder="Property Description"
+                onChange={(e) =>
+                  setHotelData({ ...hotelData, description: e.target.value })
+                }
+              />
+              <button type="submit" className={styles.createBtn}>
+                Create Hotel
+              </button>
             </form>
           </section>
 
           {/* SECTION 3: ROOM CREATION */}
           <section className={styles.adminSection}>
-            <div className={styles.sectionHeader}>3. Add Rooms to Inventory</div>
+            <div className={styles.sectionHeader}>
+              3. Add Rooms to Inventory
+            </div>
             <form onSubmit={handleCreateRoom} className={styles.adminFormGrid}>
-              <select required onChange={(e) => setRoomData({ ...roomData, hotel: e.target.value })}>
+              <select
+                required
+                onChange={(e) =>
+                  setRoomData({ ...roomData, hotel: e.target.value })
+                }
+              >
                 <option value="">Select a Hotel</option>
-                {hotels.map(h => <option key={h._id} value={h._id}>{h.name}</option>)}
+                {hotels.map((h) => (
+                  <option key={h._id} value={h._id}>
+                    {h.name}
+                  </option>
+                ))}
               </select>
-              <input type="text" placeholder="Room Name (e.g. 101)" required
-                onChange={(e) => setRoomData({ ...roomData, roomName: e.target.value })} />
-              <select onChange={(e) => setRoomData({ ...roomData, roomType: e.target.value })}>
+              <input
+                type="text"
+                placeholder="Room Name (e.g. 101)"
+                required
+                onChange={(e) =>
+                  setRoomData({ ...roomData, roomName: e.target.value })
+                }
+              />
+              <select
+                onChange={(e) =>
+                  setRoomData({ ...roomData, roomType: e.target.value })
+                }
+              >
                 <option value="single">Single</option>
                 <option value="double">Double</option>
                 <option value="suite">Suite</option>
               </select>
-              <input type="number" placeholder="Price Per Night" required
-                onChange={(e) => setRoomData({ ...roomData, basePrice: Number(e.target.value) })} />
-              <input type="number" placeholder="Max Occupancy" required
-                onChange={(e) => setRoomData({ ...roomData, maxOccupancy: Number(e.target.value) })} />
-              <button type="submit" className={styles.createBtn}>Create Room</button>
+              <input
+                type="number"
+                placeholder="Price Per Night"
+                required
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    basePrice: Number(e.target.value),
+                  })
+                }
+              />
+              <input
+                type="number"
+                placeholder="Max Occupancy"
+                required
+                onChange={(e) =>
+                  setRoomData({
+                    ...roomData,
+                    maxOccupancy: Number(e.target.value),
+                  })
+                }
+              />
+              <button type="submit" className={styles.createBtn}>
+                Create Room
+              </button>
             </form>
           </section>
 
@@ -272,7 +360,13 @@ export default function AdminPanel() {
                     <td className={styles.idCell}>{user._id.slice(-6)}...</td>
                     <td style={{ fontWeight: 500 }}>{user.email}</td>
                     <td>
-                      <span className={`${styles.roleBadge} ${user.role === 'admin' ? styles.roleAdmin : styles.roleGuest}`}>
+                      <span
+                        className={`${styles.roleBadge} ${
+                          user.role === "admin"
+                            ? styles.roleAdmin
+                            : styles.roleGuest
+                        }`}
+                      >
                         {user.role}
                       </span>
                     </td>
