@@ -1,12 +1,14 @@
 import type { Action, ThunkAction } from "@reduxjs/toolkit";
 import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
-import counterReducer from "./features/counter/counterSlice";
+import preferenceReducer from "./features/preference/preferenceSlice";
+import userReducer from "./features/user/userSlice";
 import { apiSlice } from "./features/api/apiSlice";
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
+    user: userReducer,
+    preference: preferenceReducer,
     [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) => {

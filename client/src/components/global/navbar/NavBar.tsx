@@ -70,10 +70,17 @@ export default function Navbar() {
               Sign In
             </NavLink>
 
-            {/* Admin access (Visible logic can be added later based on user role) */}
-            <NavLink to="/bookroom" className="btn-secondary">
-              Book Now
-            </NavLink>
+            {(currentPath === "/" || currentPath === "/check-reservation") && (
+              <NavLink to="/roomlisting" className="btn-secondary">
+                Book Now
+              </NavLink>
+            )}
+
+            {currentPath !== "/" && currentPath !== "/check-reservation" && (
+              <NavLink to="/check-reservation" className="btn-secondary">
+                Check Reservation
+              </NavLink>
+            )}
           </div>
         </div>
       </nav>

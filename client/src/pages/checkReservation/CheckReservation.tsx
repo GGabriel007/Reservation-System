@@ -13,7 +13,8 @@ export default function CheckReservation() {
 
   // Initialize the RTK Query hook
   // "trigger" is the function we call, and the object gives us status info
-  const [triggerLookup, { isLoading, isError, error }] = useLazyLookupReservationQuery();
+  const [triggerLookup, { isLoading, isError, error }] =
+    useLazyLookupReservationQuery();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +28,9 @@ export default function CheckReservation() {
       }).unwrap(); // .unwrap() allows us to catch errors in the try/catch block
 
       // Success: Navigate and pass data
-      navigate("/found-reservation", { state: { reservation: reservationData } });
+      navigate("/found-reservation", {
+        state: { reservation: reservationData },
+      });
     } catch (err: any) {
       // RTK Query errors are handled here automatically
       console.error("Lookup failed:", err);
@@ -40,12 +43,12 @@ export default function CheckReservation() {
         <h1>Welcome to Lioré</h1>
         <p>Thank you for booking your stay with us</p>
         <div className="layout-grid">
-          
           {/* Displaying errors from the RTK hook */}
           {isError && (
             <p className={styles.errorText}>
               {/* @ts-ignore */}
-              {error?.data?.message || "Could not find a reservation with those details."}
+              {error?.data?.message ||
+                "Could not find a reservation with those details."}
             </p>
           )}
 
@@ -96,8 +99,12 @@ export default function CheckReservation() {
             </button>
 
             <div className={styles.links}>
-              <p>Have an account? <Link to="/login">Sign In</Link></p>
-              <p>Want to join? <Link to="/signup">Sign Up</Link></p>
+              <p>
+                Have an account? <Link to="/login">Sign In</Link>
+              </p>
+              <p>
+                Want to join? <Link to="/signup">Sign Up</Link>
+              </p>
             </div>
           </form>
         </div>

@@ -12,60 +12,63 @@ import mongoose from "mongoose";
  * - hotel: Reference to the parent Hotel document
  * - isDeleted: Soft delete flag for inventory management
  */
-const RoomSchema = new mongoose.Schema({
-  roomName: {
-    type: String,
-    required: true,
-    trim: true,
+const RoomSchema = new mongoose.Schema(
+  {
+    roomName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    roomType: {
+      type: String,
+      enum: ["Single", "Double", "Suite", "Deluxe", "Penthouse", "Studio"],
+      required: true,
+    },
+    description: {
+      type: String,
+      trim: true,
+    },
+    basePrice: {
+      type: Number,
+      required: true,
+    },
+    maxOccupancy: {
+      type: Number,
+      required: true,
+    },
+    amenities: {
+      type: [String],
+      default: [],
+    },
+    availabilityStatus: {
+      type: String,
+      enum: ["available", "occupied", "maintenance", "pending"],
+      default: "available",
+      required: true,
+    },
+    images: {
+      type: [String],
+      required: false,
+    },
+    hotel: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Hotel",
+      required: true,
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
   },
-  roomType: {
-    type: String,
-    enum: ["Single", "Double", "Suite", "Deluxe", "Penthouse", "Studio"], 
-    required: true,
-  },
-  description: {
-    type: String,
-    trim: true, 
-  },
-  basePrice: {
-    type: Number,
-    required: true,
-  },
-  maxOccupancy: {
-    type: Number,
-    required: true,
-  },
-  amenities: {
-    type: [String],
-    default: [],
-  },
-  availabilityStatus: {
-    type: String,
-    enum: ["available", "occupied", "maintenance", "pending"],
-    default: "available",
-    required: true,
-  },
-  images: {
-    type: [String],
-    required: false,
-  },
-  hotel: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Hotel",
-    required: true,
-  },
-  isDeleted: {
-    type: Boolean,
-    default: false,
-  },
-}, { 
-  timestamps: true 
-});
+  {
+    timestamps: true,
+  }
+);
 
 /**
  * SOFT DELETION MIDDLEWARE
  */
-RoomSchema.pre(/^find/, function() {
+RoomSchema.pre(/^find/, function () {
   this.where({ isDeleted: { $ne: true } });
 });
 

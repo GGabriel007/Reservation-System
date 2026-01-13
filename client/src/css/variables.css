@@ -28,6 +28,8 @@
   --grey: #949f99;
   --dark-grey: #535d59;
   --red: #690500;
+
+  color: var(--black);
 }
 
 @media only screen and (min-width: 768px) {

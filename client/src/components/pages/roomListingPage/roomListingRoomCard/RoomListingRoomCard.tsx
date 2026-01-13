@@ -1,0 +1,114 @@
+import styles from "./styles.module.css";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
+import { selectPreference } from "@/redux/features/preference/preferenceSlice";
+import { setRoom } from "@/redux/features/user/userSlice";
+import { useNavigate } from "react-router-dom";
+
+interface Room {
+  room: {
+    _id: string;
+    roomName: string;
+    roomDescription: string;
+    roomType: string;
+    basePrice: number;
+    maxOccupancy: number;
+    amenities: string[];
+    availabilityStatus: string;
+    images: string[];
+    hotel: string;
+  };
+}
+
+/**
+ * Room Card page that exist in the booking room page
+ * @param room: Room interface
+ * @returns RoomCard component
+ */
+export default function RoomListingRoomCard({ room }: Room) {
+  const { rooms } = useAppSelector(selectPreference);
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleOnBookRoomClick = () => {
+    dispatch(
+      setRoom({
+        _id: room._id,
+        roomName: room.roomName,
+        basePrice: room.basePrice,
+        image: room.images[0],
+      })
+    );
+    navigate("/checkout");
+  };
+  const handleOnModalClick = () => {
+    const modal = document.querySelector(`#D${room._id}`) as HTMLDialogElement;
+    if (modal.showModal) {
+      modal.showModal();
+      (document.querySelector("body") as HTMLBodyElement).style.overflow =
+        "hidden";
+    }
+
+    window.addEventListener("click", (e: PointerEvent) => {
+      const element = e.target as HTMLElement;
+      if (e && element.classList.contains("js-dialog")) {
+        modal.close();
+      }
+    });
+
+    document.querySelectorAll("dialog").forEach((element) => {
+      element.addEventListener("close", () => {
+        (document.querySelector("body") as HTMLBodyElement).style.overflow =
+          "visible";
+      });
+    });
+  };
+  return (
+    <>
+      <article className={styles.roomCard}>
+        <img src={room.images[0]} />
+        <div className={styles.roomAmenities}>
+          <ul>
+            {room.amenities.map((amenity) => {
+              return <li>{amenity}</li>;
+            })}
+          </ul>
+          <p className="js-dialog-toggle" onClick={handleOnModalClick}>
+            Room Details
+          </p>
+        </div>
+
+        <div className={styles.roomamenities}>
+          <h3>{room.roomName}</h3>
+          <p>{room.roomDescription}</p>
+        </div>
+        <div>
+          <button className="btn-primary" onClick={handleOnBookRoomClick}>
+            ${room.basePrice * rooms} | Book Room
+          </button>
+        </div>
+      </article>
+      <dialog id={`D${room._id}`} className={`js-dialog ${styles.roomDetails}`}>
+        <form method="dialog">
+          <menu>
+            <button className={styles.closeButton}>
+              <picture>
+                <img src="/close.png" alt="closing icon for the modal" />
+              </picture>
+            </button>
+          </menu>
+          <img src={room.images[0]} />
+          <div className={styles.modalDetails}>
+            <h2>{room.roomName}</h2>
+            <p>{room.roomDescription}</p>
+            <h3>Room Features Include:</h3>
+            <ul>
+              {room.amenities.map((amenity) => {
+                return <li>{amenity}</li>;
+              })}
+            </ul>
+          </div>
+        </form>
+      </dialog>
+    </>
+  );
+}

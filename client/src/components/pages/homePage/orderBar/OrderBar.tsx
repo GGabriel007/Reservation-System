@@ -1,8 +1,22 @@
-import { forwardRef, memo, useEffect, useState } from "react";
+import { forwardRef, memo, useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import styles from "./styles.module.css";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { useAppSelector, useAppDispatch } from "@/redux/store";
+import {
+  increaseRooms,
+  descreaseRooms,
+  increaseAdults,
+  descreaseAdults,
+  increaseChildren,
+  descreaseChildren,
+  increaseBeds,
+  descreaseBeds,
+  setStartDate,
+  setEndDate,
+  selectPreference,
+} from "@/redux/features/preference/preferenceSlice";
 
 /* Order Bar in Home Page, can be expand to be used elsewhere
  * Uses React Datepicker to display the date picker
@@ -38,12 +52,9 @@ const CustomInputButton2 = memo(
 CustomInputButton.displayName = "CustomInputButton2";
 
 export default function OrderBar() {
-  const [selectedDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [rooms, setRooms] = useState<number>(0);
-  const [adults, setAdults] = useState<number>(0);
-  const [children, setChildren] = useState<number>(0);
-  const [bed, setBed] = useState<number>(0);
+  const { rooms, adults, children, beds, startDate, endDate } =
+    useAppSelector(selectPreference);
+  const dispatch = useAppDispatch();
 
   const handleGuestButtonClick = (
     event: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -70,24 +81,24 @@ export default function OrderBar() {
     <section className={styles.orderBar}>
       <div className={styles["inner-grid"]}>
         <DatePicker
-          selected={selectedDate}
-          onChange={(date: any) => setStartDate(date)}
+          selected={startDate}
+          onChange={(date: Date | null) => dispatch(setStartDate(date))}
           customInput={<CustomInputButton className={styles.startDate} />}
           className={styles["datepicker-container"]}
           selectsStart
-          startDate={selectedDate}
+          startDate={startDate}
           endDate={endDate}
           maxDate={endDate || new Date(2026, 12, 31)}
         />
         <DatePicker
           selected={endDate}
-          onChange={(date: any) => setEndDate(date)}
+          onChange={(date: Date | null) => dispatch(setEndDate(date))}
           customInput={<CustomInputButton2 className={styles.endDate} />}
           className={styles["datepicker-container"]}
           selectsEnd
-          startDate={selectedDate}
+          startDate={startDate}
           endDate={endDate}
-          minDate={selectedDate || new Date()}
+          minDate={startDate || new Date()}
         />
         <button className={styles.guest} onClick={handleGuestButtonClick}>
           Guests
@@ -99,14 +110,14 @@ export default function OrderBar() {
                 className="roomMinus"
                 src="/minus.svg"
                 alt=""
-                onClick={() => setRooms(Math.max(rooms - 1, 0))}
+                onClick={() => dispatch(descreaseRooms())}
               />
               {rooms}
               <img
                 className="roomPlus"
                 src="/plus.svg"
                 alt=""
-                onClick={() => setRooms(Math.min(rooms + 1, 3))}
+                onClick={() => dispatch(increaseRooms())}
               />
             </p>
             <p>
@@ -115,14 +126,14 @@ export default function OrderBar() {
                 className="adultMinus"
                 src="/minus.svg"
                 alt=""
-                onClick={() => setAdults(Math.max(rooms - 1, 0))}
+                onClick={() => dispatch(descreaseAdults())}
               />
               {adults}
               <img
                 className="adultPlus"
                 src="/plus.svg"
                 alt=""
-                onClick={() => setAdults(Math.min(adults + 1, 4))}
+                onClick={() => dispatch(increaseAdults())}
               />
             </p>
             <p>
@@ -131,14 +142,14 @@ export default function OrderBar() {
                 className="childMinus"
                 src="/minus.svg"
                 alt=""
-                onClick={() => setChildren(Math.max(rooms - 1, 0))}
+                onClick={() => dispatch(descreaseChildren())}
               />
               {children}
               <img
                 className="childPlus"
                 src="/plus.svg"
                 alt=""
-                onClick={() => setChildren(Math.min(children + 1, 4))}
+                onClick={() => dispatch(increaseChildren())}
               />
             </p>
             <p>
@@ -147,19 +158,19 @@ export default function OrderBar() {
                 className="bedminus"
                 src="/minus.svg"
                 alt=""
-                onClick={() => setBed(Math.max(rooms - 1, 0))}
+                onClick={() => dispatch(descreaseBeds())}
               />
-              {bed}
+              {beds}
               <img
                 className="bedPlus"
                 src="/plus.svg"
                 alt=""
-                onClick={() => setBed(Math.min(bed + 1, 2))}
+                onClick={() => dispatch(increaseBeds())}
               />
             </p>
           </div>
         </button>
-        <NavLink to="/bookroom" className={styles.book}>
+        <NavLink to="/roomlisting" className={styles.book}>
           Book Now
         </NavLink>
       </div>

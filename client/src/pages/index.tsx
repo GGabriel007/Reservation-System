@@ -11,6 +11,7 @@ import RoomListing from "./roomListing/RoomListing";
 import Signup from "./signup/Signup";
 import UserDashboard from "./userDashboard/UserDashboard";
 import UserProfile from "./userProfile/UserProfile";
+import HotelListing from "./hotelListing/HotelListing";
 
 export {
   AdminDashboard,
@@ -26,4 +27,5 @@ export {
   Signup,
   UserDashboard,
   UserProfile,
+  HotelListing,
 };
