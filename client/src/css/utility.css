@@ -1,3 +1,12 @@
 body .hidden {
   display: none;
 }
+
+.js-dialog-toggle {
+  cursor: pointer;
+  color: var(--green);
+}
+
+.js-dialog-toggle:hover {
+  opacity: 0.7;
+}

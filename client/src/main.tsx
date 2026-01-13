@@ -15,6 +15,7 @@ import {
   BookRoom,
   RoomListing,
   FoundReservation,
+  HotelListing,
 } from "./pages/index";
 
 import { Provider } from "react-redux";
@@ -65,6 +66,10 @@ const router = createBrowserRouter([
       {
         path: "/roomlisting",
         element: <RoomListing />,
+      },
+      {
+        path: "/hotellisting",
+        element: <HotelListing />,
       },
       {
         path: "/checkout/:roomId",

@@ -24,22 +24,32 @@ export default function CheckReservation() {
     const params = new URLSearchParams({
       confirmationCode: reservationNumber,
       lastName: lastName,
-      email: email
+      email: email,
     });
 
     try {
-      const response = await fetch(`${baseUrl}/reservations/lookup?${params.toString()}`, {
-        method: "GET",
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${baseUrl}/reservations/lookup?${params.toString()}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (response.ok) {
         const reservationData = await response.json();
         // Navigate to your "foundReservation" page and pass the data via state
-        navigate("/found-reservation", { state: { reservation: reservationData } });
+        navigate("/found-reservation", {
+          state: { reservation: reservationData },
+        });
       } else {
-        const errorData = await response.json().catch(() => ({ message: "Reservation not found" }));
-        setErrorMessage(errorData.message || "Could not find a reservation with those details.");
+        const errorData = await response
+          .json()
+          .catch(() => ({ message: "Reservation not found" }));
+        setErrorMessage(
+          errorData.message ||
+            "Could not find a reservation with those details."
+        );
       }
     } catch (error) {
       console.error("Lookup error:", error);
@@ -98,14 +108,18 @@ export default function CheckReservation() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className={styles.submitBtn}
+              className="btn-primary"
             >
               {isSubmitting ? "Searching..." : "Find Reservation"}
             </button>
 
             <div className={styles.links}>
-              <p>Have an account? <Link to="/login">Sign In</Link></p>
-              <p>Want to join? <Link to="/signup">Sign Up</Link></p>
+              <p>
+                Have an account? <Link to="/login">Sign In</Link>
+              </p>
+              <p>
+                Want to join? <Link to="/signup">Sign Up</Link>
+              </p>
             </div>
           </form>
         </div>

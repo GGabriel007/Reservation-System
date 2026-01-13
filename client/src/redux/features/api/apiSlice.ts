@@ -1,6 +1,7 @@
 // Import the RTK Query methods from the React-specific entry point
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import type { User } from "@/redux/types/User";
+import type { Room } from "@/redux/types/Room";
 
 // Use the `Post` type we've already defined in `postsSlice`,
 // and then re-export it for ease of use
@@ -28,9 +29,13 @@ export const apiSlice = createApi({
           body: user,
         }),
       }),
+      getRooms: builder.query<Room[], void>({
+        query: () => "/rooms",
+      }),
     };
   },
 });
 
 // // Export the auto-generated hook for the `getPosts` query endpoint
-export const { useGetUsersQuery, useCreateUserMutation } = apiSlice;
+export const { useGetUsersQuery, useCreateUserMutation, useGetRoomsQuery } =
+  apiSlice;

@@ -1,0 +1,54 @@
+.roomListingFilter {
+  margin-block-end: 2em;
+  display: flex;
+  gap: 20px;
+}
+select {
+  padding-left: 90px;
+  height: 50px;
+  position: relative;
+  border: 1px solid #333;
+  display: block;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -o-appearance: none;
+  -ms-appearance: none;
+  border-radius: 0;
+  -webkit-box-shadow: none;
+}
+
+select {
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
+}
+
+select::picker-icon {
+  content: url("/arrow-down.png");
+  position: relative;
+  bottom: 3px;
+}
+label {
+  position: absolute;
+  z-index: 1;
+  height: 50px;
+  line-height: 48px;
+  font-weight: 400;
+  pointer-events: none;
+  text-indent: 10px;
+}
+
+option {
+  height: 50px;
+}
+
+option::checkmark {
+  display: none;
+}
+
+select:hover,
+option:hover {
+  background-color: var(--beige);
+}
