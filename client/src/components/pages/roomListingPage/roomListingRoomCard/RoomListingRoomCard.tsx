@@ -1,6 +1,8 @@
 import styles from "./styles.module.css";
-import { useAppSelector } from "@/redux/store";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { selectPreference } from "@/redux/features/preference/preferenceSlice";
+import { setRoom } from "@/redux/features/user/userSlice";
+import { useNavigate } from "react-router-dom";
 
 interface Room {
   room: {
@@ -24,7 +26,21 @@ interface Room {
  */
 export default function RoomListingRoomCard({ room }: Room) {
   const { rooms } = useAppSelector(selectPreference);
-  const handleOnClick = () => {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+
+  const handleOnBookRoomClick = () => {
+    dispatch(
+      setRoom({
+        _id: room._id,
+        roomName: room.roomName,
+        basePrice: room.basePrice,
+        image: room.images[0],
+      })
+    );
+    navigate("/checkout");
+  };
+  const handleOnModalClick = () => {
     const modal = document.querySelector(`#D${room._id}`) as HTMLDialogElement;
     if (modal.showModal) {
       modal.showModal();
@@ -56,7 +72,7 @@ export default function RoomListingRoomCard({ room }: Room) {
               return <li>{amenity}</li>;
             })}
           </ul>
-          <p className="js-dialog-toggle" onClick={handleOnClick}>
+          <p className="js-dialog-toggle" onClick={handleOnModalClick}>
             Room Details
           </p>
         </div>
@@ -66,7 +82,7 @@ export default function RoomListingRoomCard({ room }: Room) {
           <p>{room.roomDescription}</p>
         </div>
         <div>
-          <button className="btn-primary">
+          <button className="btn-primary" onClick={handleOnBookRoomClick}>
             ${room.basePrice * rooms} | Book Room
           </button>
         </div>
