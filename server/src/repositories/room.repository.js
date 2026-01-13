@@ -28,7 +28,11 @@ export const RoomRepository = {
    * This is the "Key Attribute" from your checklist.
    */
   findByHotelId: async (hotelId) => {
-    return await Room.find({ hotel: hotelId }).populate("hotel");
+    // 1. Convert string to ObjectId to be safe
+    // 2. Search using the 'hotel' field to match your DB sample
+    return await Room.find({ 
+      hotel: new mongoose.Types.ObjectId(hotelId) 
+    }); 
   },
 
   /**

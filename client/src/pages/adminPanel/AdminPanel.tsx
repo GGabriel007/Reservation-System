@@ -1,391 +1,269 @@
 import { useState, useEffect } from "react";
 import styles from "./styles.module.css";
+import toast from "react-hot-toast";
+import ActionStatusModal from "@/components/global/toast/actionsStatusModal/ActionStatusModal";
 
-interface User {
+interface Room {
   _id: string;
-  email: string;
-  role: string;
-  loginMethod: string;
-}
-
-interface Hotel {
-  _id: string;
-  name: string;
+  roomName: string;
+  roomType: string;
+  basePrice: number;
+  maxOccupancy: number;
+  amenities: string[];
+  description: string;
+  availabilityStatus: string;
 }
 
 export default function AdminPanel() {
-  const handleDeleteUser = async (userId: string, userEmail: string) => {
-    // Security check: Don't let the admin accidentally delete themselves!
-    // (Assuming you have access to the current logged-in user's email)
-
-    const confirmDelete = window.confirm(
-      `Are you sure you want to permanently delete ${userEmail}?`
-    );
-
-    if (confirmDelete) {
-      try {
-        const response = await fetch(`${baseUrl}/admin/users/${userId}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
-
-        if (response.ok) {
-          // Remove the user from local state so they "vanish" from the table
-          setUsers(users.filter((user) => user._id !== userId));
-          alert("User removed from system.");
-        } else {
-          alert("Failed to delete user. They may have active reservations.");
-        }
-      } catch (err) {
-        alert("Error connecting to server.");
-      }
-    }
-  };
-
-  // --- STATE: Existing User Management ---
-  const [users, setUsers] = useState<User[]>([]);
-  const [hotels, setHotels] = useState<Hotel[]>([]); // To populate the room-to-hotel dropdown
+  const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
-  // --- STATE: Promotion Tool ---
-  const [promoEmail, setPromoEmail] = useState("");
-  const [promoMessage, setPromoMessage] = useState("");
-
-  // --- STATE: Hotel Creation ---
-  const [hotelData, setHotelData] = useState({
-    name: "",
-    description: "",
-    street: "",
-    city: "",
-    state: "",
-    zipCode: "",
+  // Modal State
+  const [modalConfig, setModalConfig] = useState({
+    isOpen: false,
+    message: "",
+    type: 'success' as 'success' | 'error'
   });
 
-  // --- STATE: Room Creation ---
+  const assignedHotelId = "6961bedfd52cfab927969b83";
+
   const [roomData, setRoomData] = useState({
     roomName: "",
-    roomType: "single",
+    roomType: "Single",
     basePrice: 0,
     maxOccupancy: 2,
-    hotel: "", // Selected Hotel ID
+    amenities: "",
+    description: "",
   });
 
-  const baseUrl = import.meta.env.DEV
+  const baseUrl = typeof window !== "undefined" && window.location.hostname === "localhost"
     ? "http://localhost:8080"
-    : "http://liore.us-east-1.elasticbeanstalk.com";
+    : "";
 
-  // --- FETCH DATA ---
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch Users
-        const userRes = await fetch(`${baseUrl}/admin/users`, {
-          method: "GET",
-          credentials: "include",
-        });
+  const showFeedback = (message: string, type: 'success' | 'error' = 'success') => {
+    setModalConfig({ isOpen: true, message, type });
+  };
 
-        if (userRes.ok) {
-          const userData = await userRes.json();
-          setUsers(Array.isArray(userData) ? userData : userData.users);
-        } else {
-          setError("Unauthorized: You do not have Admin permissions yet.");
-        }
-
-        // Fetch existing hotels to link rooms to them
-        const hotelRes = await fetch(`${baseUrl}/hotels`, { method: "GET" });
-        if (hotelRes.ok) {
-          const hotelData = await hotelRes.json();
-          setHotels(hotelData);
-        }
-      } catch (err: any) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
+  const fetchRooms = async () => {
+    try {
+      const res = await fetch(`${baseUrl}/rooms/hotel/${assignedHotelId}`, {
+        method: "GET",
+        credentials: "include",
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setRooms(data);
       }
+    } catch (err) {
+      toast.error("Failed to load inventory");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { fetchRooms(); }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const method = isEditing ? "PUT" : "POST";
+    const url = isEditing ? `${baseUrl}/rooms/${selectedRoomId}` : `${baseUrl}/rooms`;
+
+    const payload = {
+      ...roomData,
+      hotel: assignedHotelId,
+      amenities: roomData.amenities.split(",").map(a => a.trim()).filter(a => a !== "")
     };
 
-    fetchData();
-  }, [baseUrl]);
-
-  // --- HANDLERS ---
-
-  // 1. Promote Self
-  const handlePromote = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setPromoMessage("Processing...");
     try {
-      const response = await fetch(`${baseUrl}/admin/promote-self`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: promoEmail }),
-      });
-      const data = await response.json();
-      if (response.ok) {
-        setPromoMessage(
-          "SUCCESS! Now log out and log back in to refresh your role."
-        );
-      } else {
-        setPromoMessage(data.message || "Promotion failed.");
-      }
-    } catch (err) {
-      setPromoMessage("Connection error.");
-    }
-  };
-
-  // 2. Create Hotel
-  const handleCreateHotel = async (e: React.FormEvent) => {
-    e.preventDefault();
-    try {
-      const response = await fetch(`${baseUrl}/admin/hotels`, {
-        method: "POST",
+      const response = await fetch(url, {
+        method,
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({
-          name: hotelData.name,
-          description: hotelData.description,
-          address: {
-            street: hotelData.street,
-            city: hotelData.city,
-            state: hotelData.state,
-            zipCode: hotelData.zipCode,
-          },
-        }),
+        body: JSON.stringify(payload),
       });
+
       if (response.ok) {
-        alert("Hotel Created Successfully!");
-        window.location.reload(); // Refresh to see new hotel in dropdowns
+        // --- MODAL LOGIC GOES INSIDE HERE ---
+        const action = isEditing ? "updated" : "created";
+        showFeedback(`Room "${roomData.roomName}" was successfully ${action}!`, 'success');
+        resetForm();
+        fetchRooms();
       } else {
-        alert("Failed to create hotel. Check console.");
+        const errorData = await response.json();
+        showFeedback(errorData.message || "Failed to save room", 'error');
       }
     } catch (err) {
-      alert("Error connecting to server.");
+      showFeedback("A network error occurred", 'error');
     }
   };
 
-  // 3. Create Room
-  const handleCreateRoom = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handlePriceBlur = () => {
+    // Ensures that when they stop typing, it's rounded to 2 decimal places
+    setRoomData({
+      ...roomData,
+      basePrice: Number(roomData.basePrice.toFixed(2))
+    });
+  };
+
+  const handleDelete = async (id: string) => {
+    if (!window.confirm("Are you sure you want to remove this room?")) return;
+
     try {
-      const response = await fetch(`${baseUrl}/admin/rooms`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(roomData),
+      const res = await fetch(`${baseUrl}/rooms/${id}`, {
+        method: "DELETE",
+        credentials: "include"
       });
-      if (response.ok) alert("Room Created Successfully!");
-      else alert("Failed to create room.");
+
+      if (res.ok) {
+        // --- MODAL LOGIC GOES INSIDE HERE ---
+        showFeedback("The room has been removed from your active inventory.", 'success');
+        fetchRooms();
+      } else {
+        showFeedback("Could not delete the room. Please try again.", 'error');
+      }
     } catch (err) {
-      alert("Error connecting to server.");
+      showFeedback("Network error: Could not reach server.", 'error');
     }
   };
 
-  if (loading)
-    return <div className={styles.adminPanelPage}>Loading Admin Suite...</div>;
+  const handleEditClick = (room: Room) => {
+    setIsEditing(true);
+    setSelectedRoomId(room._id);
+    setRoomData({
+      roomName: room.roomName,
+      roomType: room.roomType,
+      basePrice: room.basePrice,
+      maxOccupancy: room.maxOccupancy,
+      amenities: room.amenities.join(", "),
+      description: room.description || "",
+    });
+  };
+
+  const resetForm = () => {
+    setIsEditing(false);
+    setSelectedRoomId(null);
+    setRoomData({ roomName: "", roomType: "Single", basePrice: 0, maxOccupancy: 2, amenities: "", description: "" });
+  };
+
+  if (loading) return <div className={styles.loading}>Accessing Admin Suite...</div>;
 
   return (
     <main className={styles.adminPanelPage}>
       <header className={styles.headerArea}>
-        <h1>Lioré Administration</h1>
-        <p className={styles.statsText}>Inventory & User Management</p>
+        <div className={styles.headerTitle}>
+          <h1>Lioré Admin Panel</h1>
+          <p className={styles.statsText}>Property Inventory Management</p>
+        </div>
+        <div className={styles.headerStats}>
+          <div className={styles.statCard}>
+            <span className={styles.statLabel}>Total Rooms</span>
+            <span className={styles.statValue}>{rooms.length}</span>
+          </div>
+        </div>
       </header>
 
-      {/* SECTION 1: SYSTEM BOOTSTRAP (Promotion) */}
-      <section className={styles.adminSection}>
-        <div className={styles.sectionHeader}>
-          1. Role Promotion (Bootstrap)
-        </div>
-        <form onSubmit={handlePromote} className={styles.adminForm}>
-          <input
-            type="email"
-            placeholder="Account email to promote"
-            value={promoEmail}
-            onChange={(e) => setPromoEmail(e.target.value)}
-            required
-          />
-          <button type="submit" className={styles.promoteBtn}>
-            Make Admin
-          </button>
-        </form>
-        {promoMessage && <p className={styles.feedbackText}>{promoMessage}</p>}
-      </section>
-
-      {error ? (
-        <div className={styles.unauthorizedError}>
-          <h2>{error}</h2>
-          <p>
-            Please use the Promotion tool above, then log out and log back in.
-          </p>
-        </div>
-      ) : (
-        <>
-          {/* SECTION 2: HOTEL CREATION */}
+      <div className={styles.contentLayout}>
+        {/* LEFT SIDE: Side-bar Form */}
+        <aside className={styles.formSidebar}>
           <section className={styles.adminSection}>
             <div className={styles.sectionHeader}>
-              2. Create New Hotel Property
+              {isEditing ? "Modify Room" : "New Room"}
             </div>
-            <form onSubmit={handleCreateHotel} className={styles.adminFormGrid}>
-              <input
-                type="text"
-                placeholder="Hotel Name"
-                required
-                onChange={(e) =>
-                  setHotelData({ ...hotelData, name: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="Street Address"
-                required
-                onChange={(e) =>
-                  setHotelData({ ...hotelData, street: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="City"
-                required
-                onChange={(e) =>
-                  setHotelData({ ...hotelData, city: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="State"
-                required
-                onChange={(e) =>
-                  setHotelData({ ...hotelData, state: e.target.value })
-                }
-              />
-              <input
-                type="text"
-                placeholder="Zip Code"
-                required
-                onChange={(e) =>
-                  setHotelData({ ...hotelData, zipCode: e.target.value })
-                }
-              />
-              <textarea
-                placeholder="Property Description"
-                onChange={(e) =>
-                  setHotelData({ ...hotelData, description: e.target.value })
-                }
-              />
-              <button type="submit" className={styles.createBtn}>
-                Create Hotel
-              </button>
+            <form onSubmit={handleSubmit} className={styles.compactForm}>
+              <div className={styles.formGroup}>
+                <label>Room Name</label>
+                <input type="text" value={roomData.roomName} required onChange={(e) => setRoomData({ ...roomData, roomName: e.target.value })} />
+              </div>
+
+              <div className={styles.formRow}>
+                <div className={styles.formGroup}>
+                  <label>Category</label>
+                  <select value={roomData.roomType} onChange={(e) => setRoomData({ ...roomData, roomType: e.target.value })}>
+                    <option value="Single">Single</option>
+                    <option value="Double">Double</option>
+                    <option value="Suite">Suite</option>
+                    <option value="Deluxe">Deluxe</option>
+                    <option value="Penthouse">Penthouse</option>
+                  </select>
+                </div>
+                <div className={styles.formGroup}>
+                  <label>Max Guests</label>
+                  <input type="number" className={styles.noArrows} value={roomData.maxOccupancy === 0 ? "" : roomData.maxOccupancy} required onChange={(e) => setRoomData({ ...roomData, maxOccupancy: parseInt(e.target.value) || 0 })} />
+                </div>
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Nightly Rate ($)</label>
+                <input type="number" step="0.01" className={styles.noArrows} value={roomData.basePrice === 0 ? "" : roomData.basePrice} onBlur={handlePriceBlur} required placeholder="0.00" onChange={(e) => setRoomData({ ...roomData, basePrice: parseFloat(e.target.value) || 0 })} />
+              </div>
+
+              <div className={styles.formGroup}>
+                <label>Amenities</label>
+                <input type="text" placeholder="Wifi, AC, Pool..." value={roomData.amenities} onChange={(e) => setRoomData({ ...roomData, amenities: e.target.value })} />
+              </div>
+
+              {/* Wrap the description in a fullWidth class to make it look cleaner */}
+              <div className={`${styles.formGroup} ${styles.fullWidth}`}>
+                <label>Description</label>
+                <textarea
+                  value={roomData.description}
+                  onChange={(e) => setRoomData({ ...roomData, description: e.target.value })}
+                  placeholder="Describe the room features..."
+                />
+              </div>
+
+              <div className={styles.formActionsVertical}>
+                <button type="submit" className={styles.createBtn}>{isEditing ? "Update Room" : "Add Room"}</button>
+                {isEditing && <button type="button" onClick={resetForm} className={styles.cancelBtn}>Cancel</button>}
+              </div>
             </form>
           </section>
+        </aside>
 
-          {/* SECTION 3: ROOM CREATION */}
-          <section className={styles.adminSection}>
-            <div className={styles.sectionHeader}>
-              3. Add Rooms to Inventory
-            </div>
-            <form onSubmit={handleCreateRoom} className={styles.adminFormGrid}>
-              <select
-                required
-                onChange={(e) =>
-                  setRoomData({ ...roomData, hotel: e.target.value })
-                }
-              >
-                <option value="">Select a Hotel</option>
-                {hotels.map((h) => (
-                  <option key={h._id} value={h._id}>
-                    {h.name}
-                  </option>
-                ))}
-              </select>
-              <input
-                type="text"
-                placeholder="Room Name (e.g. 101)"
-                required
-                onChange={(e) =>
-                  setRoomData({ ...roomData, roomName: e.target.value })
-                }
-              />
-              <select
-                onChange={(e) =>
-                  setRoomData({ ...roomData, roomType: e.target.value })
-                }
-              >
-                <option value="single">Single</option>
-                <option value="double">Double</option>
-                <option value="suite">Suite</option>
-              </select>
-              <input
-                type="number"
-                placeholder="Price Per Night"
-                required
-                onChange={(e) =>
-                  setRoomData({
-                    ...roomData,
-                    basePrice: Number(e.target.value),
-                  })
-                }
-              />
-              <input
-                type="number"
-                placeholder="Max Occupancy"
-                required
-                onChange={(e) =>
-                  setRoomData({
-                    ...roomData,
-                    maxOccupancy: Number(e.target.value),
-                  })
-                }
-              />
-              <button type="submit" className={styles.createBtn}>
-                Create Room
-              </button>
-            </form>
-          </section>
-
-          {/* SECTION 4: USER TABLE */}
+        {/* RIGHT SIDE: Main Inventory Table */}
+        <section className={styles.tableMainContent}>
           <div className={styles.tableContainer}>
-            <div className={styles.tableHeader}>User Management Database</div>
+            <div className={styles.tableHeader}>
+              <span>Room Inventory Database</span>
+              <span className={styles.refreshHint}>Real-time Inventory</span>
+            </div>
             <table className={styles.userTable}>
               <thead>
                 <tr>
-                  <th>Internal ID</th>
-                  <th>Email Address</th>
-                  <th>System Role</th>
-                  <th>Auth Method</th>
-                  <th>Actions</th>
+                  <th>Room Name</th>
+                  <th>Type</th>
+                  <th>Price</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: 'right' }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {users.map((user) => (
-                  <tr key={user._id} className={styles.userRow}>
-                    <td className={styles.idCell}>{user._id.slice(-6)}...</td>
-                    <td style={{ fontWeight: 500 }}>{user.email}</td>
-                    <td>
-                      <span
-                        className={`${styles.roleBadge} ${
-                          user.role === "admin"
-                            ? styles.roleAdmin
-                            : styles.roleGuest
-                        }`}
-                      >
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>{user.loginMethod}</td>
-                    <td>
-                      <button
-                        onClick={() => handleDeleteUser(user._id, user.email)}
-                        className={styles.deleteBtn}
-                      >
-                        Delete
-                      </button>
+                {rooms.map((room) => (
+                  <tr key={room._id} className={styles.userRow}>
+                    <td><strong>{room.roomName}</strong></td>
+                    <td>{room.roomType}</td>
+                    <td>${room.basePrice.toFixed(2)}</td>
+                    <td><span className={`${styles.statusBadge} ${styles[room.availabilityStatus]}`}>{room.availabilityStatus}</span></td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button onClick={() => handleEditClick(room)} className={styles.editBtn}>Edit</button>
+                      <button onClick={() => handleDelete(room._id)} className={styles.deleteBtn}>Delete</button>
                     </td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
-        </>
-      )}
+        </section>
+      </div>
+
+      <ActionStatusModal
+        isOpen={modalConfig.isOpen}
+        message={modalConfig.message}
+        type={modalConfig.type}
+        onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+      />
     </main>
   );
 }

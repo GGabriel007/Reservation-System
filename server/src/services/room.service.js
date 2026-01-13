@@ -34,41 +34,66 @@ export const RoomService = {
   },
 
   /**
-   * Business Logic for creating a room.
-   * Ensures data is formatted correctly before saving.
+   * CREATE ROOM
+   * Added: Enum validation and duplicate room name check.
    */
   createRoom: async (roomData) => {
-    // 1. Handle price check (checking both 'price' and 'basePrice' to be safe)
-    const priceToCheck = roomData.basePrice ?? roomData.price;
-    if (priceToCheck !== undefined && priceToCheck < 0) {
+    // 1. Validate Room Type (Matches your updated Model Enums)
+    const validTypes = ["Single", "Double", "Suite", "Deluxe", "Penthouse", "Studio"];
+    if (roomData.roomType && !validTypes.includes(roomData.roomType)) {
+      throw new Error(`Invalid Room Type. Must be one of: ${validTypes.join(", ")}`);
+    }
+
+    // 2. Validate Price
+    const price = roomData.basePrice ?? roomData.price;
+    if (price !== undefined && price < 0) {
       throw new Error("Price cannot be negative");
     }
 
-    // 2. Defensive Formatting: 
-    // We check if roomName exists before trimming to avoid the crash
+    // 3. Unique Room Name Check (Prevents two "Room 101" in the same hotel)
+    const existingRooms = await RoomRepository.findByHotelId(roomData.hotelId);
+    const isDuplicate = existingRooms.some(
+      r => r.roomName.toLowerCase() === roomData.roomName.trim().toLowerCase()
+    );
+    if (isDuplicate) {
+      throw new Error(`A room with the name "${roomData.roomName}" already exists in this hotel.`);
+    }
+
+    // 4. Format and Save
     const formattedData = {
       ...roomData,
-      roomName: roomData.roomName ? roomData.roomName.trim() : `Room ${roomData.roomNumber}`
+      roomName: roomData.roomName.trim(),
     };
 
     return await RoomRepository.create(formattedData);
   },
 
   /**
-   * Updates room information.
+   * UPDATE ROOM
+   * Added: Logic to prevent room name conflicts during edit.
    */
   updateRoom: async (id, updateData) => {
-    // Security: Prevent updating 'isDeleted' through the standard update route
-    if (updateData.isDeleted !== undefined) {
-      delete updateData.isDeleted;
+    if (updateData.isDeleted !== undefined) delete updateData.isDeleted;
+
+    // If updating name, check for conflicts excluding itself
+    if (updateData.roomName) {
+      const currentRoom = await RoomRepository.findById(id);
+      const hotelRooms = await RoomRepository.findByHotelId(currentRoom.hotelId);
+      
+      const isDuplicate = hotelRooms.some(
+        r => r._id.toString() !== id && 
+             r.roomName.toLowerCase() === updateData.roomName.trim().toLowerCase()
+      );
+
+      if (isDuplicate) {
+        throw new Error("Another room in this hotel already uses that name.");
+      }
+      updateData.roomName = updateData.roomName.trim();
     }
 
     return await RoomRepository.update(id, updateData);
   },
 
-  /**
-   * Logic for soft-deleting a room.
-   */
   deleteRoom: async (id) => {
     return await RoomRepository.softDelete(id);
   }

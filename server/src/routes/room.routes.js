@@ -13,7 +13,8 @@ const router = Router();
  */
 router.get("/", RoomController.getAllRooms);                
 router.get("/:id", RoomController.getRoomById);           
-router.get("/hotel/:hotelId", RoomController.getRoomsByHotel); 
+router.get("/hotel/:hotelId", protect, RoomController.getRoomsByHotel);
+
 
 /**
  * PROTECTED ROUTES

@@ -1,180 +1,196 @@
-/* Container */
 .adminPanelPage {
-  padding: 40px 20px;
-  max-width: 1000px;
+  padding: 20px 30px;
+  max-width: 1600px; /* Expands to use more space */
   margin: 0 auto;
   font-family: 'Inter', sans-serif;
-  color: #333;
+  background-color: #fcfcfc;
+  min-height: 100vh;
 }
 
-/* Header */
+/* Header with Stats */
 .headerArea {
-  margin-bottom: 40px;
-  border-bottom: 2px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
   padding-bottom: 20px;
+  border-bottom: 1px solid #eee;
 }
 
-.headerArea h1 {
-  font-size: 2rem;
-  margin: 0;
-  color: #1a1a1a;
+.statCard {
+  background: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
 }
 
-.statsText {
-  color: #666;
-  font-size: 0.9rem;
+.statLabel { font-size: 0.7rem; text-transform: uppercase; color: #888; }
+.statValue { font-size: 1.5rem; font-weight: 700; color: #c5a059; }
+
+/* The Main Grid Layout */
+.contentLayout {
+  display: grid;
+  grid-template-columns: 350px 1fr; /* Sidebar is 350px, Table takes rest */
+  gap: 30px;
+  align-items: start;
 }
 
-/* Section Cards */
+/* Sidebar Styling */
+.formSidebar {
+  position: sticky; /* Form stays visible while you scroll the table */
+  top: 20px;
+}
+
 .adminSection {
   background: #ffffff;
   border: 1px solid #e0e0e0;
-  border-radius: 8px;
+  border-radius: 12px;
   padding: 24px;
-  margin-bottom: 30px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
-.sectionHeader {
-  font-weight: 700;
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-  color: #c5a059; /* Brand Gold */
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-/* Forms */
-.adminForm, .adminFormGrid {
+/* Compact Form */
+.compactForm {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 15px;
 }
 
-.adminFormGrid {
+.formRow {
   display: grid;
-  grid-template-columns: 1fr 1fr; /* Two column layout */
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
 }
 
-/* Make textarea and select span full width if needed */
-.adminFormGrid textarea, .adminFormGrid select:first-child {
-  grid-column: span 2;
+/* Table Area */
+.tableMainContent {
+  min-width: 0; /* Prevents table from breaking grid */
 }
 
-input, select, textarea {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.95rem;
-  width: 100%;
-}
-
-input:focus {
-  outline: none;
-  border-color: #c5a059;
-}
-
-/* Buttons */
-.promoteBtn, .createBtn {
-  padding: 12px 24px;
-  background: #1a1a1a;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-weight: 600;
-  transition: background 0.2s;
-}
-
-.createBtn {
-  background: #c5a059;
-  grid-column: span 2;
-}
-
-.promoteBtn:hover, .createBtn:hover {
-  opacity: 0.9;
-}
-
-/* Feedback & Errors */
-.feedbackText {
-  margin-top: 10px;
-  font-size: 0.85rem;
-  color: #2e7d32;
-  font-weight: 600;
-}
-
-.unauthorizedError {
-  background: #fff5f5;
-  border: 1px solid #feb2b2;
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-  color: #c53030;
-}
-
-/* User Table */
 .tableContainer {
-  margin-top: 40px;
-  overflow-x: auto;
+  background: white;
+  border-radius: 12px;
+  border: 1px solid #e0e0e0;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
 }
 
 .tableHeader {
-  font-weight: 600;
-  padding: 12px;
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 20px;
   background: #f8f9fa;
-  border: 1px solid #e0e0e0;
-  border-bottom: none;
+  font-weight: 700;
+  border-bottom: 1px solid #eee;
 }
+
+.refreshHint { font-size: 0.75rem; color: #2e7d32; font-weight: 400; }
 
 .userTable {
   width: 100%;
   border-collapse: collapse;
-  background: white;
-  border: 1px solid #e0e0e0;
-}
-
-.userTable th, .userTable td {
-  padding: 15px;
-  text-align: left;
-  border-bottom: 1px solid #eee;
 }
 
 .userTable th {
-  background: #fcfcfc;
-  font-size: 0.85rem;
-  color: #888;
-  text-transform: uppercase;
-}
-
-.idCell {
-  font-family: monospace;
-  color: #999;
-}
-
-/* Badges */
-.roleBadge {
-  padding: 4px 10px;
-  border-radius: 12px;
+  background: #fafafa;
+  padding: 12px 20px;
   font-size: 0.75rem;
-  font-weight: 700;
+  color: #999;
   text-transform: uppercase;
 }
 
-.deleteBtn {
-  padding: 6px 12px;
-  background-color: transparent;
-  color: #d32f2f;
-  border: 1px solid #d32f2f;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 0.8rem;
-  font-weight: 600;
-  transition: all 0.2s;
+.userTable td {
+  padding: 16px 20px;
+  border-bottom: 1px solid #f4f4f4;
 }
 
-.deleteBtn:hover {
-  background-color: #d32f2f;
+/* Actions */
+.formActionsVertical {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.createBtn {
+  background: #c5a059;
   color: white;
+  border: none;
+  padding: 14px;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-.roleAdmin { background: #e3f2fd; color: #1976d2; }
-.roleGuest { background: #f5f5f5; color: #616161; }
+/* Status Badges */
+.statusBadge {
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.available { background: #e8f5e9; color: #2e7d32; border: 1px solid #c8e6c9; }
+.occupied { background: #fff3e0; color: #ef6c00; border: 1px solid #ffe0b2; }
+
+/* Inputs */
+input, select, textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fdfdfd;
+}
+
+/* Update your global input selector */
+input, select, textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fdfdfd;
+  width: 100%;           /* Keep this */
+  box-sizing: border-box; /* ADD THIS LINE - It prevents the overflow */
+  font-family: inherit;
+}
+
+/* Ensure the grid row doesn't force things out */
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px; /* Spacing between Category and Max Guests */
+  width: 100%;
+}
+
+/* Optional: Improve the spacing of the sidebar container */
+.adminSection {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 20px; /* Reduced slightly to give inputs more room */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  overflow: hidden; /* Safety net */
+}
+
+.fullWidth {
+  grid-column: span 1; /* For the compact list */
+}
+
+/* Since the form is now a single column list in the sidebar, 
+   we don't need 'grid-column: span 2' anymore. 
+   Instead, just make sure the textarea feels substantial. */
+.formGroup textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+/* Media Query for Mobile */
+@media (max-width: 900px) {
+  .contentLayout {
+    grid-template-columns: 1fr;
+  }
+  .formSidebar {
+    position: static;
+  }
+}
