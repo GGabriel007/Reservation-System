@@ -3,7 +3,7 @@
   display: flex;
   gap: 20px;
 }
-select {
+.roomListingFilter select {
   padding-left: 90px;
   height: 50px;
   position: relative;
@@ -18,19 +18,19 @@ select {
   -webkit-box-shadow: none;
 }
 
-select {
+.roomListingFilter select {
   &,
   &::picker(select) {
     appearance: base-select;
   }
 }
 
-select::picker-icon {
+.roomListingFilter select::picker-icon {
   content: url("/arrow-down.png");
   position: relative;
   bottom: 3px;
 }
-label {
+.roomListingFilter label {
   position: absolute;
   z-index: 1;
   height: 50px;
@@ -40,15 +40,15 @@ label {
   text-indent: 10px;
 }
 
-option {
+.roomListingFilter option {
   height: 50px;
 }
 
-option::checkmark {
+.roomListingFilter option::checkmark {
   display: none;
 }
 
-select:hover,
-option:hover {
+.roomListingFilter select:hover,
+.roomListingFilter option:hover {
   background-color: var(--beige);
 }

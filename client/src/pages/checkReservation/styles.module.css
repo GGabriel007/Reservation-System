@@ -120,6 +120,10 @@
   width: 100%;
 }
 
+.checkReservationPage form p:last-child {
+  margin-block-start: 0px;
+}
+
 .checkReservationPage form button {
   margin-inline-start: auto;
 }

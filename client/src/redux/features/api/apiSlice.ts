@@ -33,6 +33,9 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["User"],
     }),
+    getRooms: builder.query<Room[], void>({
+      query: () => "/rooms",
+    }),
 
     /* --- RESERVATION ENDPOINTS --- */
     lookupReservation: builder.query<
@@ -45,9 +48,6 @@ export const apiSlice = createApi({
         params,
       }),
       providesTags: (result) => [{ type: "Reservation", id: result?._id }],
-    }),
-    getRooms: builder.query<Room[], void>({
-      query: () => "/rooms",
     }),
 
     // Add this to allow guests to cancel their booking

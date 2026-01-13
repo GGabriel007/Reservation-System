@@ -157,9 +157,9 @@
 }
 
 /* Inputs */
-input,
-select,
-textarea {
+.adminPanelPage input,
+.adminPanelPage select,
+.adminPanelPage textarea {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
@@ -167,9 +167,9 @@ textarea {
 }
 
 /* Update your global input selector */
-input,
-select,
-textarea {
+.adminPanelPage input,
+.adminPanelPage select,
+.adminPanelPage textarea {
   padding: 10px;
   border: 1px solid #ddd;
   border-radius: 6px;
