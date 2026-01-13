@@ -2,6 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import "./css/index.css";
+import AuthPersist from "./components/auth/AuthPersist";
 import App from "./App";
 import {
   Home,
@@ -16,6 +17,7 @@ import {
   RoomListing,
   FoundReservation,
   HotelListing,
+  StaffLogin,
 } from "./pages/index";
 
 import { Provider } from "react-redux";
@@ -29,9 +31,12 @@ import { store } from "@/redux/store"; // Import your configured Redux store
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App />, 
     children: [
       {
+        element: <AuthPersist />, 
+        children: [
+          {
         path: "/",
         element: <Home />,
       },
@@ -79,6 +84,12 @@ const router = createBrowserRouter([
         path: "/found-reservation",
         element: <FoundReservation />,
       },
+      {
+        path: "/staffLogin",
+        element: <StaffLogin />,
+      },
+        ]
+      }
     ],
   },
 ]);

@@ -46,9 +46,9 @@ const RoomSchema = new mongoose.Schema(
       default: "available",
       required: true,
     },
-    images: {
-      type: [String],
-      required: false,
+    images: { 
+      type: [String], 
+      default: [] 
     },
     hotel: {
       type: mongoose.Schema.Types.ObjectId,

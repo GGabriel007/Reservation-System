@@ -28,8 +28,13 @@ const userSchema = new mongoose.Schema({
   },
   role: {
     type: String,
-    enum: ["guest", "user", "admin"],
+    enum: ["guest", "user", "manager", "admin"], 
     default: "guest",
+  },
+  assignedHotel: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Hotel', // Matches your Hotel model name
+    required: function() { return this.role === 'manager'; } // Only required for managers
   },
   loginMethod: { 
     type: String, 

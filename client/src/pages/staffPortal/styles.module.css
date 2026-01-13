@@ -1,0 +1,48 @@
+.portalGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.portalCard {
+  padding: 20px;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  background: #fdfdfd;
+}
+
+.portalCard h3 {
+  margin: 0 0 10px 0;
+  color: #1a1a1a;
+  font-size: 1.1rem;
+}
+
+.portalCard p {
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+.adminCard {
+  border-top: 3px solid #c5a059; 
+}
+
+.hotelDropdown {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-family: inherit;
+}
+
+.secondaryBtn {
+  width: 100%;
+  padding: 12px;
+  background: #1a1a1a; 
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+}

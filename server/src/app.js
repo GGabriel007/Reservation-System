@@ -28,10 +28,10 @@ app.use(
     origin: (origin, callback) => {
       const allowedOrigins = [
         "http://localhost:5173",
-        // Add your new Elastic Beanstalk URL here once created
+         
         "http://liore.us-east-1.elasticbeanstalk.com",
       ];
-      // When All-in-One is working, 'origin' will often be undefined for same-origin requests
+      
       if (!origin || allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
@@ -55,7 +55,7 @@ app.use(
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
-      secure: false, // Set to true only if you have HTTPS/SSL configured later
+      secure: false,  
       sameSite: "lax", 
     },
     store: MongoStore.create({
@@ -86,7 +86,8 @@ app.use((req, res, next) => {
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/hotels", hotelRoutes);      
-app.use("/rooms", roomRoutes);        
+app.use("/rooms", roomRoutes);   
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));     
 app.use("/reservations", reservationRoutes); 
 app.use("/transactions", transactionRoutes); 
 
@@ -98,13 +99,13 @@ app.get("/api/health", (req, res) => {
 const distPath = path.join(process.cwd(), 'client-build', 'dist');
 
 
-// 1. Serve static files from the 'public' folder
+// Serve static files from the 'public' folder
 // This folder should be located at: server/src/public (if you use this path)
 // Note: If you put 'public' in the server root, use path.join(__dirname, '../public')
 app.use(express.static(distPath));
 
 /**
- * 2. The "Catch-all" route (FIXED FOR EXPRESS 5)
+ * The "Catch-all" route (FIXED FOR EXPRESS 5)
  * In Express 5, we use '*splat' instead of just '*'
  * This sends the index.html for any request that isn't an API call.
  */

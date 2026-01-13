@@ -1,0 +1,142 @@
+.staffLoginPage {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fcfcfc; /* Matching your AdminPanel background */
+  font-family: "Inter", sans-serif;
+  padding: 20px;
+}
+
+.loginContainer {
+  width: 100%;
+  max-width: 400px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 12px; /* Matching your AdminSection radius */
+  border: 1px solid #e0e0e0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Matching your AdminSection shadow */
+}
+
+.branding {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.branding h1 {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+}
+
+.goldText { 
+  color: #c5a059; /* Your brand gold */
+  font-weight: 600;
+}
+
+.branding p {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 5px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.staffBadge {
+  background: #f8f9fa; /* Light gray header look */
+  color: #c5a059; 
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-align: center;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #eee;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.inputGroup {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.inputGroup label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+}
+
+.inputGroup input {
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fdfdfd;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.2s;
+}
+
+.inputGroup input:focus {
+  outline: none;
+  border-color: #c5a059; /* Gold focus state */
+}
+
+.loginBtn {
+  width: 100%;
+  padding: 14px;
+  background-color: #c5a059; /* Your primary Gold action color */
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.2s;
+  margin-top: 10px;
+}
+
+.loginBtn:hover {
+  opacity: 0.9;
+}
+
+.errorBanner {
+  background: #fff3e0; /* Using your 'Occupied' status orange for warnings */
+  color: #ef6c00;
+  padding: 12px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  margin-bottom: 20px;
+  text-align: center;
+  border: 1px solid #ffe0b2;
+}
+
+.footer {
+  margin-top: 30px;
+  text-align: center;
+  border-top: 1px solid #eee;
+  padding-top: 20px;
+}
+
+.footer p {
+  font-size: 0.7rem;
+  color: #999;
+}
+
+.guestLink {
+  display: inline-block;
+  margin-top: 15px;
+  font-size: 0.8rem;
+  color: #888;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.guestLink:hover {
+  color: #c5a059;
+  text-decoration: underline;
+}

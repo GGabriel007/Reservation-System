@@ -44,7 +44,7 @@ router.post("/register", async (req, res) => {
  * @desc    Authenticates local credentials via Passport middleware.
  */
 router.post("/local/login", localAuth, (req, res) => {
-  // 1. Manually save the session to ensure MongoDB is updated before we tell the frontend "Success"
+  // Manually save the session to ensure MongoDB is updated before we tell the frontend "Success"
   req.session.save((err) => {
     if (err) {
       console.error("Session save error:", err);
@@ -56,7 +56,9 @@ router.post("/local/login", localAuth, (req, res) => {
     const userResponse = {
       _id: req.user._id,
       email: req.user.email,
-      role: req.user.role || "guest"
+      role: req.user.role || "guest",
+      firstName: req.user.firstName, 
+      assignedHotel: req.user.assignedHotel 
     };
 
     res.status(200).json({ 

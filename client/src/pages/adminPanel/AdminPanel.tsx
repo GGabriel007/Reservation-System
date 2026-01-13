@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppSelector } from "@/redux/store";
+import { selectUserInfo } from "@/redux/features/user/userSlice";
 import styles from "./styles.module.css";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import ActionStatusModal from "@/components/global/toast/actionsStatusModal/ActionStatusModal";
+import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToast/ConfirmationDeleteToast";
+import RoomDetailsModal from "@/components/modals/roomDetailsModal/RoomDetailsModal";
 
 interface Room {
   _id: string;
@@ -12,41 +17,93 @@ interface Room {
   amenities: string[];
   description: string;
   availabilityStatus: string;
+  images: string[];
 }
 
+// Define available amenities for the Tag Cloud
+const AMENITY_OPTIONS = ["Wifi", "AC", "Pool", "TV", "Parking", "Kitchen", "Gym", "Breakfast", "Ocean View", "Pet Friendly"];
+
 export default function AdminPanel() {
+  const navigate = useNavigate();
+
+  // 1. Get the logged-in staff info from Redux
+  const userInfo = useAppSelector(selectUserInfo);
+  const assignedHotelId = userInfo?.assignedHotel;
+
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
+  const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
+  const [viewRoom, setViewRoom] = useState<Room | null>(null);
 
-  // Modal State
+  // --- MULTI-IMAGE STATE ---
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+
+  // State for the fetched Hotel Name
+  const [hotelName, setHotelName] = useState("Loading Hotel...");
+  const [searchTerm, setSearchTerm] = useState("");
+
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     message: "",
     type: 'success' as 'success' | 'error'
   });
 
-  const assignedHotelId = "6961bedfd52cfab927969b83";
-
   const [roomData, setRoomData] = useState({
     roomName: "",
     roomType: "Single",
     basePrice: 0,
     maxOccupancy: 2,
-    amenities: "",
+    amenities: [] as string[],
     description: "",
+    availabilityStatus: "available",
+    images: [] as string[]
   });
 
-  const baseUrl = typeof window !== "undefined" && window.location.hostname === "localhost"
-    ? "http://localhost:8080"
-    : "";
+  // Dynamic URL: Works for Localhost AND AWS Production
+  const baseUrl = import.meta.env.PROD 
+  ? "http://liore.us-east-1.elasticbeanstalk.com" 
+  : "http://localhost:8080";
+
+  // 2. ROLE GUARD
+  useEffect(() => {
+    if (!userInfo || (userInfo.role !== 'admin' && userInfo.role !== 'manager')) {
+      navigate("/staff/login");
+    }
+  }, [userInfo, navigate]);
+
+  // Fetch Hotel Name for the Header
+  useEffect(() => {
+    const fetchHotelName = async () => {
+      if (assignedHotelId) {
+        try {
+          const res = await fetch(`${baseUrl}/hotels/${assignedHotelId}`);
+          if (res.ok) {
+            const data = await res.json();
+            setHotelName(data.name);
+          } else {
+            setHotelName("Unknown Hotel");
+          }
+        } catch (err) {
+          setHotelName("Hotel Info Unavailable");
+        }
+      }
+    };
+    fetchHotelName();
+  }, [assignedHotelId, baseUrl]);
 
   const showFeedback = (message: string, type: 'success' | 'error' = 'success') => {
     setModalConfig({ isOpen: true, message, type });
   };
 
   const fetchRooms = async () => {
+    if (!assignedHotelId) {
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch(`${baseUrl}/rooms/hotel/${assignedHotelId}`, {
         method: "GET",
@@ -63,29 +120,90 @@ export default function AdminPanel() {
     }
   };
 
-  useEffect(() => { fetchRooms(); }, []);
+  useEffect(() => {
+    if (assignedHotelId) {
+      fetchRooms();
+    }
+  }, [assignedHotelId]);
+
+  // Helper to toggle amenities in the array
+  const toggleAmenity = (amenity: string) => {
+    setRoomData((prev) => {
+      const current = prev.amenities || [];
+      if (current.includes(amenity)) {
+        return { ...prev, amenities: current.filter(a => a !== amenity) };
+      } else {
+        return { ...prev, amenities: [...current, amenity] };
+      }
+    });
+  };
+
+  // --- NEW: Handle Multiple Images ---
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+
+      // Store Files (to send to backend)
+      setImageFiles((prev) => [...prev, ...filesArray]);
+
+      // Generate Previews (to show user)
+      const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+      setImagePreviews((prev) => [...prev, ...newPreviews]);
+    }
+  };
+
+  const removeImage = (index: number) => {
+    // Note: This logic removes visual previews. 
+    // Ideally, for editing existing rooms, you'd need separate logic 
+    // to distinguish between "New File to remove" vs "Existing DB Image to delete".
+    // For this version, we will handle UI removal.
+    setImageFiles((prev) => prev.filter((_, i) => i !== index));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing ? `${baseUrl}/rooms/${selectedRoomId}` : `${baseUrl}/rooms`;
 
-    const payload = {
-      ...roomData,
-      hotel: assignedHotelId,
-      amenities: roomData.amenities.split(",").map(a => a.trim()).filter(a => a !== "")
-    };
+    // Create FormData object
+    const formData = new FormData();
+    formData.append("roomName", roomData.roomName);
+    formData.append("roomType", roomData.roomType);
+    formData.append("basePrice", roomData.basePrice.toString());
+    formData.append("maxOccupancy", roomData.maxOccupancy.toString());
+    formData.append("description", roomData.description);
+    formData.append("hotel", assignedHotelId || "");
+    formData.append("availabilityStatus", roomData.availabilityStatus);
+
+    // Append Amenities
+    roomData.amenities.forEach((amenity) => {
+      formData.append("amenities", amenity);
+    });
+
+    // Append New Uploaded Images
+    imageFiles.forEach((file) => {
+      formData.append("images", file);
+    });
+
+    // --- NEW: Append "Kept" Existing Images ---
+    // This tells the server which old images to SAVE. 
+    // If you deleted one in the UI, it won't be in this array, so it won't be sent.
+    if (roomData.images && roomData.images.length > 0) {
+      roomData.images.forEach((imgUrl) => {
+        formData.append("existingImages", imgUrl);
+      });
+    }
+    // ---------------------------------------------
 
     try {
       const response = await fetch(url, {
         method,
-        headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify(payload),
+        body: formData,
       });
 
       if (response.ok) {
-        // --- MODAL LOGIC GOES INSIDE HERE ---
         const action = isEditing ? "updated" : "created";
         showFeedback(`Room "${roomData.roomName}" was successfully ${action}!`, 'success');
         resetForm();
@@ -97,27 +215,25 @@ export default function AdminPanel() {
     } catch (err) {
       showFeedback("A network error occurred", 'error');
     }
-  };
+};
 
   const handlePriceBlur = () => {
-    // Ensures that when they stop typing, it's rounded to 2 decimal places
     setRoomData({
       ...roomData,
       basePrice: Number(roomData.basePrice.toFixed(2))
     });
   };
 
-  const handleDelete = async (id: string) => {
-    if (!window.confirm("Are you sure you want to remove this room?")) return;
+  const executeDelete = async () => {
+    if (!roomToDelete) return;
 
     try {
-      const res = await fetch(`${baseUrl}/rooms/${id}`, {
+      const res = await fetch(`${baseUrl}/rooms/${roomToDelete}`, {
         method: "DELETE",
         credentials: "include"
       });
 
       if (res.ok) {
-        // --- MODAL LOGIC GOES INSIDE HERE ---
         showFeedback("The room has been removed from your active inventory.", 'success');
         fetchRooms();
       } else {
@@ -125,7 +241,13 @@ export default function AdminPanel() {
       }
     } catch (err) {
       showFeedback("Network error: Could not reach server.", 'error');
+    } finally {
+      setRoomToDelete(null);
     }
+  };
+
+  const handleDelete = (id: string) => {
+    setRoomToDelete(id);
   };
 
   const handleEditClick = (room: Room) => {
@@ -136,58 +258,171 @@ export default function AdminPanel() {
       roomType: room.roomType,
       basePrice: room.basePrice,
       maxOccupancy: room.maxOccupancy,
-      amenities: room.amenities.join(", "),
+      amenities: Array.isArray(room.amenities)
+        ? room.amenities
+        : (typeof room.amenities === 'string' ? (room.amenities as string).split(",") : []),
       description: room.description || "",
+      availabilityStatus: room.availabilityStatus,
+      images: room.images || [],
     });
+
+    // --- Handling Existing Images ---
+    setImageFiles([]); // Clear pending uploads
+
+    // Convert DB paths to full URLs for preview
+    const existingImages = room.images || [];
+    const fullPaths = existingImages.map(img => img.startsWith("http") ? img : `${baseUrl}${img}`);
+    setImagePreviews(fullPaths);
   };
 
   const resetForm = () => {
     setIsEditing(false);
     setSelectedRoomId(null);
-    setRoomData({ roomName: "", roomType: "Single", basePrice: 0, maxOccupancy: 2, amenities: "", description: "" });
+    setRoomData({
+      roomName: "",
+      roomType: "Single",
+      basePrice: 0,
+      maxOccupancy: 2,
+      amenities: [],
+      description: "",
+      availabilityStatus: "available",
+      images: [],
+
+    });
+    // Reset Images
+    setImageFiles([]);
+    setImagePreviews([]);
   };
 
-  if (loading) return <div className={styles.loading}>Accessing Admin Suite...</div>;
+  if (loading) return <div className={styles.loading}>Accessing Management Suite...</div>;
+
+  const filteredRooms = rooms.filter((room) =>
+    room.roomName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <main className={styles.adminPanelPage}>
+      <Toaster />
       <header className={styles.headerArea}>
         <div className={styles.headerTitle}>
-          <h1>Lioré Admin Panel</h1>
-          <p className={styles.statsText}>Property Inventory Management</p>
+          <h1>Manager Dashboard <span className={styles.goldText}>Lioré</span></h1>
+          <p className={styles.statsText}>
+            Operating as: <strong>{userInfo?.firstName}</strong> | Hotel: <strong>{hotelName}</strong>
+          </p>
         </div>
         <div className={styles.headerStats}>
           <div className={styles.statCard}>
-            <span className={styles.statLabel}>Total Rooms</span>
+            <span className={styles.statLabel}>Active Inventory</span>
             <span className={styles.statValue}>{rooms.length}</span>
           </div>
         </div>
       </header>
 
       <div className={styles.contentLayout}>
-        {/* LEFT SIDE: Side-bar Form */}
         <aside className={styles.formSidebar}>
           <section className={styles.adminSection}>
             <div className={styles.sectionHeader}>
               {isEditing ? "Modify Room" : "New Room"}
             </div>
             <form onSubmit={handleSubmit} className={styles.compactForm}>
+
+              {/* --- MULTI-IMAGE UPLOAD SECTION --- */}
+              <div className={styles.formGroup}>
+                <label>Room Gallery (Max 5)</label>
+
+                {/* Upload Box */}
+                <div
+                  style={{
+                    border: '2px dashed #cfaa5f',
+                    borderRadius: '8px',
+                    padding: '20px',
+                    textAlign: 'center',
+                    cursor: 'pointer',
+                    backgroundColor: '#fafafa',
+                    marginBottom: '10px'
+                  }}
+                  onClick={() => document.getElementById('roomImagesInput')?.click()}
+                >
+                  <p style={{ margin: '5px 0', fontSize: '12px', color: '#666' }}>Click to add photos</p>
+                  <input
+                    type="file"
+                    id="roomImagesInput"
+                    hidden
+                    multiple // ALLOWS MULTIPLE FILES
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                </div>
+
+                {/* Preview Grid */}
+                {imagePreviews.length > 0 && (
+                  <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '5px' }}>
+                    {imagePreviews.map((src, index) => (
+                      <div key={index} style={{ position: 'relative', flexShrink: 0 }}>
+                        <img
+                          src={src}
+                          alt="Preview"
+                          style={{ width: '60px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #ddd' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          style={{
+                            position: 'absolute', top: -5, right: -5,
+                            background: 'red', color: 'white', border: 'none',
+                            borderRadius: '50%', width: '18px', height: '18px',
+                            cursor: 'pointer', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center'
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              {/* ---------------------------------- */}
+
+
               <div className={styles.formGroup}>
                 <label>Room Name</label>
                 <input type="text" value={roomData.roomName} required onChange={(e) => setRoomData({ ...roomData, roomName: e.target.value })} />
               </div>
 
-              <div className={styles.formRow}>
-                <div className={styles.formGroup}>
-                  <label>Category</label>
-                  <select value={roomData.roomType} onChange={(e) => setRoomData({ ...roomData, roomType: e.target.value })}>
-                    <option value="Single">Single</option>
-                    <option value="Double">Double</option>
-                    <option value="Suite">Suite</option>
-                    <option value="Deluxe">Deluxe</option>
-                    <option value="Penthouse">Penthouse</option>
-                  </select>
-                </div>
+              {/* Inside the form, near the Category/Type select */}
+
+              <div className={styles.formGroup}>
+                <label>Category</label>
+                <select value={roomData.roomType} onChange={(e) => setRoomData({ ...roomData, roomType: e.target.value })}>
+                  <option value="Single">Single</option>
+                  <option value="Double">Double</option>
+                  <option value="Suite">Suite</option>
+                  <option value="Deluxe">Deluxe</option>
+                  <option value="Penthouse">Penthouse</option>
+                </select>
+              </div>
+
+              {/* --- NEW STATUS DROPDOWN --- */}
+              <div className={styles.formGroup}>
+                <label>Current Status</label>
+                <select
+                  value={roomData.availabilityStatus}
+                  onChange={(e) => setRoomData({ ...roomData, availabilityStatus: e.target.value })}
+                  style={{
+                    borderLeft: `5px solid ${roomData.availabilityStatus === 'available' ? '#4CAF50' :
+                      roomData.availabilityStatus === 'occupied' ? '#F44336' :
+                        roomData.availabilityStatus === 'maintenance' ? '#cc7a00' : '#887a00'
+                      }`
+                  }}
+                >
+                  <option value="available">Available (Green)</option>
+                  <option value="occupied">Occupied (Red)</option>
+                  <option value="maintenance">Maintenance (Orange)</option>
+                  <option value="pending">Cleaning/Pending (Yellow)</option>
+                </select>
+
+                {/* --------------------------- */}
+
                 <div className={styles.formGroup}>
                   <label>Max Guests</label>
                   <input type="number" className={styles.noArrows} value={roomData.maxOccupancy === 0 ? "" : roomData.maxOccupancy} required onChange={(e) => setRoomData({ ...roomData, maxOccupancy: parseInt(e.target.value) || 0 })} />
@@ -199,12 +434,35 @@ export default function AdminPanel() {
                 <input type="number" step="0.01" className={styles.noArrows} value={roomData.basePrice === 0 ? "" : roomData.basePrice} onBlur={handlePriceBlur} required placeholder="0.00" onChange={(e) => setRoomData({ ...roomData, basePrice: parseFloat(e.target.value) || 0 })} />
               </div>
 
+              {/* Amenities Tag Cloud */}
               <div className={styles.formGroup}>
                 <label>Amenities</label>
-                <input type="text" placeholder="Wifi, AC, Pool..." value={roomData.amenities} onChange={(e) => setRoomData({ ...roomData, amenities: e.target.value })} />
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "5px" }}>
+                  {AMENITY_OPTIONS.map((amenity) => {
+                    const isSelected = roomData.amenities.includes(amenity);
+                    return (
+                      <button
+                        type="button"
+                        key={amenity}
+                        onClick={() => toggleAmenity(amenity)}
+                        style={{
+                          padding: "5px 10px",
+                          borderRadius: "15px",
+                          border: isSelected ? "1px solid #cfaa5f" : "1px solid #ddd",
+                          backgroundColor: isSelected ? "#f9f3e5" : "#fff",
+                          color: isSelected ? "#000" : "#666",
+                          fontSize: "12px",
+                          cursor: "pointer",
+                          transition: "all 0.2s"
+                        }}
+                      >
+                        {amenity} {isSelected && "✓"}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* Wrap the description in a fullWidth class to make it look cleaner */}
               <div className={`${styles.formGroup} ${styles.fullWidth}`}>
                 <label>Description</label>
                 <textarea
@@ -222,12 +480,29 @@ export default function AdminPanel() {
           </section>
         </aside>
 
-        {/* RIGHT SIDE: Main Inventory Table */}
         <section className={styles.tableMainContent}>
           <div className={styles.tableContainer}>
             <div className={styles.tableHeader}>
               <span>Room Inventory Database</span>
-              <span className={styles.refreshHint}>Real-time Inventory</span>
+
+              {/* --- NEW SEARCH BAR --- */}
+              <input
+                type="text"
+                placeholder="Search room name..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                style={{
+                  padding: "6px 12px",
+                  borderRadius: "6px",
+                  border: "1px solid #ddd",
+                  fontSize: "0.9rem",
+                  marginLeft: "auto",     
+                  marginRight: "15px",    
+                  width: "200px"
+                }}
+              />
+              {/* ---------------------- */}
+              <span className={styles.refreshHint}>Live Updates Enabled</span>
             </div>
             <table className={styles.userTable}>
               <thead>
@@ -240,9 +515,15 @@ export default function AdminPanel() {
                 </tr>
               </thead>
               <tbody>
-                {rooms.map((room) => (
+                {filteredRooms.map((room) => (
                   <tr key={room._id} className={styles.userRow}>
-                    <td><strong>{room.roomName}</strong></td>
+                    <td
+                      onClick={() => setViewRoom(room)}
+                      style={{ cursor: "pointer", color: "#c5a059", textDecoration: "underline" }}
+                      title="Click to view details"
+                    >
+                      <strong>{room.roomName}</strong>
+                    </td>
                     <td>{room.roomType}</td>
                     <td>${room.basePrice.toFixed(2)}</td>
                     <td><span className={`${styles.statusBadge} ${styles[room.availabilityStatus]}`}>{room.availabilityStatus}</span></td>
@@ -263,6 +544,17 @@ export default function AdminPanel() {
         message={modalConfig.message}
         type={modalConfig.type}
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
+      />
+
+      <ConfirmDeleteToast
+        isOpen={!!roomToDelete}
+        onClose={() => setRoomToDelete(null)}
+        onConfirm={executeDelete}
+      />
+
+      <RoomDetailsModal
+        room={viewRoom}
+        onClose={() => setViewRoom(null)}
       />
     </main>
   );

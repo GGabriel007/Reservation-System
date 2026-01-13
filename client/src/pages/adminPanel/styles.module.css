@@ -1,6 +1,6 @@
 .adminPanelPage {
   padding: 20px 30px;
-  max-width: 1600px; /* Expands to use more space */
+  max-width: 1600px; 
   margin: 0 auto;
   font-family: "Inter", sans-serif;
   background-color: #fcfcfc;
@@ -41,14 +41,14 @@
 /* The Main Grid Layout */
 .contentLayout {
   display: grid;
-  grid-template-columns: 350px 1fr; /* Sidebar is 350px, Table takes rest */
+  grid-template-columns: 350px 1fr; 
   gap: 30px;
   align-items: start;
 }
 
 /* Sidebar Styling */
 .formSidebar {
-  position: sticky; /* Form stays visible while you scroll the table */
+  position: sticky;
   top: 20px;
 }
 
@@ -75,7 +75,7 @@
 
 /* Table Area */
 .tableMainContent {
-  min-width: 0; /* Prevents table from breaking grid */
+  min-width: 0; 
 }
 
 .tableContainer {
@@ -137,23 +137,73 @@
   cursor: pointer;
 }
 
+/* Base styles for both buttons */
+.editBtn, .deleteBtn {
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  margin-left: 10px; 
+}
+
+/* 1. EDIT BUTTON: Blue/Indigo Theme */
+.editBtn {
+  background-color: #f5fff8;
+  color: #000000; 
+}
+
+.editBtn:hover {
+  background-color: #3aca38; 
+  color: #ffffff; 
+  transform: translateY(-2px); 
+}
+
+/* 2. DELETE BUTTON: Red/Danger Theme */
+.deleteBtn {
+  background-color: #fee2e2; 
+  color: #dc2626; 
+}
+
+.deleteBtn:hover {
+  background-color: #dc2626; 
+  color: #ffffff; 
+  transform: translateY(-2px); 
+  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2); 
+}
+
 /* Status Badges */
 .statusBadge {
   padding: 4px 12px;
   border-radius: 20px;
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+}
+.available {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+  border: 1px solid #1e7e34;
 }
 
-.available {
-  background: #e8f5e9;
-  color: #2e7d32;
-  border: 1px solid #c8e6c9;
-}
 .occupied {
-  background: #fff3e0;
-  color: #ef6c00;
-  border: 1px solid #ffe0b2;
+  background-color: #fce8e6;
+  color: #c5221f;
+  border: 1px solid #c5221f;
+}
+
+.maintenance {
+  background-color: #fff0d1;
+  color: #b07404;
+  border: 1px solid #b05c04;
+}
+
+.pending {
+  background-color: #fcfee0;
+  color: #aeb81d;
+  border: 1px solid #cec103;
 }
 
 /* Inputs */
@@ -174,8 +224,8 @@
   border: 1px solid #ddd;
   border-radius: 6px;
   background: #fdfdfd;
-  width: 100%; /* Keep this */
-  box-sizing: border-box; /* ADD THIS LINE - It prevents the overflow */
+  width: 100%; 
+  box-sizing: border-box; 
   font-family: inherit;
 }
 
@@ -183,7 +233,7 @@
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 15px; /* Spacing between Category and Max Guests */
+  gap: 15px; 
   width: 100%;
 }
 
@@ -192,18 +242,16 @@
   background: #ffffff;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  padding: 20px; /* Reduced slightly to give inputs more room */
+  padding: 20px; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  overflow: hidden; /* Safety net */
+  overflow: hidden; 
 }
 
 .fullWidth {
-  grid-column: span 1; /* For the compact list */
+  grid-column: span 1; 
 }
 
-/* Since the form is now a single column list in the sidebar, 
-   we don't need 'grid-column: span 2' anymore. 
-   Instead, just make sure the textarea feels substantial. */
+
 .formGroup textarea {
   min-height: 80px;
   resize: vertical;

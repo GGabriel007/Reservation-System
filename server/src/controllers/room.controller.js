@@ -1,5 +1,6 @@
 // Room CRUD & search logic
 import { RoomService } from "../services/room.service.js";
+import { Room } from "../models/room.model.js";
 
 /**
  * RoomController
@@ -11,107 +12,141 @@ export const RoomController = {
   // GET ALL ROOMS
   getAllRooms: async (req, res) => {
     try {
-      const rooms = await RoomService.getAllRooms();
+      const rooms = await Room.find().populate("hotel", "name location");
       res.status(200).json(rooms);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching rooms", error: error.message });
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching rooms", error: err.message });
     }
   },
 
   // GET ROOM BY ID
   getRoomById: async (req, res) => {
     try {
-      const room = await RoomService.getRoomById(req.params.id);
+      const room = await Room.findById(req.params.id).populate("hotel");
       if (!room) return res.status(404).json({ message: "Room not found" });
       res.status(200).json(room);
-    } catch (error) {
-      res.status(500).json({ message: "Error fetching room details", error: error.message });
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching room", error: err.message });
     }
   },
 
-  // GET ROOMS BY HOTEL (Crucial for the "Hotel Details" page)
+  // Get Rooms by Hotel (For your Admin Panel)
   getRoomsByHotel: async (req, res) => {
-  try {
-    const { hotelId } = req.params;
-
-    // 1. Defensive check: Ensure req.user exists
-    if (!req.user) {
-      return res.status(401).json({ message: "Not authenticated" });
+    try {
+      const { hotelId } = req.params;
+      const rooms = await Room.find({ hotel: hotelId });
+      res.status(200).json(rooms);
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching hotel inventory", error: err.message });
     }
+  },
 
-    // 2. Security: Manager check
-    if (req.user.role === 'manager' && req.user.assignedHotelId?.toString() !== hotelId) {
-      return res.status(403).json({ message: "Unauthorized for this hotel" });
+  // GET ROOMS BY HOTEL
+  getRoomsByHotel: async (req, res) => {
+    try {
+      const { hotelId } = req.params;
+
+      if (!req.user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+
+      if (req.user.role === 'manager') {
+        const managerHotelId = req.user.assignedHotel?.toString();
+        if (managerHotelId !== hotelId) {
+          return res.status(403).json({ message: "Unauthorized for this hotel" });
+        }
+      }
+
+      const rooms = await RoomService.getRoomsByHotel(hotelId);
+      res.status(200).json(rooms);
+    } catch (error) {
+      console.error("GET_ROOMS_ERROR:", error);
+      res.status(500).json({ message: "Server Error", error: error.message });
     }
-
-    const rooms = await RoomService.getRoomsByHotel(hotelId);
-    res.status(200).json(rooms);
-  } catch (error) {
-    console.error("GET_ROOMS_ERROR:", error); // This logs the error in your terminal
-    res.status(500).json({ message: "Server Error", error: error.message });
-  }
-},
+  },
 
   // CREATE NEW ROOM
   createRoom: async (req, res) => {
-  try {
-    // Ensure we capture the hotel ID regardless of which key the frontend sends
-    const roomData = {
-      ...req.body,
-      hotel: req.body.hotel || req.body.hotelId
-    };
-
-    // Security: Ensure a manager can only create rooms for their assigned hotel
-    if (req.user.role === 'manager' && req.user.assignedHotelId.toString() !== roomData.hotel) {
-      return res.status(403).json({ message: "You can only add rooms to your own hotel." });
-    }
-
-    const newRoom = await RoomService.createRoom(roomData);
-    res.status(201).json(newRoom);
-  } catch (error) {
-    res.status(400).json({ message: error.message });
-  }
-},
-
-  // UPDATE ROOM
-  updateRoom: async (req, res) => {
     try {
-      const roomId = req.params.id;
-      
-      // 1. Fetch the room first to check ownership
-      const room = await RoomService.getRoomById(roomId);
-      if (!room) return res.status(404).json({ message: "Room not found" });
+      const { roomName, roomType, basePrice, maxOccupancy, description, amenities, hotel, availabilityStatus } = req.body;
 
-      // 2. SECURITY: Manager check
-      if (req.user.role === 'manager' && room.hotelId.toString() !== req.user.assignedHotelId.toString()) {
-        return res.status(403).json({ message: "Unauthorized: You do not manage this room's hotel." });
+      // Handle Image: If Multer processed a file, it will be in req.file
+      let imagePaths = [];
+      if (req.files && req.files.length > 0) {
+        imagePaths = req.files.map(file => `/uploads/${file.filename}`);
       }
 
-      const updatedRoom = await RoomService.updateRoom(roomId, req.body);
-      res.status(200).json(updatedRoom);
-    } catch (error) {
-      res.status(400).json({ message: "Failed to update room", error: error.message });
+      const newRoom = new Room({
+        roomName,
+        roomType,
+        basePrice,
+        maxOccupancy,
+        description,
+        amenities: Array.isArray(amenities) ? amenities : [amenities],
+        hotel,
+        images: imagePaths,
+        availabilityStatus: availabilityStatus || "available",
+      });
+
+      const savedRoom = await newRoom.save();
+      res.status(201).json(savedRoom);
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Failed to create room", error: err.message });
     }
   },
 
-  // DELETE ROOM (Soft Delete)
-  deleteRoom: async (req, res) => {
-  try {
-    const { id } = req.params;
+  // UPDATE ROOM (Fixed Logic)
+  updateRoom: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const updates = req.body; // Contains text fields AND 'existingImages'
 
-    // 1. Find the room first to check which hotel it belongs to
-    const room = await RoomService.getRoomById(id);
-    if (!room) return res.status(404).json({ message: "Room not found" });
+      // Handle Existing Images
+      // Multer puts text fields in req.body.
+      // If we sent multiple 'existingImages', it's an array. If one, it's a string.
+      let keptImages = updates.existingImages || [];
 
-    // 2. Security Check: Managers can only delete rooms in their assigned hotel
-    if (req.user.role === 'manager' && req.user.assignedHotelId.toString() !== room.hotel.toString()) {
-      return res.status(403).json({ message: "Access denied: This room belongs to another property." });
+      // Normalize to array if it's a single string
+      if (!Array.isArray(keptImages)) {
+        keptImages = [keptImages];
+      }
+
+      // Handle New Uploads
+      let newPaths = [];
+      if (req.files && req.files.length > 0) {
+        newPaths = req.files.map(file => `/uploads/${file.filename}`);
+      }
+
+      // Combine them
+      // We do NOT use "room.images" from the DB anymore. 
+      // We fully trust the frontend's "keptImages" + "newPaths".
+      updates.images = [...keptImages, ...newPaths];
+
+      const updatedRoom = await Room.findByIdAndUpdate(id, updates, {
+        new: true,
+        runValidators: true,
+      });
+
+      if (!updatedRoom) return res.status(404).json({ message: "Room not found" });
+
+      res.status(200).json(updatedRoom);
+    } catch (err) {
+      res.status(500).json({ message: "Failed to update room", error: err.message });
     }
+  },
 
-    await RoomService.deleteRoom(id);
-    res.status(200).json({ message: "Room soft-deleted successfully" });
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-}
+  // DELETE ROOM
+  deleteRoom: async (req, res) => {
+    try {
+      const { id } = req.params;
+      const room = await Room.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
+
+      if (!room) return res.status(404).json({ message: "Room not found" });
+
+      res.status(200).json({ message: "Room deleted successfully" });
+    } catch (err) {
+      res.status(500).json({ message: "Failed to delete room", error: err.message });
+    }
+  },
 };

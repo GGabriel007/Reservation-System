@@ -1,0 +1,145 @@
+/* Reusing the dark overlay style */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  animation: fadeIn 0.3s ease;
+  margin: -16px; 
+}
+
+.container {
+  background: white;
+  width: 90%;
+  max-width: 600px; /* Wider than the delete modal */
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Keeps the header/footer neat */
+  animation: slideUp 0.3s ease;
+  max-height: 90vh; /* Prevents it from being taller than the screen */
+}
+
+/* Header with Gold accent */
+.header {
+  background: #f9f9f9;
+  padding: 20px 30px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header h2 {
+  margin: 0;
+  color: #1a1a1a;
+  font-size: 1.4rem;
+}
+
+.closeIcon {
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #999;
+  background: none;
+  border: none;
+  transition: color 0.2s;
+}
+
+.closeIcon:hover {
+  color: #333;
+}
+
+/* Scrollable Content Area */
+.content {
+  padding: 30px;
+  overflow-y: auto; /* Allows scrolling if text is long */
+}
+
+.imagePlaceholder {
+  width: 100%;
+  height: 200px;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  color: #888;
+  border: 2px dashed #ddd;
+}
+
+.section {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #888;
+  margin-bottom: 5px;
+  font-weight: 600;
+}
+
+.value {
+  font-size: 1.1rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.tagContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.amenityTag {
+  background: #f9f3e5; /* Light Gold */
+  color: #c5a059;     /* Dark Gold */
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.footer {
+  padding: 15px 30px;
+  border-top: 1px solid #eee;
+  text-align: right;
+  background: #fff;
+}
+
+.closeBtn {
+  background: #333;
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.closeBtn:hover {
+  background: #000;
+}
+
+.roomImage {
+  width: 100%;
+  height: 250px; /* Slightly taller than the placeholder */
+  object-fit: cover; /* Ensures the image covers the area without stretching/distortion */
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1); /* Subtle shadow for depth */
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }

@@ -12,6 +12,7 @@ import Signup from "./signup/Signup";
 import UserDashboard from "./userDashboard/UserDashboard";
 import UserProfile from "./userProfile/UserProfile";
 import HotelListing from "./hotelListing/HotelListing";
+import StaffLogin from "./staffLogin/StaffLogin";
 
 export {
   AdminDashboard,
@@ -28,4 +29,5 @@ export {
   UserDashboard,
   UserProfile,
   HotelListing,
+  StaffLogin
 };

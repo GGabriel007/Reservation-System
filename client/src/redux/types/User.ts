@@ -1,6 +1,8 @@
 export type User = {
-  _id: number;
+  _id: string; 
   email: string;
   firstName: string;
-  role: string;
+  lastName?: string;
+  role: 'guest' | 'user' | 'manager' | 'admin';
+  assignedHotel?: string; 
 };

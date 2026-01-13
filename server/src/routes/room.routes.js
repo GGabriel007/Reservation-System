@@ -4,6 +4,7 @@ import { Router } from "express";
 import { RoomController } from "../controllers/room.controller.js";
 import { protect } from "../middleware/authMiddleware.js";
 import { authorize } from "../middleware/roleMiddleware.js";
+import { upload } from "../middleware/uploadMiddleware.js";
 
 const router = Router();
 
@@ -26,6 +27,7 @@ router.post(
   "/", 
   protect, 
   authorize("admin", "manager"), 
+  upload.array("images", 5),
   RoomController.createRoom
 );
 
@@ -34,6 +36,7 @@ router.put(
   "/:id", 
   protect, 
   authorize("admin", "manager"), 
+  upload.array("images", 5),
   RoomController.updateRoom
 );
 
