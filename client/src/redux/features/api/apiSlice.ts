@@ -46,6 +46,9 @@ export const apiSlice = createApi({
       }),
       providesTags: (result) => [{ type: "Reservation", id: result?._id }],
     }),
+    getRooms: builder.query<Room[], void>({
+      query: () => "/rooms",
+    }),
 
     // Add this to allow guests to cancel their booking
     cancelReservation: builder.mutation<
@@ -64,6 +67,7 @@ export const apiSlice = createApi({
 
 // // Export the auto-generated hook for the `getPosts` query endpoint
 export const {
+  useGetRoomsQuery,
   useGetUsersQuery,
   useCreateUserMutation,
   useLazyLookupReservationQuery,
