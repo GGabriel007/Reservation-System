@@ -1,6 +1,5 @@
 import { AdminService } from "../services/admin.service.js";
 import { Reservation } from "../models/reservation.model.js";
-// FIX: Import the Hotel model so we can use it below
 import { Hotel } from "../models/hotel.model.js";
 
 /**
@@ -23,12 +22,11 @@ export const AdminController = {
     }
   },
 
-  // --- HOTEL MANAGEMENT (Direct Model Access) ---
+  // --- HOTEL MANAGEMENT ---
 
   // Create a new Hotel
   createHotel: async (req, res) => {
     try {
-      // Direct Database Call: Safer and clearer than Service for simple CRUD
       const hotel = await Hotel.create(req.body);
       res.status(201).json(hotel);
     } catch (error) {
@@ -37,10 +35,10 @@ export const AdminController = {
     }
   },
 
-  // Get All Hotels (Property Directory)
-  getAllInventory: async (req, res) => {
+  // FIX: Renamed from 'getAllInventory' to 'getFullInventory' to match your Routes!
+  getFullInventory: async (req, res) => {
     try {
-      // Fetches all hotels that are NOT soft-deleted (handled by pre-find hook)
+      // Fetches all hotels that are NOT soft-deleted
       const hotels = await Hotel.find({}).sort({ createdAt: -1 });
       res.status(200).json(hotels);
     } catch (error) {
@@ -70,7 +68,6 @@ export const AdminController = {
   deleteHotel: async (req, res) => {
     try {
       const { id } = req.params;
-      // We only Soft Delete!
       const deletedHotel = await Hotel.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
       
       if (!deletedHotel) {
@@ -84,7 +81,6 @@ export const AdminController = {
 
   // --- ROOM & SYSTEM MANAGEMENT ---
 
-  // Temporary
   createRoom: async (req, res) => {
     try {
       const room = await AdminService.createRoom(req.body);
@@ -104,7 +100,7 @@ export const AdminController = {
     }
   },
 
-  // 1. SYSTEM-WIDE STATISTICS
+  // SYSTEM-WIDE STATISTICS
   getSystemStats: async (req, res) => {
     try {
       const stats = await AdminService.getSystemStats();

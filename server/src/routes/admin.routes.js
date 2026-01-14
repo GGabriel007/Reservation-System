@@ -20,6 +20,12 @@ router.use(protect);
 router.get("/reservations/:hotelId", authorize("admin", "manager"), AdminController.getHotelReservations);
 router.post("/rooms", authorize("admin", "manager"), AdminController.createRoom);
 
+/**
+ * @route   GET /api/admin/inventory
+ * @desc    Global inventory audit (All Hotels + All Rooms)
+ */
+router.get("/inventory", authorize("admin", "manager"), AdminController.getFullInventory);
+
 router.use(authorize("admin"));
 
 router.delete("/users/:id", AdminController.deleteUser);
@@ -45,10 +51,6 @@ router.get("/users", AdminController.getAllUsers);
  */
 router.patch("/users/:id/role", AdminController.updateUserRole);
 
-/**
- * @route   GET /api/admin/inventory
- * @desc    Global inventory audit (All Hotels + All Rooms)
- */
-router.get("/inventory", AdminController.getAllInventory);
+
 
 export default router;

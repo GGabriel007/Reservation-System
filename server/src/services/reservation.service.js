@@ -11,11 +11,6 @@ export const ReservationService = {
 
   /**
    * CREATE RESERVATION
-   * Logic: 
-   * - Find the room to get the price.
-   * - Calculate the number of nights.
-   * - Calculate total amount.
-   * - Save the reservation.
    */
   createReservation: async (data) => {
     const { roomId, checkIn, checkOut } = data;
@@ -36,11 +31,10 @@ export const ReservationService = {
 
     const nights = Math.ceil(timeDiff / (1000 * 3600 * 24));
 
-    // 2. FINANCIAL CALCULATIONS (Server-side Truth)
-    // Formula: $$Total = (nights \times basePrice) + tax + fees$$
+    // 2. FINANCIAL CALCULATIONS
     const roomSubtotal = nights * room.basePrice;
     
-    // Simulate realistic hotel math (e.g., 12% tax and a $25 resort fee)
+    // Simulate realistic hotel math
     const tax = parseFloat((roomSubtotal * 0.12).toFixed(2)); 
     const fees = 25.00; 
     const totalAmount = roomSubtotal + tax + fees;
@@ -49,16 +43,15 @@ export const ReservationService = {
     const confirmationCode = crypto.randomBytes(3).toString('hex').toUpperCase();
 
     // 4. PREPARE FINAL OBJECT
-    // We explicitly map fields to ensure they match our updated Model
     const finalData = {
       ...data,
       hotelId: room.hotel,
-      roomPrice: roomSubtotal, // This represents the price for all nights
+      roomPrice: roomSubtotal, 
       tax,
       fees,
       totalAmount,
       confirmationCode,
-      status: "confirmed" // Setting to confirmed as payment is "captured" in checkout
+      status: "confirmed" 
     };
 
     return await ReservationRepository.create(finalData);
@@ -96,14 +89,25 @@ export const ReservationService = {
   },
 
   /**
-   * CANCEL RESERVATION (Logged-in User)
+   * CANCEL RESERVATION (Logged-in User/Admin)
+   * FIXED: Now uses Repository and correctly allows Admins/Managers.
    */
   cancelReservation: async (id, userId, userRole) => {
-    const reservation = await Reservation.findById(id);
+    // 1. FIX: Use ReservationRepository instead of undefined 'Reservation' model
+    const reservation = await ReservationRepository.findById(id);
     if (!reservation) throw new Error("Reservation not found");
 
-    if (userRole === "guest" && reservation.userId.toString() !== userId) {
-      throw new Error("You do not have permission to cancel this booking");
+    // 2. FIX: Explicitly allow Admins and Managers to bypass ownership checks
+    const isAdminOrManager = userRole === 'admin' || userRole === 'manager';
+
+    if (!isAdminOrManager) {
+      // If not admin, check strict ownership:
+      // Helper to safely get the string ID whether population occurred or not
+      const ownerId = reservation.userId?._id?.toString() || reservation.userId?.toString();
+
+      if (ownerId !== userId) {
+         throw new Error("You do not have permission to cancel this booking");
+      }
     }
 
     return await ReservationRepository.updateStatus(id, "cancelled");
@@ -116,51 +120,24 @@ export const ReservationService = {
   cancelReservationByGuest: async (id, confirmationCode, email) => {
     const reservation = await ReservationRepository.findById(id);
     
-    // Safety check: ensure the code and email match before allowing the cancel
+    if (!reservation) throw new Error("Reservation not found");
+
+    // Safety check: ensure the code matches
     if (reservation.confirmationCode !== confirmationCode) {
       throw new Error("Invalid confirmation code for this operation.");
     }
-    
-    // Note: You might need to populate 'userId' to check the email here 
-    // depending on if your Repository does it automatically.
 
+    // Additional check: Ensure email matches (for security)
+    const storedEmail = reservation.guestEmail || reservation.userId?.email;
+    if (storedEmail && storedEmail.toLowerCase() !== email.toLowerCase()) {
+        throw new Error("Email address does not match reservation records.");
+    }
+    
     return await ReservationRepository.updateStatus(id, "cancelled");
   },
 
   /**
-   * LOOKUP RESERVATION
-   */
-  lookupReservation: async (confirmationCode, lastName, email) => {
-    const reservation = await ReservationRepository.findForGuestLookup(confirmationCode);
-
-    if (!reservation) {
-        throw new Error("No reservation found with that confirmation code.");
-    }
-
-    // Logic: Check if it's a registered user OR an anonymous guest
-    let matches = false;
-
-    if (reservation.userId) {
-        // Path A: Registered User
-        const user = reservation.userId;
-        matches = user.email.toLowerCase() === email.toLowerCase() && 
-                  user.lastName.toLowerCase() === lastName.toLowerCase();
-    } else {
-        // Path B: Anonymous Guest (using fields on the reservation model)
-        matches = reservation.guestEmail.toLowerCase() === email.toLowerCase() && 
-                  reservation.guestLastName.toLowerCase() === lastName.toLowerCase();
-    }
-
-    if (!matches) {
-        throw new Error("The details provided do not match our records.");
-    }
-
-    return reservation;
-},
-
-  /**
    * MODIFY RESERVATION
-   * Logic: Re-calculate price and check if the room is still available for new dates.
    */
   modifyReservation: async (id, updates) => {
     const reservation = await ReservationRepository.findById(id);
@@ -168,11 +145,7 @@ export const ReservationService = {
 
     // If dates are changing, we must re-verify availability
     if (updates.checkIn || updates.checkOut) {
-      const newStart = new Date(updates.checkIn || reservation.checkIn);
-      const newEnd = new Date(updates.checkOut || reservation.checkOut);
-      
-      // Here you would typically call a 'checkRoomAvailability' method
-      // to ensure no other bookings overlap with these new dates.
+      // Logic to check overlap would go here
     }
 
     return await ReservationRepository.update(id, updates);

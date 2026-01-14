@@ -4,9 +4,11 @@ import mongoose from "mongoose";
  * Hotel Schema
  * Defines the structure of hotel documents in the MongoDB collection.
  * Supports multiple locations and soft deletion.
- * * Fields:
+ * Fields:
  * - name: Name of the hotel (String, required)
  * - address: Structured location including street, city, state, and zip (Object, required)
+ * - phone: Contact number (String, optional)
+ * - email: Contact email (String, optional)
  * - description: Detailed text about the property (String, optional)
  * - images: URLs for property photos (Array of Strings, optional)
  * - isDeleted: Soft delete flag to hide hotel without losing data (Boolean, default: false)
@@ -19,7 +21,6 @@ const HotelSchema = new mongoose.Schema({
     trim: true 
   },
   
-  
   address: {
     street: { type: String, required: true },
     city: { type: String, required: true },
@@ -28,26 +29,37 @@ const HotelSchema = new mongoose.Schema({
     country: { type: String, default: "USA" }
   },
 
+  // --- NEW FIELDS ADDED HERE ---
+  phone: {
+    type: String,
+    trim: true,
+    required: false
+  },
+  
+  email: {
+    type: String,
+    trim: true,
+    lowercase: true,
+    required: false
+  },
+  // -----------------------------
+
   description: { 
     type: String, 
-    required: false // Useful for the Hotel Details page
+    required: false 
   },
 
-  // Supporting multiple images for the industry-grade UI
   images: { 
     type: [String], 
     required: false 
   },
 
   // --- BUSINESS LOGIC ---
-  
-  // SOFT DELETE: Requirement from your checklist
   isDeleted: {
     type: Boolean,
     default: false
   }
 }, { 
-  // Automatically adds 'createdAt' and 'updatedAt'
   timestamps: true 
 });
 

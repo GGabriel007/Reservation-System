@@ -1,12 +1,18 @@
+import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useCancelReservationMutation } from "@/redux/features/api/apiSlice";
 import toast from "react-hot-toast";
+// Import your custom notification component
+import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToast/ConfirmationDeleteToast";
 
 export default function FoundReservation() {
   const location = useLocation();
   const navigate = useNavigate();
   
+  // 1. State for the custom confirmation modal
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
+
   const { reservation } = location.state || {};
   const [cancelReservation, { isLoading }] = useCancelReservationMutation();
 
@@ -32,18 +38,27 @@ export default function FoundReservation() {
   const checkOutDate = new Date(reservation.checkOut);
   const nights = Math.max(1, Math.ceil(Math.abs(checkOutDate.getTime() - checkInDate.getTime()) / (1000 * 60 * 60 * 24)));
 
-  const handleCancel = async () => {
-    if (!window.confirm("Are you sure you want to cancel this reservation?")) return;
+  // 2. Step 1: Just open the modal
+  const handleCancelClick = () => {
+    setIsCancelModalOpen(true);
+  };
+
+  // 3. Step 2: The actual logic (runs only when confirmed in modal)
+  const executeCancel = async () => {
     try {
       await cancelReservation({ 
         id: reservation._id, 
         confirmationCode: reservation.confirmationCode,
         email: reservation.guestEmail || (typeof reservation.userId === 'object' ? reservation.userId?.email : "") 
       }).unwrap();
+      
       toast.success("Reservation cancelled successfully");
+      setIsCancelModalOpen(false); // Close modal
       navigate("/");
     } catch (err) {
+      console.error(err);
       toast.error("Failed to cancel reservation");
+      setIsCancelModalOpen(false); // Close modal on error too
     }
   };
 
@@ -83,7 +98,6 @@ export default function FoundReservation() {
                 <li><span>Bed Preference</span> <strong>{reservation.bedPreference || 'Standard'}</strong></li>
                 <li><span>Special Requests</span> <strong>{reservation.specialRequests ? "+" : "None"}</strong></li>
               </ul>
-              {/* Optional: Show the actual request if it exists */}
               {reservation.specialRequests && <p className={styles.requestDetail}>{reservation.specialRequests}</p>}
             </div>
           </section>
@@ -101,7 +115,6 @@ export default function FoundReservation() {
               </div>
               <div className={styles.priceDetailsText}>
                 <p>{nights} {nights === 1 ? 'Night' : 'Nights'} stay</p>
-                {/* Fixed NaN issue: added || 0 to tax and fees */}
                 <p>Taxes and fees: ${(reservation.tax || 0) + (reservation.fees || 0)}</p>
               </div>
             </div>
@@ -118,8 +131,10 @@ export default function FoundReservation() {
 
         <div className={styles.footerdivActions}>
           <Link to="/check-reservation" className={styles.backLink}><span>&larr;</span> Back</Link>
+          
+          {/* 4. Update Button to trigger Modal */}
           <button 
-            onClick={handleCancel} 
+            onClick={handleCancelClick} 
             className={styles.cancelBtn}
             disabled={isLoading}
           >
@@ -127,6 +142,15 @@ export default function FoundReservation() {
           </button>
         </div>
       </div>
+
+      {/* 5. Render the Modal */}
+      <ConfirmDeleteToast
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={executeCancel}
+        title="Cancel Reservation?"
+        message="Are you sure you want to cancel this booking? This action cannot be undone."
+      />
     </main>
   );
 }

@@ -21,75 +21,72 @@ import {
 } from "./pages/index";
 
 import { Provider } from "react-redux";
-import { store } from "@/redux/store"; // Import your configured Redux store
+import { store } from "@/redux/store";
 
-/**
- * Defines the application's route structure.
- * We nest everything under "/" with <App /> as the element
- * so the Navbar is always visible.
- */
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />,
+    element: <App />, 
     children: [
+
+      {
+        path: "/",
+        element: <Home />,
+      },
+      {
+        path: "/login",
+        element: <Login />,
+      },
+      {
+        path: "/signup",
+        element: <Signup />,
+      },
+      {
+        path: "/staffLogin",
+        element: <StaffLogin />,
+      },
+      {
+        path: "/check-reservation",
+        element: <CheckReservation />,
+      },
+      {
+        path: "/bookroom",
+        element: <BookRoom />,
+      },
+      {
+        path: "/roomlisting",
+        element: <RoomListing />,
+      },
+      {
+        path: "/hotellisting",
+        element: <HotelListing />,
+      },
+      {
+        path: "/checkout/:roomId",
+        element: <Checkout />,
+      },
+      {
+        path: "/found-reservation",
+        element: <FoundReservation />,
+      },
+      {
+        path: "/user",
+        element: <UserDashboard />,
+      },
+
       {
         element: <AuthPersist />,
         children: [
-          {
-            path: "/",
-            element: <Home />,
-          },
-          {
-            path: "/login",
-            element: <Login />,
-          },
           {
             path: "/admin/dashboard",
             element: <AdminDashboard />,
           },
           {
-            path: "/signup", //
-            element: <Signup />,
-          },
-          {
-            path: "/user",
-            element: <UserDashboard />,
-          },
-          {
             path: "/adminPanel",
             element: <AdminPanel />,
           },
-          {
-            path: "/check-reservation",
-            element: <CheckReservation />,
-          },
-          {
-            path: "/bookroom",
-            element: <BookRoom />,
-          },
-          {
-            path: "/roomlisting",
-            element: <RoomListing />,
-          },
-          {
-            path: "/hotellisting",
-            element: <HotelListing />,
-          },
-          {
-            path: "/checkout/:roomId",
-            element: <Checkout />,
-          },
-          {
-            path: "/found-reservation",
-            element: <FoundReservation />,
-          },
-          {
-            path: "/staffLogin",
-            element: <StaffLogin />,
-          },
-        ]
-      }
+        ],
+      },
     ],
   },
 ]);

@@ -3,6 +3,7 @@ import styles from "./styles.module.css";
 import HotelModal from "@/components/modals/hotelModal/HotelModal";
 import ActionStatusModal from "@/components/global/toast/actionsStatusModal/ActionStatusModal";
 import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToast/ConfirmationDeleteToast";
+import HotelDetailsModal from "@/components/modals/hotelDetailsModal/HotelDetailsModal";
 
 interface Hotel {
   _id: string;
@@ -28,26 +29,27 @@ export default function HotelManager() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingHotel, setEditingHotel] = useState<Hotel | null>(null);
 
-  // --- TOAST NOTIFICATION STATE ---
+  // State for Viewing Details
+  const [viewHotel, setViewHotel] = useState<Hotel | null>(null);
+
+  // Toast Notification State
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     message: "",
     type: 'success' as 'success' | 'error'
   });
 
-  // --- DELETE CONFIRMATION STATE ---
+  // Delete Confirmation State
   const [hotelToDelete, setHotelToDelete] = useState<string | null>(null);
 
   const baseUrl = import.meta.env.PROD 
     ? "http://liore.us-east-1.elasticbeanstalk.com/admin" 
     : "http://localhost:8080/admin";
 
-  // Helper to show Success/Error Toasts
   const showFeedback = (message: string, type: 'success' | 'error' = 'success') => {
     setModalConfig({ isOpen: true, message, type });
   };
 
-  // 1. Fetch Hotels
   const fetchHotels = async () => {
     try {
       const res = await fetch(`${baseUrl}/inventory`, {
@@ -71,7 +73,6 @@ export default function HotelManager() {
     fetchHotels();
   }, []);
 
-  // 2. Handle Add/Edit Save
   const handleSaveHotel = async (hotelData: any) => {
     try {
       const method = editingHotel ? "PUT" : "POST";
@@ -87,16 +88,13 @@ export default function HotelManager() {
       });
 
       if (res.ok) {
-        // SUCCESS FEEDBACK
         const action = editingHotel ? "updated" : "created";
         showFeedback(`Hotel "${hotelData.name}" was successfully ${action}!`, 'success');
-        
         setIsModalOpen(false);
         setEditingHotel(null);
-        fetchHotels(); // Refresh list
+        fetchHotels();
       } else {
         const err = await res.json();
-        // ERROR FEEDBACK
         showFeedback(err.message || "Failed to save hotel", 'error');
       }
     } catch (error) {
@@ -104,12 +102,10 @@ export default function HotelManager() {
     }
   };
 
-  // 3. Initiate Delete (Opens Confirmation Toast)
   const handleDeleteClick = (id: string) => {
     setHotelToDelete(id);
   };
 
-  // 4. Execute Delete (Called when user clicks "Confirm" in Toast)
   const executeDelete = async () => {
     if (!hotelToDelete) return;
 
@@ -128,7 +124,7 @@ export default function HotelManager() {
     } catch (error) {
       showFeedback("Network error: Could not reach server.", 'error');
     } finally {
-      setHotelToDelete(null); // Close confirmation toast
+      setHotelToDelete(null);
     }
   };
 
@@ -146,7 +142,6 @@ export default function HotelManager() {
 
   return (
     <div className={styles.container}>
-      {/* Header Section */}
       <div className={styles.header}>
         <div>
           <h2 className={styles.title}>Property Directory</h2>
@@ -157,7 +152,6 @@ export default function HotelManager() {
         </button>
       </div>
 
-      {/* Table Section */}
       <div className={styles.tableContainer}>
         {hotels.length === 0 ? (
           <div className={styles.emptyState}>
@@ -169,27 +163,40 @@ export default function HotelManager() {
               <tr>
                 <th>Name</th>
                 <th>City / State</th>
-                <th>Details</th>
-                <th style={{ textAlign: "right" }}>Actions</th>
+                <th>Description</th>
+                <th className={styles.actionsCell}>Actions</th>
               </tr>
             </thead>
             <tbody>
               {hotels.map((hotel) => (
                 <tr key={hotel._id}>
-                  <td className={styles.nameCell}>
-                    <strong>{hotel.name}</strong>
+                  {/* Name (Clickable) */}
+                  <td 
+                    onClick={() => setViewHotel(hotel)}
+                    className={styles.nameCell}
+                    title="Click to view details"
+                  >
+                    {hotel.name}
                   </td>
+                  
+                  {/* Location */}
                   <td>
                     {hotel.address.city}, {hotel.address.state}
                   </td>
+                  
+                  {/* Description (Truncated) */}
                   <td className={styles.descCell}>
                     {hotel.description ? (
-                      hotel.description.substring(0, 50) + "..."
+                      hotel.description.length > 50 
+                        ? hotel.description.substring(0, 50) + "..." 
+                        : hotel.description
                     ) : (
-                      <span style={{ color: "#999" }}>No description</span>
+                      <span className={styles.noDesc}>No description</span>
                     )}
                   </td>
-                  <td style={{ textAlign: "right" }}>
+                  
+                  {/* Actions */}
+                  <td className={styles.actionsCell}>
                     <button 
                       onClick={() => openEditModal(hotel)} 
                       className={styles.editBtn}
@@ -210,7 +217,7 @@ export default function HotelManager() {
         )}
       </div>
 
-      {/* Hotel Form Modal */}
+      {/* MODALS */}
       <HotelModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
@@ -218,9 +225,11 @@ export default function HotelManager() {
         initialData={editingHotel}
       />
 
-      {/* --- TOAST COMPONENTS --- */}
-      
-      {/* 1. Success/Error Feedback Modal */}
+      <HotelDetailsModal
+        hotel={viewHotel}
+        onClose={() => setViewHotel(null)}
+      />
+
       <ActionStatusModal
         isOpen={modalConfig.isOpen}
         message={modalConfig.message}
@@ -228,7 +237,6 @@ export default function HotelManager() {
         onClose={() => setModalConfig({ ...modalConfig, isOpen: false })}
       />
 
-      {/* 2. Delete Confirmation Toast */}
       <ConfirmDeleteToast
         isOpen={!!hotelToDelete}
         onClose={() => setHotelToDelete(null)}

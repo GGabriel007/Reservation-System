@@ -23,7 +23,7 @@ router.use(protect);
 router.get("/my-bookings", ReservationController.getMyReservations);
 
 // Admin: View every single reservation in the system
-router.get("/all", authorize('admin'), ReservationController.getAllReservations);
+router.get("/all", authorize('admin', 'manager'), ReservationController.getAllReservations);
 
 
 // DYNAMIC ROUTES (Using Parameters) 

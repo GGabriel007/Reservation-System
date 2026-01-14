@@ -1,36 +1,20 @@
 import { useState } from "react";
 import styles from "./styles.module.css";
+// REAL COMPONENTS
 import HotelManager from "../../components/modals/hotelManager/HotelManager";
-
-// --- PLACEHOLDER COMPONENTS (Keep these until you build them) ---
-const DashboardStats = () => (
-  <div className="p-6 text-center text-gray-500">
-    <h3 className="text-lg font-bold">Global Analytics</h3>
-    <p>Charts for Room Utilization & Revenue will go here.</p>
-  </div>
-);
-
-const UserManager = () => (
-  <div className="p-6 text-center text-gray-500">
-    <h3 className="text-lg font-bold">User & Role Management</h3>
-    <p>Searchable table to promote Guests to Managers goes here.</p>
-  </div>
-);
-
-const TransactionLog = () => (
-  <div className="p-6 text-center text-gray-500">
-    <h3 className="text-lg font-bold">Financial Audit</h3>
-    <p>Stripe transaction history table goes here.</p>
-  </div>
-);
-// ---------------------------------------------------------------------
+import UserManager from "../../components/modals/userManager/UserManager";
+import TransactionManager from "../../components/modals/transactionManager/TransactionManager";
+import Overview from "../../components/modals/overview/Overview";
+// NEW COMPONENT
+import ReservationManager from "../../components/modals/reservationManager/ReservationManager";
 
 /**
  * Admin Dashboard Page
  * A centralized "Command Center" for Global Administrators.
  */
 export default function AdminDashboard() {
-  const [activeTab, setActiveTab] = useState<"overview" | "hotels" | "users" | "finance">("overview");
+  // 1. Added "reservations" to the allowed state values
+  const [activeTab, setActiveTab] = useState<"overview" | "hotels" | "users" | "reservations" | "finance">("overview");
 
   return (
     <main className={styles.mainPage}>
@@ -45,7 +29,7 @@ export default function AdminDashboard() {
             </p>
           </div>
           <div className={styles.adminBadge}>
-            Global Admin
+            Global Admin Page
           </div>
         </header>
 
@@ -57,18 +41,29 @@ export default function AdminDashboard() {
           >
             Overview
           </button>
+          
           <button 
             onClick={() => setActiveTab("hotels")}
             className={`${styles.tabButton} ${activeTab === "hotels" ? styles.active : ""}`}
           >
             Properties
           </button>
+
+          {/* 2. Added the Reservations Tab Button */}
+          <button 
+            onClick={() => setActiveTab("reservations")}
+            className={`${styles.tabButton} ${activeTab === "reservations" ? styles.active : ""}`}
+          >
+            Reservations
+          </button>
+
           <button 
             onClick={() => setActiveTab("users")}
             className={`${styles.tabButton} ${activeTab === "users" ? styles.active : ""}`}
           >
             Users & Roles
           </button>
+
           <button 
             onClick={() => setActiveTab("finance")}
             className={`${styles.tabButton} ${activeTab === "finance" ? styles.active : ""}`}
@@ -79,13 +74,12 @@ export default function AdminDashboard() {
 
         {/* DYNAMIC CONTENT AREA */}
         <section className={styles.contentArea}>
-          {activeTab === "overview" && <DashboardStats />}
-          
-          {/* This now renders your REAL component from the other file */}
+          {activeTab === "overview" && <Overview />}
           {activeTab === "hotels" && <HotelManager />}
-          
+          {/* 3. Added the Render Logic */}
+          {activeTab === "reservations" && <ReservationManager />}
           {activeTab === "users" && <UserManager />}
-          {activeTab === "finance" && <TransactionLog />}
+          {activeTab === "finance" && <TransactionManager />}
         </section>
 
       </div>

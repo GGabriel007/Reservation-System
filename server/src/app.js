@@ -13,7 +13,10 @@ import hotelRoutes from "./routes/hotel.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import reservationRoutes from "./routes/reservation.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
+import userRoutes from "./routes/user.routes.js";
+import analyticsRoutes from "./routes/analytics.routes.js";
 import fs from 'fs';
+
 
 // --- ES MODULE FIX FOR __dirname ---
 const __filename = fileURLToPath(import.meta.url);
@@ -40,7 +43,7 @@ app.use(
       }
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
@@ -96,6 +99,8 @@ app.use("/hotels", hotelRoutes);
 app.use("/rooms", roomRoutes);   
 app.use("/reservations", reservationRoutes); 
 app.use("/transactions", transactionRoutes); 
+app.use("/users", userRoutes);
+app.use("/analytics", analyticsRoutes);
 
 app.get("/api/health", (req, res) => {
   res.send("Online and Connected!");

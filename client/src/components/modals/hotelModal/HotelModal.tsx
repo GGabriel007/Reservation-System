@@ -1,67 +1,58 @@
-import { useState, useEffect } from "react";
-import styles from "./styles.module.css"; 
+import React, { useState, useEffect } from "react";
+import styles from "./styles.module.css";
 
-interface HotelData {
-  _id?: string;
-  name: string;
-  address: {
-    street: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-  };
-  description: string;
-  // images removed
-}
-
-interface Props {
+interface HotelModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (data: HotelData) => Promise<void>;
-  initialData?: HotelData | null;
+  onSave: (data: any) => void;
+  initialData?: any;
 }
 
-export default function HotelModal({ isOpen, onClose, onSave, initialData }: Props) {
-  const [formData, setFormData] = useState<HotelData>({
-    name: "",
-    address: { street: "", city: "", state: "", zipCode: "", country: "USA" },
-    description: ""
-  });
-
+export default function HotelModal({ isOpen, onClose, onSave, initialData }: HotelModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Load data if editing
+  // 1. UPDATE STATE TO INCLUDE PHONE & EMAIL
+  const [formData, setFormData] = useState({
+    name: initialData?.name || "",
+    address: initialData?.address || {
+      street: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      country: "USA",
+    },
+    phone: initialData?.phone || "", 
+    email: initialData?.email || "", 
+    description: initialData?.description || "",
+  });
+
+  // Reset form when modal opens or initialData changes
   useEffect(() => {
-    if (initialData) {
-      // We strip out images if they happen to exist in the DB, just in case
-      const { images, ...cleanData } = initialData as any;
-      setFormData(cleanData);
-    } else {
-      // Reset for "Add New"
+    if (isOpen) {
       setFormData({
-        name: "",
-        address: { street: "", city: "", state: "", zipCode: "", country: "USA" },
-        description: ""
+        name: initialData?.name || "",
+        address: initialData?.address || {
+          street: "",
+          city: "",
+          state: "",
+          zipCode: "",
+          country: "USA",
+        },
+        phone: initialData?.phone || "",
+        email: initialData?.email || "",
+        description: initialData?.description || "",
       });
     }
-  }, [initialData, isOpen]);
-
-  if (!isOpen) return null;
+  }, [isOpen, initialData]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    try {
-      await onSave(formData);
-      onClose();
-    } catch (error) {
-      console.error("Failed to save hotel", error);
-      alert("Error saving hotel. Check console.");
-    } finally {
-      setIsSubmitting(false);
-    }
+    await onSave(formData);
+    setIsSubmitting(false);
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className={styles.overlay}>
@@ -138,13 +129,33 @@ export default function HotelModal({ isOpen, onClose, onSave, initialData }: Pro
               />
             </div>
              <div className={styles.formGroup}>
-              <label className={styles.label}>Country</label>
+            </div>
+          </div>
+
+          {/* --- 2. NEW CONTACT INFO SECTION --- */}
+          <div className={styles.gridTwo}>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Phone Number</label>
               <input 
-                type="text" disabled value="USA"
-                className={`${styles.input} ${styles.inputDisabled}`}
+                type="text" 
+                className={styles.input}
+                value={formData.phone}
+                onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                placeholder="(555) 123-4567"
+              />
+            </div>
+            <div className={styles.formGroup}>
+              <label className={styles.label}>Email Address</label>
+              <input 
+                type="email" 
+                className={styles.input}
+                value={formData.email}
+                onChange={(e) => setFormData({...formData, email: e.target.value})}
+                placeholder="contact@hotel.com"
               />
             </div>
           </div>
+          {/* ----------------------------------- */}
 
           {/* Row 3: Description */}
           <div className={styles.formGroup}>

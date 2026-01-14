@@ -1,0 +1,109 @@
+.container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.header {
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f4f4f4;
+  padding-bottom: 15px;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 0.9rem;
+  margin-top: 4px;
+}
+
+/* --- STATS CARDS --- */
+.statsRow {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 25px;
+}
+
+.statCard {
+  background: #fcfcfc;
+  border: 1px solid #eee;
+  padding: 15px;
+  border-radius: 8px;
+  flex: 1;
+  text-align: center;
+}
+
+.statValue {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: #c5a059;
+  display: block;
+}
+
+.statLabel {
+  font-size: 0.8rem;
+  color: #777;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* --- TABLE --- */
+.tableContainer {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.table th, .table td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #eee;
+}
+
+.table th {
+  background-color: #f9f9f9;
+  font-weight: 600;
+  color: #555;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+}
+
+.amount {
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.positive { color: #2e7d32; }
+.negative { color: #c62828; }
+
+/* --- BADGES --- */
+.badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+  display: inline-block;
+}
+
+.status_succeeded { background-color: #e6f4ea; color: #1e8e3e; }
+.status_refunded { background-color: #fce8e6; color: #d93025; }
+.status_processing { background-color: #e8f0fe; color: #1a73e8; }
+.status_failed { background-color: #fce8e6; color: #c62828; }
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #888;
+}
