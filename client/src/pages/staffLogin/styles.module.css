@@ -1,142 +1,183 @@
+/* Page Container with a premium gradient background */
 .staffLoginPage {
   min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #fcfcfc; /* Matching your AdminPanel background */
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
   font-family: "Inter", sans-serif;
   padding: 20px;
 }
 
+/* The "Floating" Card */
 .loginContainer {
   width: 100%;
-  max-width: 400px;
+  max-width: 420px;
   background: #ffffff;
-  padding: 40px;
-  border-radius: 12px; /* Matching your AdminSection radius */
-  border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Matching your AdminSection shadow */
+  padding: 3rem;
+  border-radius: 16px; 
+  border: 1px solid #fff;
+  box-shadow: 
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+    0 4px 6px -2px rgba(0, 0, 0, 0.05),
+    0 0 0 1px rgba(0,0,0,0.02); /* Subtle outline */
+  animation: slideUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/* Branding Section */
 .branding {
   text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 2rem;
 }
 
 .branding h1 {
-  font-size: 1.8rem;
+  font-size: 2rem;
   margin: 0;
-  color: #1a1a1a;
-  letter-spacing: -0.5px;
+  color: #111827;
+  letter-spacing: -0.02em;
+  font-weight: 800;
 }
 
 .goldText { 
-  color: #c5a059; /* Your brand gold */
-  font-weight: 600;
+  color: #c5a059; 
 }
 
 .branding p {
-  font-size: 0.8rem;
-  color: #888;
-  margin-top: 5px;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: 8px;
+  letter-spacing: 0.02em;
 }
 
+/* The "Authorized Personnel Only" Badge */
 .staffBadge {
-  background: #f8f9fa; /* Light gray header look */
-  color: #c5a059; 
-  font-size: 0.7rem;
+  background: #fffbf2; /* Light Gold Tint */
+  color: #b48a3c; 
+  font-size: 0.75rem;
   font-weight: 700;
   text-align: center;
-  padding: 10px;
-  border-radius: 6px;
-  border: 1px solid #eee;
-  margin-bottom: 25px;
+  padding: 8px 12px;
+  border-radius: 9999px; /* Pill Shape */
+  border: 1px solid #f3e6c8;
+  margin-bottom: 2rem;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.05em;
+  display: inline-block;
+  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Inputs */
 .inputGroup {
-  margin-bottom: 20px;
+  margin-bottom: 1.25rem;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .inputGroup label {
-  font-size: 0.75rem;
+  font-size: 0.8rem;
   font-weight: 600;
-  color: #555;
+  color: #374151;
   text-transform: uppercase;
+  letter-spacing: 0.02em;
 }
 
 .inputGroup input {
-  padding: 12px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fdfdfd;
+  padding: 12px 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
   width: 100%;
   box-sizing: border-box;
   font-family: inherit;
-  transition: border-color 0.2s;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
 }
 
 .inputGroup input:focus {
   outline: none;
-  border-color: #c5a059; /* Gold focus state */
+  border-color: #c5a059;
+  box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.15); /* Gold Glow */
 }
 
+/* Login Button */
 .loginBtn {
   width: 100%;
   padding: 14px;
-  background-color: #c5a059; /* Your primary Gold action color */
+  background-color: #111827; /* Dark Black/Grey for High Contrast */
   color: white;
   border: none;
-  border-radius: 6px;
-  font-weight: 700;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1rem;
   cursor: pointer;
-  transition: opacity 0.2s;
-  margin-top: 10px;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
 .loginBtn:hover {
-  opacity: 0.9;
+  background-color: #000;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
 }
 
+.loginBtn:active {
+  transform: translateY(0);
+}
+
+/* Error Banner */
 .errorBanner {
-  background: #fff3e0; /* Using your 'Occupied' status orange for warnings */
-  color: #ef6c00;
+  background: #fef2f2; 
+  color: #991b1b;
   padding: 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  margin-bottom: 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin-bottom: 1.5rem;
   text-align: center;
-  border: 1px solid #ffe0b2;
+  border: 1px solid #fecaca;
+  animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
 }
 
+/* Footer Links */
 .footer {
-  margin-top: 30px;
+  margin-top: 2rem;
   text-align: center;
-  border-top: 1px solid #eee;
-  padding-top: 20px;
+  border-top: 1px solid #f3f4f6;
+  padding-top: 1.5rem;
 }
 
 .footer p {
-  font-size: 0.7rem;
-  color: #999;
+  font-size: 0.75rem;
+  color: #9ca3af;
 }
 
 .guestLink {
   display: inline-block;
-  margin-top: 15px;
-  font-size: 0.8rem;
-  color: #888;
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: #6b7280;
   text-decoration: none;
   transition: color 0.2s;
+  font-weight: 500;
 }
 
 .guestLink:hover {
   color: #c5a059;
   text-decoration: underline;
+}
+
+/* Animations */
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shake {
+  10%, 90% { transform: translate3d(-1px, 0, 0); }
+  20%, 80% { transform: translate3d(2px, 0, 0); }
+  30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+  40%, 60% { transform: translate3d(4px, 0, 0); }
 }

@@ -1,0 +1,180 @@
+/* Container */
+.container {
+  padding: 20px; /* Let the parent container handle padding if needed, or keep uniform */
+  font-family: 'Inter', sans-serif;
+  color: #374151;
+  animation: fadeIn 0.4s ease-out;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0 0 4px 0;
+}
+
+.subtitle {
+  color: #6b7280;
+  font-size: 0.95rem;
+  margin: 0;
+}
+
+/* Add Button */
+.addBtn {
+  background-color: #10b981; /* Green for "Create" actions is standard */
+  color: white;
+  padding: 0.7rem 1.4rem;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.addBtn:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Table Card */
+.tableContainer {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border: 1px solid #f3f4f6;
+  overflow: hidden; /* Clips the table corners */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.table th {
+  padding: 1.1rem 1.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 1.1rem 1.5rem;
+  border-bottom: 1px solid #f3f4f6;
+  vertical-align: middle;
+  font-size: 0.95rem;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover {
+  background-color: #fafafa;
+}
+
+/* --- SPECIFIC COLUMN STYLES --- */
+
+/* Name Cell: The clickable gold link */
+.nameCell {
+  color: #c5a059; /* Brand Gold */
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.nameCell:hover {
+  color: #a08040;
+  text-decoration: underline;
+}
+
+/* Description Cell: Limits text width */
+.descCell {
+  max-width: 300px;
+  color: #4b5563;
+  line-height: 1.4;
+}
+
+.noDesc {
+  color: #9ca3af;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+/* Actions Column (Right Aligned) */
+.actionsCell {
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* Action Buttons */
+.editBtn {
+  color: #2563eb; /* Blue */
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 16px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.editBtn:hover {
+  color: #1d4ed8;
+  text-decoration: underline;
+}
+
+.deleteBtn {
+  color: #ef4444; /* Red */
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+
+.deleteBtn:hover {
+  color: #dc2626;
+  text-decoration: underline;
+}
+
+/* Empty State */
+.emptyState {
+  text-align: center;
+  padding: 4rem 2rem;
+  color: #9ca3af;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+  font-style: italic;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}

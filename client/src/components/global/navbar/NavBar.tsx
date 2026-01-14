@@ -1,4 +1,4 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
 import styles from "./styles.module.css";
 
@@ -37,6 +37,7 @@ export default function Navbar() {
   //   }
   // };
 
+  const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
   /**
@@ -47,52 +48,102 @@ export default function Navbar() {
   // const linkClass = ({ isActive }: { isActive: boolean }) =>
   //   isActive ? styles.active : "";
 
+  // Define View States
+  const isStaffLogin = currentPath === "/staffLogin";
+  // Checks for /admin, /adminPanel, /manager, etc.
+  const isStaffDashboard = currentPath.startsWith("/admin") || currentPath.startsWith("/manager");
+  const isUserDashboard = currentPath === "/user";
+  
+  // Environment Setup for Logout
+  const baseUrl = import.meta.env.DEV
+    ? "http://localhost:8080"
+    : "http://liore.us-east-1.elasticbeanstalk.com";
+
+  /**
+   * Global Logout Handler
+   * Now uncommented and fully functional.
+   */
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      const response = await fetch(`${baseUrl}/auth/logout`, {
+        method: "POST", 
+        credentials: "include", 
+      });
+
+      // Smart Redirect: Staff -> Staff Login, Guest -> Guest Login
+      const redirectPath = isStaffDashboard ? "/staffLogin" : "/login";
+      navigate(redirectPath);
+      
+    } catch (error) {
+      console.error("Logout request failed:", error);
+      navigate("/login");
+    }
+  };
+
   return (
     <header>
       <nav>
         <div className={styles["inner-grid"]}>
           {/* Brand Identity */}
-          <NavLink to="/">
-            <img src="/liore.svg" alt="" />
+          <NavLink to={isStaffDashboard ? "/admin" : "/"}>
+            <img src="/liore.svg" alt="Liore Spa & Resort" />
           </NavLink>
 
           {/* Navigation Links */}
           <div className={styles.navlinks}>
-            {currentPath === "/" && (
+            
+            {/* SCENARIO A: STAFF LOGIN PAGE (Clean Slate) */}
+            {isStaffLogin ? (
+               null 
+            ) : isStaffDashboard ? (
+            
+            /* SCENARIO B: STAFF DASHBOARD (Logout Only) */
               <>
-                <HashLink to="/#stay-with-us">Stay</HashLink>
+                 <span style={{ color: 'white', fontSize: '0.9em', marginRight: '10px' }}>
+                    Staff Workspace
+                 </span>
+                 <button 
+                    onClick={handleLogout} 
+                    className="btn-secondary"
+                    style={{ cursor: 'pointer' }}
+                 >
+                    Log Out
+                 </button>
+              </>
+            ) : (
+              
+            /* SCENARIO C: GUEST VIEW (Standard) */
+              <>
+                {currentPath === "/" && (
+                  <>
+                    <HashLink to="/#stay-with-us">Stay</HashLink>
+                    <HashLink to="/#dine">Dining</HashLink>
+                  </>
+                )}
 
-                <HashLink to="/#dine">Dinning</HashLink>
+                {/* Hide "Sign In" if on Login page OR User Dashboard */}
+                {currentPath !== "/login" && !isUserDashboard && (
+                  <NavLink to="/login" className="btn-transparent">
+                    Sign In
+                  </NavLink>
+                )}
+
+                {(currentPath === "/" || currentPath === "/check-reservation") && (
+                  <NavLink to="/roomlisting" className="btn-secondary">
+                    Book Now
+                  </NavLink>
+                )}
+
+                {/* Hide "Check Reservation" if we are already there */}
+                {currentPath !== "/" && currentPath !== "/check-reservation" && currentPath !== "/login" && (
+                  <NavLink to="/check-reservation" className="btn-secondary">
+                    Check Reservation
+                  </NavLink>
+                )}
               </>
             )}
 
-            {currentPath !== "/user" &&
-              currentPath !== "/adminPanel" &&
-              currentPath !== "/login" &&
-              currentPath !== "/signup" && (
-                <NavLink to="/login" className="btn-transparent">
-                  Sign In
-                </NavLink>
-              )}
-
-            {(currentPath === "/" ||
-              currentPath === "/checkreservation" ||
-              currentPath === "/user" ||
-              currentPath === "/foundreservation") && (
-              <NavLink to="/roomlisting" className="btn-secondary">
-                Book Now
-              </NavLink>
-            )}
-
-            {currentPath !== "/" &&
-              currentPath !== "/checkreservation" &&
-              currentPath !== "/user" &&
-              currentPath !== "/adminPanel" &&
-              currentPath !== "/roomlisting/checkout" && (
-                <NavLink to="/checkreservation" className="btn-secondary">
-                  Check Reservation
-                </NavLink>
-              )}
           </div>
         </div>
       </nav>

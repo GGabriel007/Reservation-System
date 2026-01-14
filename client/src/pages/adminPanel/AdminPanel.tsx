@@ -7,6 +7,7 @@ import toast, { Toaster } from "react-hot-toast";
 import ActionStatusModal from "@/components/global/toast/actionsStatusModal/ActionStatusModal";
 import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToast/ConfirmationDeleteToast";
 import RoomDetailsModal from "@/components/modals/roomDetailsModal/RoomDetailsModal";
+import ReservationManager from "./ReservationManager";
 
 interface Room {
   _id: string;
@@ -70,7 +71,7 @@ export default function AdminPanel() {
   // 2. ROLE GUARD
   useEffect(() => {
     if (!userInfo || (userInfo.role !== 'admin' && userInfo.role !== 'manager')) {
-      navigate("/staff/login");
+      navigate("/staffLogin");
     }
   }, [userInfo, navigate]);
 
@@ -301,6 +302,8 @@ export default function AdminPanel() {
   );
 
   return (
+    <div className="container mx-auto">
+      <hr className="my-8" />
     <main className={styles.adminPanelPage}>
       <Toaster />
       <header className={styles.headerArea}>
@@ -415,10 +418,10 @@ export default function AdminPanel() {
                       }`
                   }}
                 >
-                  <option value="available">Available (Green)</option>
-                  <option value="occupied">Occupied (Red)</option>
-                  <option value="maintenance">Maintenance (Orange)</option>
-                  <option value="pending">Cleaning/Pending (Yellow)</option>
+                  <option value="available">Available</option>
+                  <option value="occupied">Occupied</option>
+                  <option value="maintenance">Maintenance</option>
+                  <option value="pending">Cleaning/Pending</option>
                 </select>
 
                 {/* --------------------------- */}
@@ -557,5 +560,10 @@ export default function AdminPanel() {
         onClose={() => setViewRoom(null)}
       />
     </main>
+    {/* Pass the logged-in user's hotel ID */}
+      {assignedHotelId && (
+        <ReservationManager hotelId={assignedHotelId} />
+      )}
+  </div>
   );
 }

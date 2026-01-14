@@ -1,11 +1,17 @@
+import { useState } from "react";
 import { useLocation, Link, useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
 import { useCancelReservationMutation } from "@/redux/features/api/apiSlice";
 import toast from "react-hot-toast";
+// Import your custom notification component
+import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToast/ConfirmationDeleteToast";
 
 export default function FoundReservation() {
   const location = useLocation();
   const navigate = useNavigate();
+  
+  // 1. State for the custom confirmation modal
+  const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
   const { reservation } = location.state || {};
   const [cancelReservation, { isLoading }] = useCancelReservationMutation();
@@ -43,9 +49,13 @@ export default function FoundReservation() {
     )
   );
 
-  const handleCancel = async () => {
-    if (!window.confirm("Are you sure you want to cancel this reservation?"))
-      return;
+  // 2. Step 1: Just open the modal
+  const handleCancelClick = () => {
+    setIsCancelModalOpen(true);
+  };
+
+  // 3. Step 2: The actual logic (runs only when confirmed in modal)
+  const executeCancel = async () => {
     try {
       await cancelReservation({
         id: reservation._id,
@@ -56,10 +66,14 @@ export default function FoundReservation() {
             ? reservation.userId?.email
             : ""),
       }).unwrap();
+      
       toast.success("Reservation cancelled successfully");
+      setIsCancelModalOpen(false); // Close modal
       navigate("/");
     } catch (err) {
+      console.error(err);
       toast.error("Failed to cancel reservation");
+      setIsCancelModalOpen(false); // Close modal on error too
     }
   };
 
@@ -109,12 +123,7 @@ export default function FoundReservation() {
                   <strong>{reservation.specialRequests ? "+" : "None"}</strong>
                 </li>
               </ul>
-              {/* Optional: Show the actual request if it exists */}
-              {reservation.specialRequests && (
-                <p className={styles.requestDetail}>
-                  {reservation.specialRequests}
-                </p>
-              )}
+              {reservation.specialRequests && <p className={styles.requestDetail}>{reservation.specialRequests}</p>}
             </div>
           </section>
 
@@ -130,14 +139,8 @@ export default function FoundReservation() {
                 <span>${reservation.roomPrice || reservation.totalAmount}</span>
               </div>
               <div className={styles.priceDetailsText}>
-                <p>
-                  {nights} {nights === 1 ? "Night" : "Nights"} stay
-                </p>
-                {/* Fixed NaN issue: added || 0 to tax and fees */}
-                <p>
-                  Taxes and fees: $
-                  {(reservation.tax || 0) + (reservation.fees || 0)}
-                </p>
+                <p>{nights} {nights === 1 ? 'Night' : 'Nights'} stay</p>
+                <p>Taxes and fees: ${(reservation.tax || 0) + (reservation.fees || 0)}</p>
               </div>
             </div>
 
@@ -161,18 +164,27 @@ export default function FoundReservation() {
         </div>
 
         <div className={styles.footerdivActions}>
-          <Link to="/checkreservation" className={styles.backLink}>
-            <span>&larr;</span> Back
-          </Link>
-          <button
-            onClick={handleCancel}
-            className="btn-cancel btn-medium"
+          <Link to="/check-reservation" className={styles.backLink}><span>&larr;</span> Back</Link>
+          
+          {/* 4. Update Button to trigger Modal */}
+          <button 
+            onClick={handleCancelClick} 
+            className={styles.cancelBtn}
             disabled={isLoading}
           >
             {isLoading ? "Processing..." : "Cancel Reservation"}
           </button>
         </div>
       </div>
+
+      {/* 5. Render the Modal */}
+      <ConfirmDeleteToast
+        isOpen={isCancelModalOpen}
+        onClose={() => setIsCancelModalOpen(false)}
+        onConfirm={executeCancel}
+        title="Cancel Reservation?"
+        message="Are you sure you want to cancel this booking? This action cannot be undone."
+      />
     </main>
   );
 }

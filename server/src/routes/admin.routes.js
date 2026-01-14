@@ -14,12 +14,24 @@ router.post("/promote-self", AdminController.promoteSelf);
  * Only users with the "admin" role can access this entire file.
  */
 router.use(protect);
-router.use(authorize("admin"));
+
 
 // Temporary
+router.get("/reservations/:hotelId", authorize("admin", "manager"), AdminController.getHotelReservations);
+router.post("/rooms", authorize("admin", "manager"), AdminController.createRoom);
+
+/**
+ * @route   GET /api/admin/inventory
+ * @desc    Global inventory audit (All Hotels + All Rooms)
+ */
+router.get("/inventory", authorize("admin", "manager"), AdminController.getFullInventory);
+
+router.use(authorize("admin"));
+
 router.delete("/users/:id", AdminController.deleteUser);
+router.put("/hotels/:id", AdminController.updateHotel);
+router.delete("/hotels/:id", AdminController.deleteHotel);
 router.post("/hotels", AdminController.createHotel);
-router.post("/rooms", AdminController.createRoom);
 
 /**
  * @route   GET /api/admin/stats
@@ -39,10 +51,6 @@ router.get("/users", AdminController.getAllUsers);
  */
 router.patch("/users/:id/role", AdminController.updateUserRole);
 
-/**
- * @route   GET /api/admin/inventory
- * @desc    Global inventory audit (All Hotels + All Rooms)
- */
-router.get("/inventory", AdminController.getAllInventory);
+
 
 export default router;

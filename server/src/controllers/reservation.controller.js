@@ -78,6 +78,23 @@ export const ReservationController = {
     }
   },
 
+  getHotelReservations: async (req, res) => {
+  try {
+    const { hotelId } = req.params; // Or get from req.user.assignedHotel
+    
+    // Find all reservations for this hotel
+    // We populate 'user' to get guest name and 'room' to get room number
+    const reservations = await Reservation.find({ hotel: hotelId })
+      .populate("user", "firstName lastName email")
+      .populate("room", "roomName roomType")
+      .sort({ checkInDate: -1 }); // Newest first
+
+    res.status(200).json(reservations);
+  } catch (err) {
+    res.status(500).json({ message: "Error fetching reservations", error: err.message });
+  }
+},
+
   // GET RESERVATION BY ID
   getReservationById: async (req, res) => {
     try {

@@ -5,28 +5,28 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = Router();
 
-// --- 1. PUBLIC ROUTES ---
+//  PUBLIC ROUTES  
 // Anyone can look up a reservation with a confirmation code
 router.get("/lookup", ReservationController.getReservationByLookup);
 
 // Cancel a reservation
 router.patch("/:id/cancel", ReservationController.cancelReservation);
 
-// --- 2. THE SECURITY GATE ---
+// THE SECURITY GATE 
 // Everything below this line requires a valid login session
 router.use(protect); 
 
 
-// --- 3. STATIC ROUTES (Must come BEFORE dynamic /:id routes) ---
+// STATIC ROUTES (Must come BEFORE dynamic /:id routes) ---
 
 // View "My Bookings" history
 router.get("/my-bookings", ReservationController.getMyReservations);
 
 // Admin: View every single reservation in the system
-router.get("/all", authorize('admin'), ReservationController.getAllReservations);
+router.get("/all", authorize('admin', 'manager'), ReservationController.getAllReservations);
 
 
-// --- 4. DYNAMIC ROUTES (Using Parameters) ---
+// DYNAMIC ROUTES (Using Parameters) 
 
 // Get specific reservation details
 // Note: ReservationController.getReservationById should handle the logic

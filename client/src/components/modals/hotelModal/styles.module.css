@@ -1,0 +1,160 @@
+/* Overlay: Centers the modal and dims the background */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* High z-index to sit on top */
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.2s ease-out;
+}
+
+/* The Modal Box */
+.modal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 90%; /* Responsive width */
+  max-width: 42rem;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  max-height: 90vh;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  color: #111827;
+  border-bottom: 2px solid #c5a059; /* Brand Gold Accent */
+  padding-bottom: 0.75rem;
+}
+
+/* Form Layout */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  letter-spacing: 0.01em;
+}
+
+.input, .textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 8px; /* Slightly softer corners */
+  padding: 0.75rem;
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+/* Brand Focus State */
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: #c5a059; /* Gold Border */
+  box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2); /* Gold Glow */
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Disabled Input (Country) */
+.inputDisabled {
+  background-color: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+  border-color: #e5e7eb;
+}
+
+/* Grid Layouts for Address Fields */
+.gridTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+}
+
+.gridThree {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+}
+
+/* Footer Buttons */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.cancelBtn {
+  padding: 0.625rem 1.25rem;
+  background-color: white;
+  color: #374151;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.cancelBtn:hover {
+  background-color: #f3f4f6;
+  color: #111;
+}
+
+.saveBtn {
+  padding: 0.625rem 1.5rem;
+  background-color: #10b981; /* Green to match 'Add' button */
+  color: white;
+  border-radius: 8px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s, background-color 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.saveBtn:hover {
+  background-color: #059669;
+  transform: translateY(-1px);
+}
+
+.saveBtn:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}

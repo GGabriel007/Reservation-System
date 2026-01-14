@@ -21,7 +21,7 @@ import {
 } from "./pages/index";
 
 import { Provider } from "react-redux";
-import { store } from "@/redux/store"; 
+import { store } from "@/redux/store";
 
 const router = createBrowserRouter([
   {
@@ -71,6 +71,11 @@ const router = createBrowserRouter([
       },
 
       {
+        path: "/user",
+        element: <UserDashboard />,
+      },
+
+      {
         element: <AuthPersist />,
         children: [
           {
@@ -80,10 +85,6 @@ const router = createBrowserRouter([
           {
             path: "/adminPanel",
             element: <AdminPanel />,
-          },
-          {
-            path: "/user",
-            element: <UserDashboard />,
           },
         ],
       },

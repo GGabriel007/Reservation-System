@@ -43,16 +43,14 @@ export default function StaffLogin() {
         // Verify if user has staff privileges
         if (loggedInUser.role === "admin" || loggedInUser.role === "manager") {
           
-          // Dispatch the user data using your actual slice action
+          // Dispatch the user data
           dispatch(setUser(loggedInUser));
 
           // Logic-based redirection
           if (loggedInUser.role === "manager") {
-            // Managers go straight to their dashboard
             navigate("/adminPanel"); 
           } else if (loggedInUser.role === "admin") {
-            // Admins go to the portal/selector page
-            navigate("/staff/portal"); 
+            navigate("/admin/dashboard"); 
           }
         } else {
           setErrorMessage("Access Denied: This portal is for authorized staff only.");
@@ -71,36 +69,43 @@ export default function StaffLogin() {
   return (
     <main className={styles.staffLoginPage}>
       <div className={styles.loginContainer}>
+        
+        {/* Branding Header */}
         <header className={styles.branding}>
           <h1>Lioré <span className={styles.goldText}>Corporate</span></h1>
           <p>Global Property Management Systems</p>
         </header>
 
-        <section className={styles.formSection}>
+        {/* Login Section */}
+        <section>
           <div className={styles.staffBadge}>Authorized Personnel Only</div>
 
-          {errorMessage && <p className={styles.errorBanner}>{errorMessage}</p>}
+          {errorMessage && <div className={styles.errorBanner}>{errorMessage}</div>}
 
-          <form onSubmit={handleStaffLogin} className={styles.staffForm}>
+          <form onSubmit={handleStaffLogin}>
             <div className={styles.inputGroup}>
-              <label>Corporate ID / Email</label>
+              <label htmlFor="email">Corporate ID / Email</label>
               <input
+                id="email"
                 type="email"
                 placeholder="staff@liore.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
             <div className={styles.inputGroup}>
-              <label>Security Password</label>
+              <label htmlFor="password">Security Password</label>
               <input
+                id="password"
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
             </div>
 
@@ -114,6 +119,7 @@ export default function StaffLogin() {
           </form>
         </section>
 
+        {/* Footer */}
         <div className={styles.footer}>
           <p>&copy; 2026 Lioré Hospitality Group. All systems monitored.</p>
           <Link to="/" className={styles.guestLink}>Return to Guest Site</Link>
