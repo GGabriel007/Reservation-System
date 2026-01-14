@@ -13,6 +13,7 @@ import hotelRoutes from "./routes/hotel.routes.js";
 import roomRoutes from "./routes/room.routes.js";
 import reservationRoutes from "./routes/reservation.routes.js";
 import transactionRoutes from "./routes/transaction.routes.js";
+import fs from 'fs';
 
 // --- ES MODULE FIX FOR __dirname ---
 const __filename = fileURLToPath(import.meta.url);
@@ -83,11 +84,16 @@ app.use((req, res, next) => {
 });
 
 // API Routes
+
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+app.use("/uploads", (req, res) => {
+  console.log(`[Warning] Missing image requested: ${req.originalUrl}`);
+  return res.status(404).send("Image not found");
+});
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
 app.use("/hotels", hotelRoutes);      
 app.use("/rooms", roomRoutes);   
-app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));     
 app.use("/reservations", reservationRoutes); 
 app.use("/transactions", transactionRoutes); 
 
@@ -97,12 +103,8 @@ app.get("/api/health", (req, res) => {
 
 // --- ALL-IN-ONE FRONTEND SERVING ---
 const distPath = path.join(process.cwd(), 'client-build', 'dist');
-
-
-// Serve static files from the 'public' folder
-// This folder should be located at: server/src/public (if you use this path)
-// Note: If you put 'public' in the server root, use path.join(__dirname, '../public')
 app.use(express.static(distPath));
+
 
 /**
  * The "Catch-all" route (FIXED FOR EXPRESS 5)

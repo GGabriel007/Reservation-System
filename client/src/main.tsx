@@ -31,63 +31,63 @@ import { store } from "@/redux/store"; // Import your configured Redux store
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, 
+    element: <App />,
     children: [
       {
-        element: <AuthPersist />, 
+        element: <AuthPersist />,
         children: [
           {
-        path: "/",
-        element: <Home />,
-      },
-      {
-        path: "/login",
-        element: <Login />,
-      },
-      {
-        path: "/signup", //
-        element: <Signup />,
-      },
-      {
-        path: "/user",
-        element: <UserDashboard />,
-      },
-      {
-        path: "/admin",
-        element: <AdminDashboard />,
-      },
-      {
-        path: "/adminPanel",
-        element: <AdminPanel />,
-      },
-      {
-        path: "/check-reservation",
-        element: <CheckReservation />,
-      },
-      {
-        path: "/bookroom",
-        element: <BookRoom />,
-      },
-      {
-        path: "/roomlisting",
-        element: <RoomListing />,
-      },
-      {
-        path: "/hotellisting",
-        element: <HotelListing />,
-      },
-      {
-        path: "/checkout/:roomId",
-        element: <Checkout />,
-      },
-      {
-        path: "/found-reservation",
-        element: <FoundReservation />,
-      },
-      {
-        path: "/staffLogin",
-        element: <StaffLogin />,
-      },
+            path: "/",
+            element: <Home />,
+          },
+          {
+            path: "/login",
+            element: <Login />,
+          },
+          {
+            path: "/admin/dashboard",
+            element: <AdminDashboard />,
+          },
+          {
+            path: "/signup", //
+            element: <Signup />,
+          },
+          {
+            path: "/user",
+            element: <UserDashboard />,
+          },
+          {
+            path: "/adminPanel",
+            element: <AdminPanel />,
+          },
+          {
+            path: "/check-reservation",
+            element: <CheckReservation />,
+          },
+          {
+            path: "/bookroom",
+            element: <BookRoom />,
+          },
+          {
+            path: "/roomlisting",
+            element: <RoomListing />,
+          },
+          {
+            path: "/hotellisting",
+            element: <HotelListing />,
+          },
+          {
+            path: "/checkout/:roomId",
+            element: <Checkout />,
+          },
+          {
+            path: "/found-reservation",
+            element: <FoundReservation />,
+          },
+          {
+            path: "/staffLogin",
+            element: <StaffLogin />,
+          },
         ]
       }
     ],

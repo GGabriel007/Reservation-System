@@ -1,0 +1,78 @@
+.mainPage {
+  min-height: 100vh;
+  background-color: #f3f4f6; /* Light Gray Background */
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.dashboardContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* --- HEADER --- */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.adminBadge {
+  background-color: #1e3a8a; /* Dark Blue */
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* --- TABS --- */
+.tabs {
+  display: flex;
+  gap: 1.5rem;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 2rem;
+}
+
+.tabButton {
+  padding-bottom: 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #6b7280; /* Gray-500 */
+  background: none;
+  border: none;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.tabButton:hover {
+  color: #111827; /* Gray-900 */
+}
+
+/* The Active State (Blue Underline) */
+.active {
+  color: #2563eb; /* Blue-600 */
+  font-weight: 600;
+}
+
+.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px; /* Moves line down to cover the border-bottom */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: #2563eb;
+}
+
+/* --- CONTENT AREA --- */
+.contentArea {
+  background-color: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  min-height: 500px;
+  border: 1px solid #e5e7eb;
+}

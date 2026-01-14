@@ -3,7 +3,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #fcfcfc; /* Matching your AdminPanel background */
+  background-color: #fcfcfc; 
   font-family: "Inter", sans-serif;
   padding: 20px;
 }
@@ -13,9 +13,9 @@
   max-width: 400px;
   background: #ffffff;
   padding: 40px;
-  border-radius: 12px; /* Matching your AdminSection radius */
+  border-radius: 12px; 
   border: 1px solid #e0e0e0;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); /* Matching your AdminSection shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03); 
 }
 
 .branding {
@@ -31,7 +31,7 @@
 }
 
 .goldText { 
-  color: #c5a059; /* Your brand gold */
+  color: #c5a059; 
   font-weight: 600;
 }
 
@@ -44,7 +44,7 @@
 }
 
 .staffBadge {
-  background: #f8f9fa; /* Light gray header look */
+  background: #f8f9fa; 
   color: #c5a059; 
   font-size: 0.7rem;
   font-weight: 700;
@@ -84,13 +84,13 @@
 
 .inputGroup input:focus {
   outline: none;
-  border-color: #c5a059; /* Gold focus state */
+  border-color: #c5a059; 
 }
 
 .loginBtn {
   width: 100%;
   padding: 14px;
-  background-color: #c5a059; /* Your primary Gold action color */
+  background-color: #c5a059; 
   color: white;
   border: none;
   border-radius: 6px;
@@ -105,7 +105,7 @@
 }
 
 .errorBanner {
-  background: #fff3e0; /* Using your 'Occupied' status orange for warnings */
+  background: #fff3e0; 
   color: #ef6c00;
   padding: 12px;
   border-radius: 6px;

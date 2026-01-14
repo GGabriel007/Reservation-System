@@ -1,0 +1,137 @@
+/* Overlay: Centers the modal and dims the background */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  backdrop-filter: blur(2px);
+}
+
+/* The Modal Box */
+.modal {
+  background-color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 42rem; /* Matches a nice medium width */
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  max-height: 90vh;
+  overflow-y: auto;
+  font-family: 'Inter', sans-serif;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #111827;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+/* Form Layout */
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.label {
+  display: block;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+.input, .textarea {
+  display: block;
+  width: 100%;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  padding: 0.625rem;
+  font-size: 0.95rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input:focus, .textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* Specific style for disabled inputs (Country) */
+.inputDisabled {
+  background-color: #f3f4f6;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* Grid Layouts for Address Fields */
+.gridTwo {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.gridThree {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1rem;
+}
+
+/* Footer Buttons */
+.footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #e5e7eb;
+}
+
+.cancelBtn {
+  padding: 0.625rem 1.25rem;
+  background-color: #f3f4f6;
+  color: #1f2937;
+  border-radius: 6px;
+  border: 1px solid #e5e7eb;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.cancelBtn:hover {
+  background-color: #e5e7eb;
+}
+
+.saveBtn {
+  padding: 0.625rem 1.25rem;
+  background-color: #2563eb; /* Blue-600 */
+  color: white;
+  border-radius: 6px;
+  border: none;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.saveBtn:hover {
+  background-color: #1d4ed8;
+}
+
+.saveBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

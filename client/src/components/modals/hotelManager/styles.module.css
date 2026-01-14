@@ -1,0 +1,131 @@
+/* Container */
+.container {
+  padding: 2rem;
+  font-family: 'Inter', sans-serif;
+  color: #374151;
+}
+
+/* Header Section */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+
+/* Add Button */
+.addButton {
+  background-color: #10b981; /* Green */
+  color: white;
+  padding: 0.6rem 1.2rem;
+  border-radius: 6px;
+  border: none;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.addButton:hover {
+  background-color: #059669;
+}
+
+/* Table Card */
+.tableCard {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e5e7eb;
+  overflow: hidden; /* Clips the table corners */
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table thead {
+  background-color: #f9fafb;
+  border-bottom: 2px solid #e5e7eb;
+}
+
+.table th {
+  padding: 1rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: #6b7280;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  vertical-align: middle;
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tr:hover {
+  background-color: #f8fafc;
+}
+
+/* Status Badges */
+.badgeActive {
+  background-color: #d1fae5;
+  color: #065f46;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.badgeInactive {
+  background-color: #fee2e2;
+  color: #991b1b;
+  padding: 4px 10px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* Action Buttons */
+.editBtn {
+  color: #2563eb;
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 12px;
+  font-weight: 500;
+}
+
+.deleteBtn {
+  color: #dc2626;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.editBtn:hover, .deleteBtn:hover {
+  text-decoration: underline;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #6b7280;
+  font-style: italic;
+}

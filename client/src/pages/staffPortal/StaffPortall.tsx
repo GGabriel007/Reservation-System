@@ -57,7 +57,7 @@ export default function StaffPortal() {
         </div>
 
         <footer className={styles.footer}>
-          <button onClick={() => navigate("/staff/login")} className={styles.guestLink}>
+          <button onClick={() => navigate("/staffLogin")} className={styles.guestLink}>
             Secure Sign Out
           </button>
         </footer>
