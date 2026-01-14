@@ -1,4 +1,3 @@
-import React from "react";
 import styles from "./styles.module.css";
 
 // Reuse the Interface from your main file to ensure types match
