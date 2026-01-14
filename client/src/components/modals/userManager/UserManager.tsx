@@ -204,8 +204,8 @@ export default function UserManager() {
                           className={`${styles.roleSelect} ${hasPendingChange ? styles.roleChanged : ''}`}
                         >
                           <option value="guest">Guest</option>
-                          <option value="manager">Hotel Manager</option>
-                          <option value="admin">Global Admin</option>
+                          <option value="manager">Manager</option>
+                          <option value="admin">Admin</option>
                         </select>
 
                         {/* Save Button (Only shows if role changed) */}

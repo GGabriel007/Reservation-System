@@ -54,7 +54,7 @@ export const RoomController = {
       // 2. Security: Manager check
       if (
         req.user.role === "manager" &&
-        req.user.assignedHotelId?.toString() !== hotelId
+        req.user.assignedHotel?.toString() !== hotelId
       ) {
         return res.status(403).json({ message: "Unauthorized for this hotel" });
       }
@@ -79,7 +79,7 @@ export const RoomController = {
       // Security: Ensure a manager can only create rooms for their assigned hotel
       if (
         req.user.role === "manager" &&
-        req.user.assignedHotelId.toString() !== roomData.hotel
+        req.user.assignedHotel?.toString() !== roomData.hotel
       ) {
         return res
           .status(403)
@@ -105,7 +105,7 @@ export const RoomController = {
       // 2. SECURITY: Manager check
       if (
         req.user.role === "manager" &&
-        room.hotelId.toString() !== req.user.assignedHotelId.toString()
+        room.hotel.toString() !== req.user.assignedHotel?.toString()
       ) {
         return res.status(403).json({
           message: "Unauthorized: You do not manage this room's hotel.",
@@ -133,7 +133,7 @@ export const RoomController = {
       // 2. Security Check: Managers can only delete rooms in their assigned hotel
       if (
         req.user.role === "manager" &&
-        req.user.assignedHotelId.toString() !== room.hotel.toString()
+        req.user.assignedHotel?.toString() !== room.hotel.toString()
       ) {
         return res.status(403).json({
           message: "Access denied: This room belongs to another property.",
