@@ -21,13 +21,10 @@ interface Room {
   images: string[];
 }
 
-// Define available amenities for the Tag Cloud
 const AMENITY_OPTIONS = ["Wifi", "AC", "Pool", "TV", "Parking", "Kitchen", "Gym", "Breakfast", "Ocean View", "Pet Friendly"];
 
 export default function AdminPanel() {
   const navigate = useNavigate();
-
-  // 1. Get the logged-in staff info from Redux
   const userInfo = useAppSelector(selectUserInfo);
   const assignedHotelId = userInfo?.assignedHotel;
 
@@ -37,12 +34,8 @@ export default function AdminPanel() {
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [roomToDelete, setRoomToDelete] = useState<string | null>(null);
   const [viewRoom, setViewRoom] = useState<Room | null>(null);
-
-  // --- MULTI-IMAGE STATE ---
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
-
-  // State for the fetched Hotel Name
   const [hotelName, setHotelName] = useState("Loading Hotel...");
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -63,24 +56,24 @@ export default function AdminPanel() {
     images: [] as string[]
   });
 
-  // Dynamic URL: Works for Localhost AND AWS Production
   const baseUrl = import.meta.env.PROD 
   ? "http://liore.us-east-1.elasticbeanstalk.com" 
   : "http://localhost:8080";
 
-  // 2. ROLE GUARD
   useEffect(() => {
     if (!userInfo || (userInfo.role !== 'admin' && userInfo.role !== 'manager')) {
       navigate("/staffLogin");
     }
   }, [userInfo, navigate]);
 
-  // Fetch Hotel Name for the Header
+  // FIX 1: ADDED CREDENTIALS: "INCLUDE"
   useEffect(() => {
     const fetchHotelName = async () => {
       if (assignedHotelId) {
         try {
-          const res = await fetch(`${baseUrl}/hotels/${assignedHotelId}`);
+          const res = await fetch(`${baseUrl}/hotels/${assignedHotelId}`, {
+            credentials: "include" // <--- CRITICAL FIX
+          });
           if (res.ok) {
             const data = await res.json();
             setHotelName(data.name);
@@ -127,7 +120,6 @@ export default function AdminPanel() {
     }
   }, [assignedHotelId]);
 
-  // Helper to toggle amenities in the array
   const toggleAmenity = (amenity: string) => {
     setRoomData((prev) => {
       const current = prev.amenities || [];
@@ -139,25 +131,16 @@ export default function AdminPanel() {
     });
   };
 
-  // --- NEW: Handle Multiple Images ---
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
       const filesArray = Array.from(e.target.files);
-
-      // Store Files (to send to backend)
       setImageFiles((prev) => [...prev, ...filesArray]);
-
-      // Generate Previews (to show user)
       const newPreviews = filesArray.map(file => URL.createObjectURL(file));
       setImagePreviews((prev) => [...prev, ...newPreviews]);
     }
   };
 
   const removeImage = (index: number) => {
-    // Note: This logic removes visual previews. 
-    // Ideally, for editing existing rooms, you'd need separate logic 
-    // to distinguish between "New File to remove" vs "Existing DB Image to delete".
-    // For this version, we will handle UI removal.
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
     setImagePreviews((prev) => prev.filter((_, i) => i !== index));
   };
@@ -167,7 +150,6 @@ export default function AdminPanel() {
     const method = isEditing ? "PUT" : "POST";
     const url = isEditing ? `${baseUrl}/rooms/${selectedRoomId}` : `${baseUrl}/rooms`;
 
-    // Create FormData object
     const formData = new FormData();
     formData.append("roomName", roomData.roomName);
     formData.append("roomType", roomData.roomType);
@@ -177,25 +159,19 @@ export default function AdminPanel() {
     formData.append("hotel", assignedHotelId || "");
     formData.append("availabilityStatus", roomData.availabilityStatus);
 
-    // Append Amenities
     roomData.amenities.forEach((amenity) => {
       formData.append("amenities", amenity);
     });
 
-    // Append New Uploaded Images
     imageFiles.forEach((file) => {
       formData.append("images", file);
     });
 
-    // --- NEW: Append "Kept" Existing Images ---
-    // This tells the server which old images to SAVE. 
-    // If you deleted one in the UI, it won't be in this array, so it won't be sent.
     if (roomData.images && roomData.images.length > 0) {
       roomData.images.forEach((imgUrl) => {
         formData.append("existingImages", imgUrl);
       });
     }
-    // ---------------------------------------------
 
     try {
       const response = await fetch(url, {
@@ -227,13 +203,11 @@ export default function AdminPanel() {
 
   const executeDelete = async () => {
     if (!roomToDelete) return;
-
     try {
       const res = await fetch(`${baseUrl}/rooms/${roomToDelete}`, {
         method: "DELETE",
         credentials: "include"
       });
-
       if (res.ok) {
         showFeedback("The room has been removed from your active inventory.", 'success');
         fetchRooms();
@@ -266,11 +240,7 @@ export default function AdminPanel() {
       availabilityStatus: room.availabilityStatus,
       images: room.images || [],
     });
-
-    // --- Handling Existing Images ---
-    setImageFiles([]); // Clear pending uploads
-
-    // Convert DB paths to full URLs for preview
+    setImageFiles([]); 
     const existingImages = room.images || [];
     const fullPaths = existingImages.map(img => img.startsWith("http") ? img : `${baseUrl}${img}`);
     setImagePreviews(fullPaths);
@@ -288,9 +258,7 @@ export default function AdminPanel() {
       description: "",
       availabilityStatus: "available",
       images: [],
-
     });
-    // Reset Images
     setImageFiles([]);
     setImagePreviews([]);
   };
@@ -328,12 +296,9 @@ export default function AdminPanel() {
               {isEditing ? "Modify Room" : "New Room"}
             </div>
             <form onSubmit={handleSubmit} className={styles.compactForm}>
-
-              {/* --- MULTI-IMAGE UPLOAD SECTION --- */}
+              {/* IMAGE UPLOAD SECTION */}
               <div className={styles.formGroup}>
                 <label>Room Gallery (Max 5)</label>
-
-                {/* Upload Box */}
                 <div
                   style={{
                     border: '2px dashed #cfaa5f',
@@ -351,13 +316,11 @@ export default function AdminPanel() {
                     type="file"
                     id="roomImagesInput"
                     hidden
-                    multiple // ALLOWS MULTIPLE FILES
+                    multiple 
                     accept="image/*"
                     onChange={handleImageChange}
                   />
                 </div>
-
-                {/* Preview Grid */}
                 {imagePreviews.length > 0 && (
                   <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '5px' }}>
                     {imagePreviews.map((src, index) => (
@@ -384,15 +347,11 @@ export default function AdminPanel() {
                   </div>
                 )}
               </div>
-              {/* ---------------------------------- */}
-
 
               <div className={styles.formGroup}>
                 <label>Room Name</label>
                 <input type="text" value={roomData.roomName} required onChange={(e) => setRoomData({ ...roomData, roomName: e.target.value })} />
               </div>
-
-              {/* Inside the form, near the Category/Type select */}
 
               <div className={styles.formGroup}>
                 <label>Category</label>
@@ -405,7 +364,6 @@ export default function AdminPanel() {
                 </select>
               </div>
 
-              {/* --- NEW STATUS DROPDOWN --- */}
               <div className={styles.formGroup}>
                 <label>Current Status</label>
                 <select
@@ -424,8 +382,6 @@ export default function AdminPanel() {
                   <option value="pending">Cleaning/Pending</option>
                 </select>
 
-                {/* --------------------------- */}
-
                 <div className={styles.formGroup}>
                   <label>Max Guests</label>
                   <input type="number" className={styles.noArrows} value={roomData.maxOccupancy === 0 ? "" : roomData.maxOccupancy} required onChange={(e) => setRoomData({ ...roomData, maxOccupancy: parseInt(e.target.value) || 0 })} />
@@ -437,7 +393,6 @@ export default function AdminPanel() {
                 <input type="number" step="0.01" className={styles.noArrows} value={roomData.basePrice === 0 ? "" : roomData.basePrice} onBlur={handlePriceBlur} required placeholder="0.00" onChange={(e) => setRoomData({ ...roomData, basePrice: parseFloat(e.target.value) || 0 })} />
               </div>
 
-              {/* Amenities Tag Cloud */}
               <div className={styles.formGroup}>
                 <label>Amenities</label>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", marginTop: "5px" }}>
@@ -487,8 +442,6 @@ export default function AdminPanel() {
           <div className={styles.tableContainer}>
             <div className={styles.tableHeader}>
               <span>Room Inventory Database</span>
-
-              {/* --- NEW SEARCH BAR --- */}
               <input
                 type="text"
                 placeholder="Search room name..."
@@ -504,7 +457,6 @@ export default function AdminPanel() {
                   width: "200px"
                 }}
               />
-              {/* ---------------------- */}
               <span className={styles.refreshHint}>Live Updates Enabled</span>
             </div>
             <table className={styles.userTable}>
@@ -539,6 +491,15 @@ export default function AdminPanel() {
               </tbody>
             </table>
           </div>
+
+          {/* FIX 2: MOVED RESERVATION MANAGER HERE */}
+          {/* By putting it inside this section, it gets a valid width from the parent container */}
+          {assignedHotelId && (
+             <div style={{ marginTop: '30px', minHeight: '400px' }}>
+                <ReservationManager hotelId={assignedHotelId} />
+             </div>
+          )}
+
         </section>
       </div>
 
@@ -560,10 +521,6 @@ export default function AdminPanel() {
         onClose={() => setViewRoom(null)}
       />
     </main>
-    {/* Pass the logged-in user's hotel ID */}
-      {assignedHotelId && (
-        <ReservationManager hotelId={assignedHotelId} />
-      )}
   </div>
   );
 }
