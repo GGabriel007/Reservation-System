@@ -1,14 +1,17 @@
 export type Reservation = {
-  userId: number;
-  roomId: number;
-  // hotelId: number;
-  checkIn: Date;
-  checkOut: Date;
+  firstName: string;
+  lastName: string;
+  phoneNumber: number;
+  emailAddress: string;
+  country: string;
+  city: string;
+  zipCode: number;
+  cardNumber: number;
+  expirationDate: string;
+  cvv: number;
+  nameOnCard: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
   totalAmount: number;
-  //   status: {
-  //     type: String,
-  //     enum: ["pending", "confirmed", "cancelled", "failed"],
-  //     default: "pending",
-  //   },
   confirmationCode: string;
 };

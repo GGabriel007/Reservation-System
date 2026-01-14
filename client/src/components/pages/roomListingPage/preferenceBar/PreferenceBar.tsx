@@ -5,8 +5,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import ReactDatePickerRef from "react-datepicker";
 import { useAppSelector, useAppDispatch } from "@/redux/store";
 import {
-  increaseRooms,
-  descreaseRooms,
   increaseAdults,
   descreaseAdults,
   increaseChildren,
@@ -19,7 +17,7 @@ import {
 } from "@/redux/features/preference/preferenceSlice";
 
 export default function PreferenceBar() {
-  const { rooms, adults, children, beds, startDate, endDate } =
+  const { adults, children, beds, startDate, endDate } =
     useAppSelector(selectPreference);
   const dispatch = useAppDispatch();
   useEffect(() => {
@@ -34,8 +32,8 @@ export default function PreferenceBar() {
 
   const handleChange = (dates: [Date | null, Date | null]) => {
     const [start, end] = dates;
-    dispatch(setStartDate(start));
-    dispatch(setEndDate(end));
+    dispatch(setStartDate(start?.toISOString()));
+    dispatch(setEndDate(end?.toISOString()));
   };
 
   const handleGuestButtonClick = (
@@ -74,18 +72,19 @@ export default function PreferenceBar() {
             {/* DatePicker */}
             <DatePicker
               ref={datePickerRef}
-              selected={startDate}
+              selected={startDate ? new Date(startDate) : null}
               onChange={handleChange}
               onClickOutside={() => {
-                if (!startDate && !endDate)
+                if (!startDate && !endDate) {
                   (
                     document.querySelector(
                       ".react-datepicker-wrapper"
                     ) as HTMLDivElement
                   ).style.display = "none";
+                }
               }}
-              startDate={startDate}
-              endDate={endDate}
+              startDate={startDate ? new Date(startDate) : null}
+              endDate={endDate ? new Date(endDate) : null}
               selectsRange
             />
           </label>
@@ -96,22 +95,6 @@ export default function PreferenceBar() {
               Room, Guest & Bed
               <div className={`${styles.bubble} hidden`}>
                 <div className={styles.bubbleHead}>Preference</div>
-                <p>
-                  Room
-                  <img
-                    className="roomMinus"
-                    src="/minus.svg"
-                    alt=""
-                    onClick={() => dispatch(descreaseRooms())}
-                  />
-                  {rooms}
-                  <img
-                    className="roomPlus"
-                    src="/plus.svg"
-                    alt=""
-                    onClick={() => dispatch(increaseRooms())}
-                  />
-                </p>
                 <p>
                   Adults
                   <img
@@ -162,14 +145,12 @@ export default function PreferenceBar() {
                 </p>
               </div>
               <ul>
-                <li>{`${rooms} Rooms`}</li>
                 <li>{`${adults} Adults, ${children} Children`}</li>
                 <li>{`${beds} Beds`}</li>
               </ul>
             </button>
           </h4>
         </div>
-        <button className="btn-cancel">Update Preference</button>
       </div>
     </section>
   );

@@ -33,8 +33,20 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["User"],
     }),
-    getRooms: builder.query<Room[], void>({
-      query: () => "/rooms",
+    getRooms: builder.query<
+      Room[],
+      { option: string; method: string; search?: string }
+    >({
+      query: ({ option, method, search }) => {
+        let finalURL = `/rooms?${option}=${method}`;
+        if (search && search.trim() !== "") {
+          finalURL += `&search=${search.trim()}`;
+        }
+        return finalURL;
+      },
+    }),
+    getRoomsFind: builder.query<Room[], { word: string }>({
+      query: ({ word }) => `/rooms/search/${word}`,
     }),
 
     /* --- RESERVATION ENDPOINTS --- */
@@ -69,6 +81,7 @@ export const apiSlice = createApi({
 export const {
   useGetRoomsQuery,
   useGetUsersQuery,
+  useGetRoomsFindQuery,
   useCreateUserMutation,
   useLazyLookupReservationQuery,
   useCancelReservationMutation,

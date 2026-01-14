@@ -5,8 +5,6 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useAppSelector, useAppDispatch } from "@/redux/store";
 import {
-  increaseRooms,
-  descreaseRooms,
   increaseAdults,
   descreaseAdults,
   increaseChildren,
@@ -52,7 +50,7 @@ const CustomInputButton2 = memo(
 CustomInputButton.displayName = "CustomInputButton2";
 
 export default function OrderBar() {
-  const { rooms, adults, children, beds, startDate, endDate } =
+  const { adults, children, beds, startDate, endDate } =
     useAppSelector(selectPreference);
   const dispatch = useAppDispatch();
 
@@ -81,45 +79,33 @@ export default function OrderBar() {
     <section className={styles.orderBar}>
       <div className={styles["inner-grid"]}>
         <DatePicker
-          selected={startDate}
-          onChange={(date: Date | null) => dispatch(setStartDate(date))}
+          selected={startDate ? new Date(startDate) : null}
+          onChange={(date: Date | null) =>
+            dispatch(setStartDate(date?.toISOString()))
+          }
           customInput={<CustomInputButton className={styles.startDate} />}
           className={styles["datepicker-container"]}
           selectsStart
-          startDate={startDate}
-          endDate={endDate}
-          maxDate={endDate || new Date(2026, 12, 31)}
+          startDate={startDate ? new Date(startDate) : null}
+          endDate={endDate ? new Date(endDate) : null}
+          maxDate={(endDate && new Date(endDate)) || new Date(2026, 12, 31)}
         />
         <DatePicker
-          selected={endDate}
-          onChange={(date: Date | null) => dispatch(setEndDate(date))}
+          selected={endDate ? new Date(endDate) : null}
+          onChange={(date: Date | null) =>
+            dispatch(setEndDate(date?.toISOString()))
+          }
           customInput={<CustomInputButton2 className={styles.endDate} />}
           className={styles["datepicker-container"]}
           selectsEnd
-          startDate={startDate}
-          endDate={endDate}
-          minDate={startDate || new Date()}
+          startDate={startDate ? new Date(startDate) : null}
+          endDate={endDate ? new Date(endDate) : null}
+          minDate={(startDate && new Date(startDate)) || new Date()}
         />
         <button className={styles.guest} onClick={handleGuestButtonClick}>
           Guests
           <div className={`${styles.bubble} hidden`}>
             <div className={styles.bubbleHead}>Preference</div>
-            <p>
-              Room
-              <img
-                className="roomMinus"
-                src="/minus.svg"
-                alt=""
-                onClick={() => dispatch(descreaseRooms())}
-              />
-              {rooms}
-              <img
-                className="roomPlus"
-                src="/plus.svg"
-                alt=""
-                onClick={() => dispatch(increaseRooms())}
-              />
-            </p>
             <p>
               Adults
               <img

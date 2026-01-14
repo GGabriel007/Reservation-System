@@ -6,12 +6,18 @@ import { RoomRepository } from "../repositories/room.repository.js";
  * Bridges the RoomController and RoomRepository.
  */
 export const RoomService = {
-
   /**
    * Fetches all active rooms across all hotels.
    */
   getAllRooms: async () => {
     return await RoomRepository.findAll();
+  },
+
+  /**
+   * Fetches all active rooms across all rooms that's sorted
+   */
+  getAllRoomsSorted: async (sorted, option, search) => {
+    return await RoomRepository.findAllSorted(sorted, option, search);
   },
 
   /**
@@ -39,9 +45,18 @@ export const RoomService = {
    */
   createRoom: async (roomData) => {
     // 1. Validate Room Type (Matches your updated Model Enums)
-    const validTypes = ["Single", "Double", "Suite", "Deluxe", "Penthouse", "Studio"];
+    const validTypes = [
+      "Single",
+      "Double",
+      "Suite",
+      "Deluxe",
+      "Penthouse",
+      "Studio",
+    ];
     if (roomData.roomType && !validTypes.includes(roomData.roomType)) {
-      throw new Error(`Invalid Room Type. Must be one of: ${validTypes.join(", ")}`);
+      throw new Error(
+        `Invalid Room Type. Must be one of: ${validTypes.join(", ")}`
+      );
     }
 
     // 2. Validate Price
@@ -53,10 +68,12 @@ export const RoomService = {
     // 3. Unique Room Name Check (Prevents two "Room 101" in the same hotel)
     const existingRooms = await RoomRepository.findByHotelId(roomData.hotelId);
     const isDuplicate = existingRooms.some(
-      r => r.roomName.toLowerCase() === roomData.roomName.trim().toLowerCase()
+      (r) => r.roomName.toLowerCase() === roomData.roomName.trim().toLowerCase()
     );
     if (isDuplicate) {
-      throw new Error(`A room with the name "${roomData.roomName}" already exists in this hotel.`);
+      throw new Error(
+        `A room with the name "${roomData.roomName}" already exists in this hotel.`
+      );
     }
 
     // 4. Format and Save
@@ -78,11 +95,14 @@ export const RoomService = {
     // If updating name, check for conflicts excluding itself
     if (updateData.roomName) {
       const currentRoom = await RoomRepository.findById(id);
-      const hotelRooms = await RoomRepository.findByHotelId(currentRoom.hotelId);
-      
+      const hotelRooms = await RoomRepository.findByHotelId(
+        currentRoom.hotelId
+      );
+
       const isDuplicate = hotelRooms.some(
-        r => r._id.toString() !== id && 
-             r.roomName.toLowerCase() === updateData.roomName.trim().toLowerCase()
+        (r) =>
+          r._id.toString() !== id &&
+          r.roomName.toLowerCase() === updateData.roomName.trim().toLowerCase()
       );
 
       if (isDuplicate) {
@@ -96,5 +116,5 @@ export const RoomService = {
 
   deleteRoom: async (id) => {
     return await RoomRepository.softDelete(id);
-  }
+  },
 };

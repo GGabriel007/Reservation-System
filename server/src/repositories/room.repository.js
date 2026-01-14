@@ -7,13 +7,31 @@ import { Room } from "../models/room.model.js";
  * Includes population of Hotel data for detailed views.
  */
 export const RoomRepository = {
-  
   /**
    * Get all active rooms
    */
   findAll: async () => {
     // Note: Model middleware handles isDeleted: false
     return await Room.find().populate("hotel");
+  },
+
+  /**
+   * Get all active rooms
+   */
+  findAllSorted: async (sorted, option, search) => {
+    const sortOrder = sorted?.toLowerCase() === "desc" ? -1 : 1;
+    const sortField = option === "name" ? "roomName" : "basePrice";
+
+    if (search)
+      return await Room.find({ roomName: { $regex: search, $options: "i" } })
+        .sort({ [sortField]: sortOrder })
+        .populate("hotel")
+        .exec();
+
+    return await Room.find()
+      .sort({ [sortField]: sortOrder })
+      .populate("hotel")
+      .exec();
   },
 
   /**
@@ -30,9 +48,9 @@ export const RoomRepository = {
   findByHotelId: async (hotelId) => {
     // 1. Convert string to ObjectId to be safe
     // 2. Search using the 'hotel' field to match your DB sample
-    return await Room.find({ 
-      hotel: new mongoose.Types.ObjectId(hotelId) 
-    }); 
+    return await Room.find({
+      hotel: new mongoose.Types.ObjectId(hotelId),
+    });
   },
 
   /**
@@ -48,7 +66,7 @@ export const RoomRepository = {
   update: async (id, updateData) => {
     return await Room.findByIdAndUpdate(id, updateData, {
       new: true,
-      runValidators: true
+      runValidators: true,
     });
   },
 
@@ -57,11 +75,7 @@ export const RoomRepository = {
    * Requirements: Inventory management without losing historical data.
    */
   softDelete: async (id) => {
-    return await Room.findByIdAndUpdate(
-      id, 
-      { isDeleted: true }, 
-      { new: true }
-    );
+    return await Room.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
   },
 
   // --- ADVANCED FILTERING (For Search Page) ---
@@ -78,8 +92,8 @@ export const RoomRepository = {
    * Uses basePrice to match your room.model.js
    */
   findByPriceRange: async (min, max) => {
-    return await Room.find({ 
-      basePrice: { $gte: min, $lte: max } 
+    return await Room.find({
+      basePrice: { $gte: min, $lte: max },
     }).populate("hotel");
   },
 
@@ -88,8 +102,8 @@ export const RoomRepository = {
    * Uses maxOccupancy to match your room.model.js
    */
   findByOccupancy: async (guests) => {
-    return await Room.find({ 
-      maxOccupancy: { $gte: guests } 
+    return await Room.find({
+      maxOccupancy: { $gte: guests },
     }).populate("hotel");
-  }
+  },
 };

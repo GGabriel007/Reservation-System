@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { NavLink } from "react-router-dom";
 import { Hero } from "@/components/pages/homePage/index";
 import styles from "./styles.module.css";
 
@@ -62,7 +63,9 @@ export default function Home() {
                 Whether you're here for work or play, our fabulous suites and
                 rooms provide the perfect backdrop for an unforgettable stay
               </p>
-              <button className="btn-secondary">Book a Room</button>
+              <NavLink to="/roomlisting" className="btn-secondary">
+                Book a Room
+              </NavLink>
             </div>
             <img
               src="homepage-stay-with-us.jpg"

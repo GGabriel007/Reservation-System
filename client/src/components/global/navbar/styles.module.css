@@ -1,6 +1,6 @@
 nav {
   background-color: var(--theme-primary);
-  height: 56px;
+  min-height: 60px;
 }
 
 nav a {
@@ -9,8 +9,8 @@ nav a {
 }
 
 nav img {
-  width: 100px;
-  height: 100%;
+  width: 200px;
+  height: 100px;
 }
 
 .inner-grid {

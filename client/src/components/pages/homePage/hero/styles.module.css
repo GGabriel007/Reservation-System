@@ -1,10 +1,10 @@
 .hero {
-  height: calc(100vh - 56px);
+  height: calc(100vh - 100px);
   --hero-opacity: 0;
 }
 
 .hero > img {
-  height: calc(100vh - 56px);
+  height: calc(100vh - 100px);
   object-fit: cover;
   width: 100%;
   position: absolute;
@@ -33,10 +33,10 @@
   content: "";
   background-color: black;
   width: 100%;
-  height: calc(100% - 56px);
+  height: calc(100% - 100px);
   display: block;
   position: absolute;
-  top: 56px;
+  top: 100px;
   opacity: var(--hero-opacity, 0.3);
   transition: opacity 0.5s ease-in;
 }

@@ -66,21 +66,33 @@ export default function Navbar() {
               </>
             )}
 
-            <NavLink to="/login" className="btn-transparent">
-              Sign In
-            </NavLink>
+            {currentPath !== "/user" &&
+              currentPath !== "/adminPanel" &&
+              currentPath !== "/login" &&
+              currentPath !== "/signup" && (
+                <NavLink to="/login" className="btn-transparent">
+                  Sign In
+                </NavLink>
+              )}
 
-            {(currentPath === "/" || currentPath === "/check-reservation") && (
+            {(currentPath === "/" ||
+              currentPath === "/checkreservation" ||
+              currentPath === "/user" ||
+              currentPath === "/foundreservation") && (
               <NavLink to="/roomlisting" className="btn-secondary">
                 Book Now
               </NavLink>
             )}
 
-            {currentPath !== "/" && currentPath !== "/check-reservation" && (
-              <NavLink to="/check-reservation" className="btn-secondary">
-                Check Reservation
-              </NavLink>
-            )}
+            {currentPath !== "/" &&
+              currentPath !== "/checkreservation" &&
+              currentPath !== "/user" &&
+              currentPath !== "/adminPanel" &&
+              currentPath !== "/roomlisting/checkout" && (
+                <NavLink to="/checkreservation" className="btn-secondary">
+                  Check Reservation
+                </NavLink>
+              )}
           </div>
         </div>
       </nav>

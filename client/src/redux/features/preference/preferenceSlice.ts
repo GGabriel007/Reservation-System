@@ -7,8 +7,9 @@ export interface PreferenceState {
   adults: number;
   children: number;
   beds: number;
-  startDate: Date | null;
-  endDate: Date | null;
+  startDate: string | null;
+  endDate: string | null;
+  specialRequests: string[];
 }
 
 // Define the initial value for the slice state
@@ -16,9 +17,10 @@ const initialState: PreferenceState = {
   rooms: 1,
   adults: 2,
   children: 0,
-  beds: 0,
+  beds: 1,
   startDate: null,
   endDate: null,
+  specialRequests: [],
 };
 
 // Slices contain Redux reducer logic for updating state, and
