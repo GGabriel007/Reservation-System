@@ -13,15 +13,7 @@
 .titleArea h1 {
   font-size: 3rem;
   font-weight: 300;
-}
-
-.signInBtn {
-  background-color: #c48b58;
-  color: white;
-  border: none;
-  padding: 0.6rem 2.5rem;
-  cursor: pointer;
-  margin-top: 1rem;
+  margin-block-end: 1em;
 }
 
 .headerImage img {
@@ -69,7 +61,8 @@
   margin-bottom: 2rem;
 }
 
-.borderedBox input, .borderedBox select {
+.borderedBox input,
+.borderedBox select {
   border: none;
   border-bottom: 1px solid #000;
   padding: 0.8rem 0;
@@ -103,7 +96,7 @@
 .checkLabel {
   display: grid;
   grid-template-columns: 32px 1fr; /* Fixed width for checkbox, rest for text */
-  align-items: center; 
+  align-items: center;
   gap: 1.2rem;
   cursor: pointer;
   user-select: none;
@@ -116,7 +109,6 @@
   width: 24px;
   height: 24px;
   border: 1px solid #000; /* Black border from your design */
-  background-color: #fff;
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -127,7 +119,7 @@
 
 /* Checkmark logic when clicked */
 .customCheckbox:checked::after {
-  content: '✓'; /* Unicode checkmark */
+  content: "✓"; /* Unicode checkmark */
   font-size: 18px;
   color: #000;
   font-weight: bold;
@@ -179,6 +171,10 @@
   margin: 1.5rem 0;
 }
 
+.innerPriceSummary > div > p:last-child {
+  margin-block-end: 0.5em;
+}
+
 .finalTotalTable div {
   display: flex;
   justify-content: space-between;
@@ -198,23 +194,6 @@
   display: flex;
   justify-content: space-between;
 }
-
-.confirmBtn {
-  background-color: #1a2b23;
-  color: #e8dcc4;
-  padding: 1rem 4rem;
-  border: none;
-  cursor: pointer;
-}
-
-.confirmBtn:hover {
-  background-color: #2d463b; 
-  transform: translateY(-1px); 
-  box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.3);
-
-}
-
-
 
 .backLink {
   text-decoration: none;

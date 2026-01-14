@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import styles from "./styles.module.css";
 // Import the lazy hook from your apiSlice
 import { useLazyLookupReservationQuery } from "@/redux/features/api/apiSlice";
+import toast from "react-hot-toast";
 
 export default function CheckReservation() {
   const [reservationNumber, setReservationNumber] = useState<string>("");
@@ -28,7 +29,7 @@ export default function CheckReservation() {
       }).unwrap(); // .unwrap() allows us to catch errors in the try/catch block
 
       // Success: Navigate and pass data
-      navigate("/found-reservation", {
+      navigate("/foundreservation", {
         state: { reservation: reservationData },
       });
     } catch (err: any) {
@@ -37,21 +38,26 @@ export default function CheckReservation() {
     }
   };
 
+  useEffect(() => {
+    if (isError) {
+      let msg = "Could not find a reservation with those details.";
+
+      if (error && "status" in error) {
+        // FetchBaseQueryError
+        const data = error.data as { message?: string } | undefined;
+        if (data?.message) msg = data.message;
+      }
+
+      toast.error(msg);
+    }
+  }, [isError, error]);
+
   return (
     <main className={styles.checkReservationPage}>
       <div className={styles["inner-grid"]}>
         <h1>Welcome to Lioré</h1>
         <p>Thank you for booking your stay with us</p>
         <div className="layout-grid">
-          {/* Displaying errors from the RTK hook */}
-          {isError && (
-            <p className={styles.errorText}>
-              {/* @ts-ignore */}
-              {error?.data?.message ||
-                "Could not find a reservation with those details."}
-            </p>
-          )}
-
           <form onSubmit={handleSubmit} className={styles.formContainer}>
             <h2>
               Look up your stay <span>* required</span>
@@ -93,7 +99,7 @@ export default function CheckReservation() {
             <button
               type="submit"
               disabled={isLoading} // Use isLoading from the hook
-              className={styles.submitBtn}
+              className="btn-primary btn-medium"
             >
               {isLoading ? "Searching..." : "Submit"}
             </button>

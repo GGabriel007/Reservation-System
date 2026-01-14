@@ -7,6 +7,15 @@ html {
   scroll-behavior: smooth;
 }
 
+body {
+  background-color: var(--white);
+}
+
+input,
+select {
+  background-color: var(--white);
+}
+
 main {
   min-height: 80vh;
 }
@@ -125,4 +134,8 @@ display-flex,
 .btn-accept:hover,
 .button-accept:hover {
   background-color: #3c7d48;
+}
+
+.btn-light-bs {
+  box-shadow: var(--light-grey) 0px 4px 4px 0px;
 }

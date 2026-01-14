@@ -37,3 +37,7 @@
 .react-datepicker__header > h2 {
   color: var(--white) !important;
 }
+
+.react-datepicker__tab-loop {
+  z-index: 5;
+}

@@ -18,7 +18,7 @@ export default function Footer() {
             <NavLink to="/adminPanel">Partners Login</NavLink>
           </div>
           <div className={styles.span3}>
-            <h2>Stay In Touch</h2>
+            <h2>STAY IN TOUCH</h2>
             <p>Be the first to know by subscribing to our newsletter</p>
             <form>
               <input type="email" placeholder="E-Mail Address" />

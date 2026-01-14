@@ -3,12 +3,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from "react-redux";
 import preferenceReducer from "./features/preference/preferenceSlice";
 import userReducer from "./features/user/userSlice";
+import reservationReducer from "./features/reservation/reservationSlice";
 import { apiSlice } from "./features/api/apiSlice";
 
 export const store = configureStore({
   reducer: {
     user: userReducer,
     preference: preferenceReducer,
+    reservation: reservationReducer,
     [apiSlice.reducerPath]: apiSlice.reducer,
   },
   middleware: (getDefaultMiddleware) => {

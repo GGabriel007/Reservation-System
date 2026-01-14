@@ -3,19 +3,9 @@
   display: flex;
   gap: 20px;
 }
-.roomListingFilter select {
-  padding-left: 90px;
-  height: 50px;
-  position: relative;
-  border: 1px solid #333;
-  display: block;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  -o-appearance: none;
-  -ms-appearance: none;
-  border-radius: 0;
-  -webkit-box-shadow: none;
+
+.roomListingFilter label {
+  font-weight: 500;
 }
 
 .roomListingFilter select {
@@ -23,21 +13,17 @@
   &::picker(select) {
     appearance: base-select;
   }
+
+  border-radius: 0;
+  height: 40px;
+  cursor: pointer;
+  margin-inline-start: 10px;
 }
 
 .roomListingFilter select::picker-icon {
   content: url("/arrow-down.png");
   position: relative;
   bottom: 3px;
-}
-.roomListingFilter label {
-  position: absolute;
-  z-index: 1;
-  height: 50px;
-  line-height: 48px;
-  font-weight: 400;
-  pointer-events: none;
-  text-indent: 10px;
 }
 
 .roomListingFilter option {
@@ -51,4 +37,22 @@
 .roomListingFilter select:hover,
 .roomListingFilter option:hover {
   background-color: var(--beige);
+}
+
+.roomListingFilter input {
+  margin-inline-start: 10px;
+  border: 1px solid var(--black);
+  height: 40px;
+  padding: 10px;
+}
+
+.roomListingFilter input:focus {
+  background-color: var(--beige);
+  outline: var(--dark-beige);
+}
+
+@media screen and (max-width: 768px) {
+  .roomListingFilter {
+    flex-wrap: wrap;
+  }
 }

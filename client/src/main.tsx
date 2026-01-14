@@ -6,7 +6,6 @@ import App from "./App";
 import {
   Home,
   Login,
-  AdminDashboard,
   UserDashboard,
   Signup,
   AdminPanel,
@@ -16,10 +15,12 @@ import {
   RoomListing,
   FoundReservation,
   HotelListing,
+  ErrorPage,
 } from "./pages/index";
 
 import { Provider } from "react-redux";
 import { store } from "@/redux/store"; // Import your configured Redux store
+import ThankYou from "./pages/thankYou/ThankYou";
 
 /**
  * Defines the application's route structure.
@@ -48,15 +49,11 @@ const router = createBrowserRouter([
         element: <UserDashboard />,
       },
       {
-        path: "/admin",
-        element: <AdminDashboard />,
-      },
-      {
         path: "/adminPanel",
         element: <AdminPanel />,
       },
       {
-        path: "/check-reservation",
+        path: "/checkreservation",
         element: <CheckReservation />,
       },
       {
@@ -72,12 +69,20 @@ const router = createBrowserRouter([
         element: <HotelListing />,
       },
       {
-        path: "/checkout/:roomId",
+        path: "/roomlisting/checkout",
         element: <Checkout />,
       },
       {
-        path: "/found-reservation",
+        path: "/foundreservation",
         element: <FoundReservation />,
+      },
+      {
+        path: "/thankyou",
+        element: <ThankYou />,
+      },
+      {
+        path: "*",
+        element: <ErrorPage />,
       },
     ],
   },

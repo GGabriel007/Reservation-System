@@ -1,6 +1,5 @@
 import styles from "./styles.module.css";
-import { useAppDispatch, useAppSelector } from "@/redux/store";
-import { selectPreference } from "@/redux/features/preference/preferenceSlice";
+import { useAppDispatch } from "@/redux/store";
 import { setRoom } from "@/redux/features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 
@@ -8,7 +7,7 @@ interface Room {
   room: {
     _id: string;
     roomName: string;
-    roomDescription: string;
+    description: string;
     roomType: string;
     basePrice: number;
     maxOccupancy: number;
@@ -25,7 +24,6 @@ interface Room {
  * @returns RoomCard component
  */
 export default function RoomListingRoomCard({ room }: Room) {
-  const { rooms } = useAppSelector(selectPreference);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
@@ -38,7 +36,7 @@ export default function RoomListingRoomCard({ room }: Room) {
         image: room.images[0],
       })
     );
-    navigate("/checkout");
+    navigate("/roomlisting/checkout");
   };
   const handleOnModalClick = () => {
     const modal = document.querySelector(`#D${room._id}`) as HTMLDialogElement;
@@ -72,18 +70,23 @@ export default function RoomListingRoomCard({ room }: Room) {
               return <li>{amenity}</li>;
             })}
           </ul>
-          <p className="js-dialog-toggle" onClick={handleOnModalClick}>
+          <p
+            className={`js-dialog-toggle ${styles.roomDetailsToggle}`}
+            onClick={handleOnModalClick}
+          >
             Room Details
           </p>
         </div>
 
         <div className={styles.roomamenities}>
           <h3>{room.roomName}</h3>
-          <p>{room.roomDescription}</p>
+          <p>{room.description}</p>
         </div>
         <div>
+          <p className={styles.fee}>${room.basePrice} per night</p>
+          <p className={styles.feeSmall}>Tax and Fee calculated at checkout</p>
           <button className="btn-primary" onClick={handleOnBookRoomClick}>
-            ${room.basePrice * rooms} | Book Room
+            Book Room
           </button>
         </div>
       </article>
@@ -99,7 +102,7 @@ export default function RoomListingRoomCard({ room }: Room) {
           <img src={room.images[0]} />
           <div className={styles.modalDetails}>
             <h2>{room.roomName}</h2>
-            <p>{room.roomDescription}</p>
+            <p>{room.description}</p>
             <h3>Room Features Include:</h3>
             <ul>
               {room.amenities.map((amenity) => {

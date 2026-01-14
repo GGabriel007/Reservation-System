@@ -1,0 +1,75 @@
+.bookRoomPage {
+  margin-block: 2em;
+}
+
+.bookRoomPage h2 {
+  margin-block-end: 1em;
+  font-weight: 500;
+  font-size: 2em;
+}
+
+.outlineBox {
+  border: 1px solid #000;
+  padding: 1rem 1.5rem;
+  grid-column: span 6;
+}
+
+.iconLabel {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Room Section Styles */
+.roomSection {
+  border: 1px solid #ccc;
+  grid-column: span 3;
+}
+
+.roomHeader {
+  background-color: #f7d794; /* Gold header from Figma */
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 1.2rem;
+}
+
+.roomBody {
+  padding: 1.5rem;
+}
+
+.roomBody h3 {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
+}
+
+.detailsList li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.confirmAddRoom {
+  display: flex;
+  margin-block-start: 2em;
+  justify-content: space-between;
+}
+
+.confirmAddRoom button {
+  background: none;
+  cursor: pointer;
+}
+
+.confirmAddRoom button:hover {
+  opacity: 0.8;
+}
+
+@media (max-width: 768px) {
+  .topInfoGrid,
+  .mainContentGrid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}
