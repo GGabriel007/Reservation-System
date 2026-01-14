@@ -53,7 +53,7 @@ export default function Navbar() {
   // Checks for /admin, /adminPanel, /manager, etc.
   const isStaffDashboard = currentPath.startsWith("/admin") || currentPath.startsWith("/manager");
   const isUserDashboard = currentPath === "/user";
-  
+
   // Environment Setup for Logout
   const baseUrl = import.meta.env.DEV
     ? "http://localhost:8080"
@@ -66,15 +66,15 @@ export default function Navbar() {
   const handleLogout = async (e: React.MouseEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch(`${baseUrl}/auth/logout`, {
-        method: "POST", 
-        credentials: "include", 
+      await fetch(`${baseUrl}/auth/logout`, {
+        method: "POST",
+        credentials: "include",
       });
 
       // Smart Redirect: Staff -> Staff Login, Guest -> Guest Login
       const redirectPath = isStaffDashboard ? "/staffLogin" : "/login";
       navigate(redirectPath);
-      
+
     } catch (error) {
       console.error("Logout request failed:", error);
       navigate("/login");
@@ -92,28 +92,28 @@ export default function Navbar() {
 
           {/* Navigation Links */}
           <div className={styles.navlinks}>
-            
+
             {/* SCENARIO A: STAFF LOGIN PAGE (Clean Slate) */}
             {isStaffLogin ? (
-               null 
+              null
             ) : isStaffDashboard ? (
-            
-            /* SCENARIO B: STAFF DASHBOARD (Logout Only) */
+
+              /* SCENARIO B: STAFF DASHBOARD (Logout Only) */
               <>
-                 <span style={{ color: 'white', fontSize: '0.9em', marginRight: '10px' }}>
-                    Staff Workspace
-                 </span>
-                 <button 
-                    onClick={handleLogout} 
-                    className="btn-secondary"
-                    style={{ cursor: 'pointer' }}
-                 >
-                    Log Out
-                 </button>
+                <span style={{ color: 'white', fontSize: '0.9em', marginRight: '10px' }}>
+                  Staff Workspace
+                </span>
+                <button
+                  onClick={handleLogout}
+                  className="btn-secondary"
+                  style={{ cursor: 'pointer' }}
+                >
+                  Log Out
+                </button>
               </>
             ) : (
-              
-            /* SCENARIO C: GUEST VIEW (Standard) */
+
+              /* SCENARIO C: GUEST VIEW (Standard) */
               <>
                 {currentPath === "/" && (
                   <>
