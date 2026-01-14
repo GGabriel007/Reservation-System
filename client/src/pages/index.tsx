@@ -12,6 +12,7 @@ import UserDashboard from "./userDashboard/UserDashboard";
 import HotelListing from "./hotelListing/HotelListing";
 import StaffLogin from "./staffLogin/StaffLogin";
 import ErrorPage from "./404/ErrorPage";
+import AdminDashboard from "./adminDashboard/AdminDashboard";
 
 export {
   AdminPanel,
@@ -28,4 +29,5 @@ export {
   HotelListing,
   StaffLogin,
   ErrorPage,
+  AdminDashboard
 };
