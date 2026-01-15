@@ -159,13 +159,13 @@ export default function UserManager() {
 
     // 2. FIX: Use pending role if it exists, otherwise fallback to existing role
     const newRole = pendingChanges[userId] || currentUser.role;
-    
+
     // 3. FIX: Use pending hotel if it exists, otherwise fallback to existing hotel ID
     // We check if assignedHotel is an object (populated) or string to get the ID safely
-    const existingHotelId = typeof currentUser.assignedHotel === 'object' 
-        ? currentUser.assignedHotel?._id 
-        : currentUser.assignedHotel;
-        
+    const existingHotelId = typeof currentUser.assignedHotel === 'object'
+      ? currentUser.assignedHotel?._id
+      : currentUser.assignedHotel;
+
     const newHotel = pendingHotels[userId] || existingHotelId;
 
     // Validation: Prevent saving a manager without a hotel
@@ -195,12 +195,12 @@ export default function UserManager() {
           }
           return u;
         }));
-        
+
         // Clear pending changes
         const remainingChanges = { ...pendingChanges };
         delete remainingChanges[userId];
         setPendingChanges(remainingChanges);
-        
+
         const remainingHotels = { ...pendingHotels };
         delete remainingHotels[userId];
         setPendingHotels(remainingHotels);
