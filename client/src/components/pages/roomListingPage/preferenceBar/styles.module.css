@@ -21,7 +21,7 @@
   border: 0;
   padding: 0;
   font-size: 1em;
-  width: 105%;
+  width: 110%;
 }
 .datePicker {
   display: flex;
@@ -137,8 +137,12 @@
     height: 100%;
   }
 
-  .inner-grid > div:not(:last-child) {
+  .inner-grid > div {
     justify-content: flex-start;
+    align-items: flex-start;
+  }
+
+  .datePicker {
     align-items: flex-start;
   }
 

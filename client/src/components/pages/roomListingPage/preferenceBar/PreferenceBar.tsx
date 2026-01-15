@@ -83,9 +83,11 @@ export default function PreferenceBar() {
                   ).style.display = "none";
                 }
               }}
+              minDate={(startDate && new Date(startDate)) || new Date()}
               startDate={startDate ? new Date(startDate) : null}
               endDate={endDate ? new Date(endDate) : null}
               selectsRange
+              isClearable
             />
           </label>
         </div>

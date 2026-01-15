@@ -41,3 +41,12 @@
 .react-datepicker__tab-loop {
   z-index: 5;
 }
+
+body .react-datepicker__close-icon {
+  right: -20px;
+}
+
+body .react-datepicker__close-icon:after {
+  background-color: var(--dark-beige);
+  color: var(--black);
+}

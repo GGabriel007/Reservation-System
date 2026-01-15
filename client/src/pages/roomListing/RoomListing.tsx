@@ -1,6 +1,9 @@
 import { useState, useEffect } from "react";
 import styles from "./styles.module.css";
-import { useGetRoomsQuery } from "@/redux/features/api/apiSlice";
+import {
+  useGetRoomsQuery,
+  useGetRoomsAmenitiesQuery,
+} from "@/redux/features/api/apiSlice";
 import {
   RoomListingRoomCard,
   RoomListingCarousel,
@@ -18,6 +21,9 @@ export default function RoomListing() {
   const [sortedMethod, setSortedMethod] = useState<"ASC" | "DESC">("ASC");
   const [search, setSearch] = useState("");
   const [debouncedSearch, setDebouncedSearch] = useState(search);
+  const [filters, setFilters] = useState<string[]>([]);
+  const { data } = useGetRoomsAmenitiesQuery();
+  const amenities = data?.amenities ?? [];
 
   useEffect(() => {
     const handler = setTimeout(() => setDebouncedSearch(search), 500);
@@ -28,6 +34,7 @@ export default function RoomListing() {
     option: sortedOption,
     method: sortedMethod,
     search: debouncedSearch || undefined,
+    filters: filters || undefined,
   });
   return (
     <main className={styles.bookRoomPage}>
@@ -42,6 +49,9 @@ export default function RoomListing() {
           setSortedMethod={setSortedMethod}
           search={search}
           setSearch={setSearch}
+          filters={filters}
+          setFilters={setFilters}
+          amenities={amenities}
         ></FilterAndSearch>
         <ul className={styles.roomList}>
           {rooms?.map((room) => {

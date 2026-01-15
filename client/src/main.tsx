@@ -26,9 +26,8 @@ import { store } from "@/redux/store";
 const router = createBrowserRouter([
   {
     path: "/",
-    element: <App />, 
+    element: <App />,
     children: [
-
       {
         path: "/",
         element: <Home />,
@@ -62,7 +61,7 @@ const router = createBrowserRouter([
         element: <HotelListing />,
       },
       {
-        path: "/checkout/:roomId",
+        path: "/roomlisting/checkout",
         element: <Checkout />,
       },
       {

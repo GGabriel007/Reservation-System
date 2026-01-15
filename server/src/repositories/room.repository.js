@@ -18,20 +18,45 @@ export const RoomRepository = {
   /**
    * Get all active rooms
    */
-  findAllSorted: async (sorted, option, search) => {
+  findAllSorted: async (sorted, option, search, filters) => {
     const sortOrder = sorted?.toLowerCase() === "desc" ? -1 : 1;
     const sortField = option === "name" ? "roomName" : "basePrice";
 
-    if (search)
-      return await Room.find({ roomName: { $regex: search, $options: "i" } })
-        .sort({ [sortField]: sortOrder })
-        .populate("hotel")
-        .exec();
+    const query = { availabilityStatus: "available" };
 
-    return await Room.find()
-      .sort({ [sortField]: sortOrder })
+    if (search) {
+      query.roomName = { $regex: search, $options: "i" };
+    }
+
+    if (Array.isArray(filters) && filters.length > 0) {
+      query.amenities = { $all: filters };
+    }
+
+    const rooms = await Room.find(query)
+      .sort({
+        [sortField]: sortOrder,
+      })
       .populate("hotel")
       .exec();
+
+    // 🔹 Deduplicate by roomName
+    const seen = new Set();
+    const deduped = [];
+
+    for (const room of rooms) {
+      if (!seen.has(room.roomName)) {
+        seen.add(room.roomName);
+        deduped.push(room);
+      }
+    }
+
+    return deduped;
+  },
+
+  getAllRoomAmenities: async () => {
+    return Room.distinct("amenities", {
+      isDeleted: false,
+    });
   },
 
   /**

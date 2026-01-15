@@ -11,7 +11,9 @@ export const apiSlice = createApi({
   // The cache reducer expects to be added at `state.api` (already default - this is optional)
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:8080",
+    baseUrl: import.meta.env.PROD
+      ? "http://liore.us-east-1.elasticbeanstalk.com"
+      : "http://localhost:8080",
     credentials: "include",
   }),
 
@@ -35,18 +37,23 @@ export const apiSlice = createApi({
     }),
     getRooms: builder.query<
       Room[],
-      { option: string; method: string; search?: string }
+      { option: string; method: string; search?: string; filters?: string[] }
     >({
-      query: ({ option, method, search }) => {
+      query: ({ option, method, search, filters }) => {
         let finalURL = `/rooms?${option}=${method}`;
         if (search && search.trim() !== "") {
           finalURL += `&search=${search.trim()}`;
         }
+        if (Array.isArray(filters) && filters.length > 0) {
+          for (let filter of filters) {
+            finalURL += `&${filter}`;
+          }
+        }
         return finalURL;
       },
     }),
-    getRoomsFind: builder.query<Room[], { word: string }>({
-      query: ({ word }) => `/rooms/search/${word}`,
+    getRoomsAmenities: builder.query<{ amenities: string[] }, void>({
+      query: () => "/rooms/amenities",
     }),
 
     /* --- RESERVATION ENDPOINTS --- */
@@ -80,8 +87,8 @@ export const apiSlice = createApi({
 // // Export the auto-generated hook for the `getPosts` query endpoint
 export const {
   useGetRoomsQuery,
+  useGetRoomsAmenitiesQuery,
   useGetUsersQuery,
-  useGetRoomsFindQuery,
   useCreateUserMutation,
   useLazyLookupReservationQuery,
   useCancelReservationMutation,

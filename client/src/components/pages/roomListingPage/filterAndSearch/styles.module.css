@@ -6,6 +6,8 @@
 
 .roomListingFilter label {
   font-weight: 500;
+  display: flex;
+  align-items: center;
 }
 
 .roomListingFilter select {
@@ -18,12 +20,14 @@
   height: 40px;
   cursor: pointer;
   margin-inline-start: 10px;
+  display: flex;
+  align-items: center;
 }
 
 .roomListingFilter select::picker-icon {
   content: url("/arrow-down.png");
   position: relative;
-  bottom: 3px;
+  bottom: -3px;
 }
 
 .roomListingFilter option {
@@ -49,6 +53,50 @@
 .roomListingFilter input:focus {
   background-color: var(--beige);
   outline: var(--dark-beige);
+}
+
+.amenities {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  padding: 10px;
+  border: 1px solid var(--black);
+  cursor: pointer;
+  position: relative;
+}
+
+.amenities:hover {
+  background-color: var(--beige);
+}
+
+.amenityOptions {
+  position: absolute;
+  border: 1px solid var(--black);
+  padding: 10px;
+  top: 10px;
+  min-width: 220px;
+  background: var(--white);
+  left: 50%;
+  display: flex;
+  flex-direction: column;
+  max-height: 150px;
+  overflow: scroll;
+}
+
+.amenityOptions label {
+  gap: 10px;
+  font-size: 0.85em;
+  cursor: pointer;
+}
+
+.amenityOptions label:hover {
+  font-size: 1em;
+  font-weight: 500;
+}
+
+.amenityOptions input[type="checkbox"] {
+  accent-color: var(--dark-beige);
+  width: 15px;
 }
 
 @media screen and (max-width: 768px) {

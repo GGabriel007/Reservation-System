@@ -11,12 +11,22 @@ export const RoomController = {
   // GET ALL ROOMS
   getAllRooms: async (req, res) => {
     try {
-      const { name, price, search } = req.query;
+      const { name, price, search, ...filters } = req.query;
       let rooms;
       if (name) {
-        rooms = await RoomService.getAllRoomsSorted(name, "name", search);
+        rooms = await RoomService.getAllRoomsSorted(
+          name,
+          "name",
+          search,
+          Object.keys(filters)
+        );
       } else if (price) {
-        rooms = await RoomService.getAllRoomsSorted(price, "price", search);
+        rooms = await RoomService.getAllRoomsSorted(
+          price,
+          "price",
+          search,
+          Object.keys(filters)
+        );
       } else {
         rooms = await RoomService.getAllRooms();
       }
@@ -25,6 +35,18 @@ export const RoomController = {
       res
         .status(500)
         .json({ message: "Error fetching rooms", error: error.message });
+    }
+  },
+
+  // GET ALL ROOMS' AMENITIES
+  getAllRoomAmenities: async (req, res) => {
+    try {
+      const amenities = await RoomService.getAllRoomAmenities();
+      res.status(200).json({ amenities: amenities });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Error fetching room details", error: error.message });
     }
   },
 
@@ -102,12 +124,12 @@ export const RoomController = {
 
       // 2. SAFE ID EXTRACTION
       // Handle case where room.hotel is populated (Object) or not (String)
-      const roomHotelId = room.hotel._id 
-        ? room.hotel._id.toString() 
+      const roomHotelId = room.hotel._id
+        ? room.hotel._id.toString()
         : room.hotel.toString();
-        
-      const userHotelId = req.user.assignedHotel 
-        ? req.user.assignedHotel.toString() 
+
+      const userHotelId = req.user.assignedHotel
+        ? req.user.assignedHotel.toString()
         : "";
 
       // 3. SECURITY: Manager check
@@ -135,12 +157,12 @@ export const RoomController = {
       if (!room) return res.status(404).json({ message: "Room not found" });
 
       // 1. SAFE ID EXTRACTION
-      const roomHotelId = room.hotel._id 
-        ? room.hotel._id.toString() 
+      const roomHotelId = room.hotel._id
+        ? room.hotel._id.toString()
         : room.hotel.toString();
 
-      const userHotelId = req.user.assignedHotel 
-        ? req.user.assignedHotel.toString() 
+      const userHotelId = req.user.assignedHotel
+        ? req.user.assignedHotel.toString()
         : "";
 
       // 2. SECURITY: Manager check

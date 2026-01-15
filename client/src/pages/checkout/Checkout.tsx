@@ -120,7 +120,7 @@ export default function Checkout() {
             </NavLink>
           </div>
           <div className={styles.headerImage}>
-            <img src={room.image} alt="Room View" />
+            <img src={room.image} alt={room.roomName} />
           </div>
         </section>
 

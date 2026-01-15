@@ -88,6 +88,7 @@ export default function OrderBar() {
           selectsStart
           startDate={startDate ? new Date(startDate) : null}
           endDate={endDate ? new Date(endDate) : null}
+          minDate={(startDate && new Date(startDate)) || new Date()}
           maxDate={(endDate && new Date(endDate)) || new Date(2026, 12, 31)}
         />
         <DatePicker

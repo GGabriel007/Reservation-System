@@ -13,6 +13,7 @@ const router = Router();
  * Guests need to see rooms to make a reservation.
  */
 router.get("/", RoomController.getAllRooms);
+router.get("/amenities", RoomController.getAllRoomAmenities);
 router.get("/:id", RoomController.getRoomById);
 router.get("/hotel/:hotelId", protect, RoomController.getRoomsByHotel);
 

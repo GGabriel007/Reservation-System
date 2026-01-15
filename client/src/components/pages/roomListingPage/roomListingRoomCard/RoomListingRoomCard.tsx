@@ -1,7 +1,9 @@
 import styles from "./styles.module.css";
-import { useAppDispatch } from "@/redux/store";
+import { useAppSelector, useAppDispatch } from "@/redux/store";
 import { setRoom } from "@/redux/features/user/userSlice";
 import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { selectPreference } from "@/redux/features/preference/preferenceSlice";
 
 interface Room {
   room: {
@@ -26,6 +28,7 @@ interface Room {
 export default function RoomListingRoomCard({ room }: Room) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const preference = useAppSelector(selectPreference);
 
   const handleOnBookRoomClick = () => {
     dispatch(
@@ -36,6 +39,10 @@ export default function RoomListingRoomCard({ room }: Room) {
         image: room.images[0],
       })
     );
+    console.log(room.images[0]);
+    if (!preference.startDate || !preference.endDate) {
+      return toast.error("Please enter the Check in and Check Out date");
+    }
     navigate("/roomlisting/checkout");
   };
   const handleOnModalClick = () => {

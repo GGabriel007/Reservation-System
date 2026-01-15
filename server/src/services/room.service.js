@@ -15,9 +15,20 @@ export const RoomService = {
 
   /**
    * Fetches all active rooms across all rooms that's sorted
+   * also provide search capabilities
    */
-  getAllRoomsSorted: async (sorted, option, search) => {
-    return await RoomRepository.findAllSorted(sorted, option, search);
+  getAllRoomsSorted: async (sorted, option, search, filters) => {
+    const rooms = await RoomRepository.findAllSorted(
+      sorted,
+      option,
+      search,
+      filters
+    );
+    return rooms;
+  },
+
+  getAllRoomAmenities: async () => {
+    return await RoomRepository.getAllRoomAmenities();
   },
 
   /**
