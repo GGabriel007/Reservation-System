@@ -18,23 +18,38 @@ export const UserController = {
     }
   },
 
-  // UPDATE USER ROLE
-  // Used to promote a Guest to Hotel Manager or Admin
+  // UPDATE USER ROLE & HOTEL ASSIGNMENT
   updateUserRole: async (req, res) => {
     const { id } = req.params;
-    const { role } = req.body; // Expecting "guest", "manager", or "admin"
+    const { role, assignedHotel } = req.body; // Expecting role AND optionally assignedHotel
 
-    // basic validation
+    // 1. Basic role validation
     const validRoles = ["guest", "manager", "admin"];
     if (!validRoles.includes(role)) {
       return res.status(400).json({ message: "Invalid role specified" });
     }
 
     try {
+      // 2. Prepare update object
+      const updateData = { role: role };
+
+      // 3. Logic for Managers: Must have a hotel assigned
+      if (role === "manager") {
+        if (!assignedHotel) {
+          return res.status(400).json({ message: "Managers must be assigned to a hotel." });
+        }
+        updateData.assignedHotel = assignedHotel;
+      } 
+      
+      // 4. Logic for non-managers: Clear the hotel assignment if role is changed back to guest/admin
+      if (role !== "manager") {
+        updateData.assignedHotel = null;
+      }
+
       const updatedUser = await User.findByIdAndUpdate(
         id,
-        { role: role },
-        { new: true } // Return the updated document
+        updateData,
+        { new: true } 
       ).select("-password");
 
       if (!updatedUser) {
@@ -43,6 +58,7 @@ export const UserController = {
 
       res.status(200).json(updatedUser);
     } catch (error) {
+      console.error("UPDATE_USER_ROLE_ERROR:", error);
       res.status(500).json({ message: "Error updating role", error: error.message });
     }
   },

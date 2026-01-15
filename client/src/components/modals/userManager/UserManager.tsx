@@ -3,23 +3,51 @@ import styles from "./styles.module.css";
 import ActionStatusModal from "@/components/global/toast/actionsStatusModal/ActionStatusModal";
 import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToast/ConfirmationDeleteToast";
 
+interface Hotel {
+  _id: string;
+  name: string;
+}
+
 interface User {
   _id: string;
   firstName?: string;
   lastName?: string;
   email: string;
   role: "guest" | "manager" | "admin";
+  assignedHotel?: string | Hotel;
   createdAt?: string;
 }
 
 export default function UserManager() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
+  // Store the list of available hotels
+  const [hotels, setHotels] = useState<Hotel[]>([]);
+  // Track hotel selection: { userId: hotelId }
+  const [pendingHotels, setPendingHotels] = useState<{ [key: string]: string }>({});
+
+  const fetchHotels = async () => {
+    try {
+      const res = await fetch(`${baseUrl}/hotels`, { credentials: "include" });
+      if (res.ok) {
+        const data = await res.json();
+        setHotels(data);
+      }
+    } catch (error) {
+      console.error("Error loading hotels:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsers();
+    fetchHotels();
+  }, []);
+
 
   // --- FILTER & STATE MANAGEMENT ---
   const [filterTab, setFilterTab] = useState<"all" | "admin" | "manager" | "guest">("all");
   const [pendingChanges, setPendingChanges] = useState<{ [key: string]: string }>({});
-  
+
   // Track which user is being deleted (triggers the modal)
   const [userToDelete, setUserToDelete] = useState<string | null>(null);
 
@@ -29,9 +57,9 @@ export default function UserManager() {
     type: 'success' as 'success' | 'error'
   });
 
-  const baseUrl = import.meta.env.PROD 
-    ? "http://liore.us-east-1.elasticbeanstalk.com" 
-    : "http://localhost:8080"; 
+  const baseUrl = import.meta.env.PROD
+    ? "http://liore.us-east-1.elasticbeanstalk.com"
+    : "http://localhost:8080";
 
   // --- HELPER: Extract Date ---
   const getJoinDate = (user: User) => {
@@ -80,12 +108,12 @@ export default function UserManager() {
 
       if (res.ok) {
         setUsers(prev => prev.filter(user => user._id !== userToDelete));
-        
+
         // Clear pending changes for this user
         setPendingChanges(prev => {
-           const copy = { ...prev };
-           delete copy[userToDelete];
-           return copy;
+          const copy = { ...prev };
+          delete copy[userToDelete];
+          return copy;
         });
 
         setModalConfig({ isOpen: true, message: "User deleted successfully", type: 'success' });
@@ -95,7 +123,7 @@ export default function UserManager() {
     } catch (error) {
       setModalConfig({ isOpen: true, message: "Failed to delete user.", type: 'error' });
     } finally {
-      setUserToDelete(null); 
+      setUserToDelete(null);
     }
   };
 
@@ -105,30 +133,81 @@ export default function UserManager() {
       ...prev,
       [userId]: newRole
     }));
+
+    // If switching AWAY from manager, clear any pending hotel selection
+    if (newRole !== "manager") {
+      setPendingHotels(prev => {
+        const copy = { ...prev };
+        delete copy[userId];
+        return copy;
+      });
+    }
+  };
+
+  // 7. Add a new function to handle hotel selection
+  const handleHotelSelect = (userId: string, hotelId: string) => {
+    setPendingHotels(prev => ({
+      ...prev,
+      [userId]: hotelId
+    }));
   };
 
   const executeRoleUpdate = async (userId: string) => {
-    const newRole = pendingChanges[userId];
-    if (!newRole) return;
+    // 1. Get the user object to access current values
+    const currentUser = users.find(u => u._id === userId);
+    if (!currentUser) return;
+
+    // 2. FIX: Use pending role if it exists, otherwise fallback to existing role
+    const newRole = pendingChanges[userId] || currentUser.role;
+    
+    // 3. FIX: Use pending hotel if it exists, otherwise fallback to existing hotel ID
+    // We check if assignedHotel is an object (populated) or string to get the ID safely
+    const existingHotelId = typeof currentUser.assignedHotel === 'object' 
+        ? currentUser.assignedHotel?._id 
+        : currentUser.assignedHotel;
+        
+    const newHotel = pendingHotels[userId] || existingHotelId;
+
+    // Validation: Prevent saving a manager without a hotel
+    if (newRole === 'manager' && !newHotel) {
+      setModalConfig({ isOpen: true, message: "Please select a hotel for the manager.", type: 'error' });
+      return;
+    }
 
     try {
       const res = await fetch(`${baseUrl}/users/${userId}/role`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ role: newRole })
+        // Send the effective Role and Hotel (whether changed or not)
+        body: JSON.stringify({ role: newRole, assignedHotel: newHotel })
       });
 
       if (res.ok) {
-        setUsers(prev => prev.map(u => u._id === userId ? { ...u, role: newRole as any } : u));
+        setUsers(prev => prev.map(u => {
+          if (u._id === userId) {
+            return {
+              ...u,
+              role: newRole as any,
+              // Update local state with the new hotel object (found from the hotels list)
+              assignedHotel: hotels.find(h => h._id === newHotel)
+            };
+          }
+          return u;
+        }));
         
+        // Clear pending changes
         const remainingChanges = { ...pendingChanges };
         delete remainingChanges[userId];
         setPendingChanges(remainingChanges);
+        
+        const remainingHotels = { ...pendingHotels };
+        delete remainingHotels[userId];
+        setPendingHotels(remainingHotels);
 
-        setModalConfig({ isOpen: true, message: "User role updated successfully!", type: 'success' });
+        setModalConfig({ isOpen: true, message: "User updated successfully!", type: 'success' });
       } else {
-        setModalConfig({ isOpen: true, message: "Failed to update role.", type: 'error' });
+        setModalConfig({ isOpen: true, message: "Failed to update user.", type: 'error' });
       }
     } catch (error) {
       setModalConfig({ isOpen: true, message: "Network error.", type: 'error' });
@@ -145,7 +224,7 @@ export default function UserManager() {
 
   return (
     <div className={styles.container}>
-      {/* Header */}
+      {/* Header and Filter Pills remain exactly the same... */}
       <div className={styles.header}>
         <div>
           <h2 className={styles.title}>User Management</h2>
@@ -156,10 +235,9 @@ export default function UserManager() {
         </div>
       </div>
 
-      {/* Filter Pills */}
       <div className={styles.filterTabs}>
         {['all', 'admin', 'manager', 'guest'].map((tab) => (
-          <button 
+          <button
             key={tab}
             className={`${styles.filterBtn} ${filterTab === tab ? styles.activeFilter : ''}`}
             onClick={() => setFilterTab(tab as any)}
@@ -187,7 +265,21 @@ export default function UserManager() {
               filteredUsers.map((user) => {
                 const pendingRole = pendingChanges[user._id];
                 const currentRole = pendingRole || user.role;
-                const hasPendingChange = pendingRole && pendingRole !== user.role;
+
+                // 1. Check if the user is currently being set to Manager
+                const isManager = currentRole === 'manager';
+
+                // 2. Determine the current Hotel Value (Existing OR Pending)
+                // We handle cases where assignedHotel is a string ID or a populated Object
+                const existingHotelId = typeof user.assignedHotel === 'object'
+                  ? user.assignedHotel?._id
+                  : user.assignedHotel;
+
+                const currentHotelValue = pendingHotels[user._id] || existingHotelId || "";
+
+                const hasPendingChange =
+                  (pendingRole && pendingRole !== user.role) ||
+                  (pendingHotels[user._id] && pendingHotels[user._id] !== existingHotelId);
 
                 return (
                   <tr key={user._id}>
@@ -198,6 +290,8 @@ export default function UserManager() {
                     <td>{getJoinDate(user)}</td>
                     <td className={styles.roleCell}>
                       <div className={styles.roleWrapper}>
+
+                        {/* ROLE SELECTOR */}
                         <select
                           value={currentRole}
                           onChange={(e) => handleRoleSelect(user._id, e.target.value)}
@@ -208,20 +302,40 @@ export default function UserManager() {
                           <option value="admin">Admin</option>
                         </select>
 
-                        {/* Save Button (Only shows if role changed) */}
+                        {/* HOTEL SELECTOR (Conditional: Only shows for Managers) */}
+                        {isManager && (
+                          <select
+                            value={currentHotelValue}
+                            onChange={(e) => handleHotelSelect(user._id, e.target.value)}
+                            className={styles.roleSelect} // Re-using same style for consistency
+                            style={{ marginLeft: '10px', maxWidth: '150px' }} // Tiny inline tweak for spacing
+                          >
+                            <option value="" disabled>Select Hotel</option>
+                            {hotels.map(hotel => (
+                              <option key={hotel._id} value={hotel._id}>
+                                {hotel.name}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+
+                        {/* Save Button */}
                         {hasPendingChange && (
-                          <button 
+                          <button
                             onClick={() => executeRoleUpdate(user._id)}
                             className={styles.saveBtn}
                             title="Confirm Role Change"
+                            // Disable save if they are a manager but haven't picked a hotel yet
+                            disabled={isManager && !currentHotelValue}
+                            style={isManager && !currentHotelValue ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
                           >
                             Save
                           </button>
                         )}
 
-                        {/* Delete Button (Only shows if NO change pending) */}
+                        {/* Delete Button */}
                         {!hasPendingChange && (
-                          <button 
+                          <button
                             onClick={() => initiateDelete(user._id)}
                             className={styles.deleteBtn}
                             title="Delete User"
