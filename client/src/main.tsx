@@ -18,6 +18,8 @@ import {
   FoundReservation,
   HotelListing,
   StaffLogin,
+  ThankYou,
+  ErrorPage,
 } from "./pages/index";
 
 import { Provider } from "react-redux";
@@ -43,6 +45,14 @@ const router = createBrowserRouter([
       {
         path: "/staffLogin",
         element: <StaffLogin />,
+      },
+      {
+        path: "/thankyou",
+        element: <ThankYou />,
+      },
+      {
+        path: "*",
+        element: <ErrorPage />,
       },
       {
         path: "/check-reservation",
