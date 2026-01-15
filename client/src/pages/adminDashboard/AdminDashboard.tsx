@@ -1,12 +1,12 @@
 import { useState } from "react";
 import styles from "./styles.module.css";
-// REAL COMPONENTS
 import HotelManager from "../../components/modals/hotelManager/HotelManager";
 import UserManager from "../../components/modals/userManager/UserManager";
 import TransactionManager from "../../components/modals/transactionManager/TransactionManager";
 import Overview from "../../components/modals/overview/Overview";
-// NEW COMPONENT
 import ReservationManager from "../../components/modals/reservationManager/ReservationManager";
+import { useAppSelector } from "@/redux/store";
+import { selectUserInfo } from "@/redux/features/user/userSlice";
 
 /**
  * Admin Dashboard Page
@@ -16,23 +16,31 @@ export default function AdminDashboard() {
   // 1. Added "reservations" to the allowed state values
   const [activeTab, setActiveTab] = useState<"overview" | "hotels" | "users" | "reservations" | "finance">("overview");
 
+  const userInfo = useAppSelector(selectUserInfo);
+
   return (
     <main className={styles.mainPage}>
       <div className={styles.dashboardContainer}>
         
         {/* HEADER SECTION */}
         <header className={styles.header}>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">Global Command Center</h1>
-            <p className="text-gray-500 mt-1">
-              Manage properties, staff, and financial health from one place.
-            </p>
-          </div>
-          <div className={styles.adminBadge}>
-            Global Admin Page
-          </div>
-        </header>
-
+        <div>
+          <h1 className="text-3xl font-bold text-gray-900">Global Command Center</h1>
+          
+          {/* This is the new part that matches your AdminPanel style */}
+          <p className="mt-2 text-gray-600">
+            Operating as: <strong className="text-gray-900">{userInfo?.firstName} {userInfo?.lastName}</strong>
+          </p>
+          
+          <p className="text-gray-400 text-sm mt-1">
+            Manage properties, staff, and financial health from one place.
+          </p>
+        </div>
+        
+        <div className={styles.adminBadge}>
+          Global Admin Page
+        </div>
+      </header>
         {/* TAB NAVIGATION */}
         <div className={styles.tabs}>
           <button 
