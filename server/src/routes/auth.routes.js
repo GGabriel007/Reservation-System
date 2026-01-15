@@ -111,12 +111,12 @@ router.get("/need", protect, (req, res) => {
  * @route   GET /auth/logout
  * @desc    Terminates the session and clears the client-side session cookie.
  */
-router.get("/logout", (req, res, next) => {
+router.post("/logout", (req, res, next) => {
   req.logout((err) => {
     if (err) return next(err);
     req.session.destroy((err) => {
       if (err) return next(err);
-      // Clear the session cookie ('sid') to ensure client is fully logged out
+      // Clear the session cookie ('sid') 
       res.clearCookie("sid"); 
       res.status(200).json({ message: "Logged out successfully" });
     });

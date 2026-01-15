@@ -86,9 +86,17 @@ export default function Navbar() {
       <nav>
         <div className={styles["inner-grid"]}>
           {/* Brand Identity */}
-          <NavLink to={isStaffDashboard ? "/admin" : "/"}>
-            <img src="/liore.svg" alt="Liore Spa & Resort" />
-          </NavLink>
+          {isStaffDashboard ? (
+            /* For Staff: Just an image, no link, and a default cursor */
+            <div style={{ cursor: 'default' }}>
+              <img src="/liore.svg" alt="Liore Spa & Resort" />
+            </div>
+          ) : (
+            /* For Guests: Standard link to home */
+            <NavLink to="/">
+              <img src="/liore.svg" alt="Liore Spa & Resort" />
+            </NavLink>
+          )}
 
           {/* Navigation Links */}
           <div className={styles.navlinks}>
