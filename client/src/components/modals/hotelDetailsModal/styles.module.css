@@ -12,6 +12,7 @@
   z-index: 1000;
   animation: fadeIn 0.2s ease-out;
   backdrop-filter: blur(2px); /* Premium glass effect */
+  margin: -16px; /* Fix for potential parent margins */
 }
 
 /* The white box itself */
@@ -27,6 +28,10 @@
   flex-direction: column;
   gap: 20px;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  
+  /* IMPORTANT: Ensures modal fits on small screens without cutting off */
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 /* Header Section */
@@ -74,6 +79,7 @@
   font-size: 0.95rem;
   color: #333;
   line-height: 1.5;
+  word-break: break-word; /* Prevents long emails/addresses from breaking layout */
 }
 
 .idText {
@@ -117,4 +123,34 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 600px) {
+  .modal {
+    width: 95%; /* Wider on small screens */
+    padding: 20px; /* Reduce padding to save space */
+  }
+
+  .gridRow {
+    /* Stack grid items vertically on phone */
+    grid-template-columns: 1fr; 
+    gap: 15px;
+  }
+
+  .title {
+    font-size: 1.25rem; /* Slightly smaller title */
+  }
+  
+  .closeButton {
+    width: 100%; /* Full width button for easier tapping */
+    padding: 12px;
+  }
+  
+  .footer {
+    justify-content: center; /* Center button */
+  }
 }

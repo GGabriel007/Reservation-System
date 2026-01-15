@@ -9,6 +9,7 @@
   z-index: 1000; /* High z-index to sit on top */
   backdrop-filter: blur(2px);
   animation: fadeIn 0.2s ease-out;
+  margin: -16px; /* Ensures full coverage if parent has padding */
 }
 
 /* The Modal Box */
@@ -23,6 +24,7 @@
   overflow-y: auto;
   font-family: 'Inter', sans-serif;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-sizing: border-box;
 }
 
 .title {
@@ -64,6 +66,7 @@
   font-size: 0.95rem;
   transition: all 0.2s ease;
   font-family: inherit;
+  box-sizing: border-box; /* Prevents padding from blowing out width */
 }
 
 /* Brand Focus State */
@@ -157,4 +160,44 @@
 @keyframes slideUp {
   from { opacity: 0; transform: translateY(20px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 600px) {
+  .modal {
+    width: 95%; /* Use more screen width */
+    padding: 1.25rem; /* Less padding */
+  }
+
+  .title {
+    font-size: 1.25rem; /* Smaller title */
+    margin-bottom: 1rem;
+  }
+
+  /* Stack the grids vertically on phone */
+  .gridTwo, .gridThree {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Stack buttons vertically for better touch targets */
+  .footer {
+    flex-direction: column-reverse; /* Put 'Save' on top or bottom depending on preference. usually stack is better */
+    gap: 0.75rem;
+  }
+
+  .cancelBtn, .saveBtn {
+    width: 100%; /* Full width buttons */
+    text-align: center;
+    padding: 0.8rem; /* Taller touch target */
+  }
+  
+  /* Make inputs slightly taller for touch */
+  .input, .textarea {
+    font-size: 16px; /* Prevents iOS auto-zoom */
+    padding: 0.85rem;
+  }
 }

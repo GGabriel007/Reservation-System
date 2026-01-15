@@ -46,12 +46,11 @@ export const RoomController = {
     try {
       const { hotelId } = req.params;
 
-      // 1. Defensive check: Ensure req.user exists
       if (!req.user) {
         return res.status(401).json({ message: "Not authenticated" });
       }
 
-      // 2. Security: Manager check
+      // Security: Manager check
       if (
         req.user.role === "manager" &&
         req.user.assignedHotel?.toString() !== hotelId
@@ -62,7 +61,7 @@ export const RoomController = {
       const rooms = await RoomService.getRoomsByHotel(hotelId);
       res.status(200).json(rooms);
     } catch (error) {
-      console.error("GET_ROOMS_ERROR:", error); // This logs the error in your terminal
+      console.error("GET_ROOMS_ERROR:", error);
       res.status(500).json({ message: "Server Error", error: error.message });
     }
   },
@@ -70,7 +69,6 @@ export const RoomController = {
   // CREATE NEW ROOM
   createRoom: async (req, res) => {
     try {
-      // Ensure we capture the hotel ID regardless of which key the frontend sends
       const roomData = {
         ...req.body,
         hotel: req.body.hotel || req.body.hotelId,
@@ -98,15 +96,22 @@ export const RoomController = {
     try {
       const roomId = req.params.id;
 
-      // 1. Fetch the room first to check ownership
+      // 1. Fetch the room first
       const room = await RoomService.getRoomById(roomId);
       if (!room) return res.status(404).json({ message: "Room not found" });
 
-      // 2. SECURITY: Manager check
-      if (
-        req.user.role === "manager" &&
-        room.hotel.toString() !== req.user.assignedHotel?.toString()
-      ) {
+      // 2. SAFE ID EXTRACTION
+      // Handle case where room.hotel is populated (Object) or not (String)
+      const roomHotelId = room.hotel._id 
+        ? room.hotel._id.toString() 
+        : room.hotel.toString();
+        
+      const userHotelId = req.user.assignedHotel 
+        ? req.user.assignedHotel.toString() 
+        : "";
+
+      // 3. SECURITY: Manager check
+      if (req.user.role === "manager" && roomHotelId !== userHotelId) {
         return res.status(403).json({
           message: "Unauthorized: You do not manage this room's hotel.",
         });
@@ -126,15 +131,20 @@ export const RoomController = {
     try {
       const { id } = req.params;
 
-      // 1. Find the room first to check which hotel it belongs to
       const room = await RoomService.getRoomById(id);
       if (!room) return res.status(404).json({ message: "Room not found" });
 
-      // 2. Security Check: Managers can only delete rooms in their assigned hotel
-      if (
-        req.user.role === "manager" &&
-        req.user.assignedHotel?.toString() !== room.hotel.toString()
-      ) {
+      // 1. SAFE ID EXTRACTION
+      const roomHotelId = room.hotel._id 
+        ? room.hotel._id.toString() 
+        : room.hotel.toString();
+
+      const userHotelId = req.user.assignedHotel 
+        ? req.user.assignedHotel.toString() 
+        : "";
+
+      // 2. SECURITY: Manager check
+      if (req.user.role === "manager" && roomHotelId !== userHotelId) {
         return res.status(403).json({
           message: "Access denied: This room belongs to another property.",
         });

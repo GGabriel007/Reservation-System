@@ -12,7 +12,9 @@
   align-items: center;
   z-index: 2000;
   animation: fadeIn 0.3s ease;
-  margin: -16px; 
+  margin: -16px; /* Counteract potential parent padding */
+  padding: 1rem; /* Safety padding for small screens */
+  box-sizing: border-box;
 }
 
 .container {
@@ -28,6 +30,7 @@
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  box-sizing: border-box;
 }
 
 .icon {
@@ -41,6 +44,7 @@
   color: #1a1a1a;
   font-size: 1.5rem;
   font-weight: 600;
+  line-height: 1.2;
 }
 
 .message {
@@ -66,6 +70,7 @@
   transition: all 0.2s ease;
   font-size: 14px;
   border: none;
+  white-space: nowrap; /* Prevents text wrap inside buttons */
 }
 
 .cancelBtn {
@@ -89,3 +94,38 @@
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 480px) {
+  .container {
+    padding: 30px 20px; /* Reduced padding */
+    width: 95%;
+  }
+
+  .title {
+    font-size: 1.25rem; /* Smaller title */
+  }
+
+  .message {
+    font-size: 0.9rem;
+  }
+
+  /* Stack buttons vertically for better touch targets */
+  .actions {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .cancelBtn, .deleteBtn {
+    width: 100%; /* Full width buttons */
+    padding: 14px; /* Taller touch target */
+    font-size: 1rem; /* Slightly larger text for readability */
+  }
+
+  /* Optional: Reverse order so "Delete" (destructive) is at the bottom? 
+     Usually, you keep Primary action top or right. 
+     If you want Cancel on top, use flex-direction: column-reverse; */
+}

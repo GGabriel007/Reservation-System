@@ -12,6 +12,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* Allows items to wrap on small screens */
+  gap: 12px;
 }
 
 .title {
@@ -34,6 +36,8 @@
   background: #f3f4f6;
   padding: 4px 10px;
   border-radius: 20px;
+  white-space: nowrap; /* Prevents text from breaking */
+  display: inline-block; /* Keeps it robust */
 }
 
 /* Filter Tabs (Pill Style) */
@@ -43,6 +47,16 @@
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #e5e7eb;
+  
+  /* Mobile Magic: Horizontal Scroll for Tabs */
+  overflow-x: auto; 
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Hide scrollbar Firefox */
+}
+
+.filterTabs::-webkit-scrollbar {
+  display: none; /* Hide scrollbar Chrome/Safari */
 }
 
 .filterBtn {
@@ -55,6 +69,7 @@
   border-radius: 20px;
   transition: all 0.2s ease;
   font-weight: 500;
+  flex-shrink: 0; /* Prevents buttons from squashing */
 }
 
 .filterBtn:hover {
@@ -76,13 +91,17 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
   border: 1px solid #f3f4f6;
-  overflow: hidden;
+  
+  /* CRITICAL FOR MOBILE: Horizontal Scrolling */
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 800px; /* Forces scrollbar if screen < 800px */
 }
 
 .table thead {
@@ -97,6 +116,7 @@
   text-transform: uppercase;
   color: #6b7280;
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .table td {
@@ -117,7 +137,8 @@
 
 /* Role Management Column */
 .roleCell {
-  width: 320px;
+  width: 320px; /* Fixed width works fine because we have a scrolling table now */
+  min-width: 300px; /* Ensures it never gets too small */
 }
 
 .roleWrapper {
@@ -164,6 +185,7 @@
   animation: fadeIn 0.3s ease-in-out;
   box-shadow: 0 2px 4px rgba(197, 160, 89, 0.2);
   transition: all 0.2s;
+  white-space: nowrap;
 }
 
 .saveBtn:hover {
@@ -184,6 +206,7 @@
   cursor: pointer;
   transition: all 0.2s;
   font-size: 1rem;
+  flex-shrink: 0;
 }
 
 .deleteBtn:hover {
@@ -210,4 +233,34 @@
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px; /* Less padding on mobile */
+  }
+
+  .header {
+    flex-direction: column; /* Stack Title and UserCount vertically */
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .title {
+    font-size: 1.25rem;
+  }
+  
+  /* Make role select slightly easier to tap */
+  .roleSelect {
+    padding: 10px;
+    font-size: 16px; /* Prevents zoom on iOS */
+  }
+
+  .table td, .table th {
+    padding: 0.75rem 1rem; /* Compact rows */
+  }
 }

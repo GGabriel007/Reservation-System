@@ -16,6 +16,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 2rem;
+  flex-wrap: wrap; /* Allows items to wrap if screen is narrow */
+  gap: 15px;       /* Adds space between wrapped items */
 }
 
 .adminBadge {
@@ -26,6 +28,7 @@
   font-size: 0.875rem;
   font-weight: 600;
   letter-spacing: 0.05em;
+  white-space: nowrap; /* Prevents text from breaking weirdly */
 }
 
 /* --- TABS --- */
@@ -34,6 +37,18 @@
   gap: 1.5rem;
   border-bottom: 2px solid #e5e7eb;
   margin-bottom: 2rem;
+  
+  /* Mobile Magic: Horizontal Scroll */
+  overflow-x: auto; 
+  white-space: nowrap; 
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+  
+  /* Hide scrollbar for cleaner look */
+  scrollbar-width: none; /* Firefox */
+}
+
+.tabs::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
 }
 
 .tabButton {
@@ -46,6 +61,7 @@
   cursor: pointer;
   position: relative;
   transition: all 0.2s ease;
+  flex-shrink: 0; /* Prevents tabs from shrinking/squashing */
 }
 
 .tabButton:hover {
@@ -75,4 +91,37 @@
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
   min-height: 500px;
   border: 1px solid #e5e7eb;
+  /* Ensure content doesn't overflow container on mobile */
+  overflow: hidden; 
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 768px) {
+  .mainPage {
+    padding: 1rem; /* Reduce padding on phones */
+  }
+
+  .header {
+    flex-direction: column; /* Stack Title and Badge vertically */
+    align-items: flex-start;
+    margin-bottom: 1.5rem;
+  }
+
+  .adminBadge {
+    font-size: 0.75rem; /* Slightly smaller badge */
+    padding: 0.4rem 0.8rem;
+  }
+
+  .tabs {
+    gap: 1rem; /* Bring tabs closer together */
+    margin-bottom: 1.5rem;
+  }
+
+  .tabButton {
+    font-size: 0.9rem; /* Slightly smaller text */
+    padding-bottom: 0.6rem;
+  }
 }

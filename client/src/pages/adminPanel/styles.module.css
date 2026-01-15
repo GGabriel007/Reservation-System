@@ -1,12 +1,12 @@
 .adminPanelPage {
   padding: 20px 30px;
-  max-width: 1600px; 
+  max-width: 1600px;
   margin: 0 auto;
   font-family: "Inter", sans-serif;
   min-height: 100vh;
 }
 
-/* Header with Stats */
+/* --- Header with Stats --- */
 .headerArea {
   display: flex;
   justify-content: space-between;
@@ -14,6 +14,8 @@
   margin-bottom: 30px;
   padding-bottom: 20px;
   border-bottom: 1px solid #eee;
+  flex-wrap: wrap; /* Allows wrapping on medium screens */
+  gap: 20px;
 }
 
 .statCard {
@@ -24,6 +26,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  min-width: 120px;
 }
 
 .statLabel {
@@ -31,21 +34,22 @@
   text-transform: uppercase;
   color: #888;
 }
+
 .statValue {
   font-size: 1.5rem;
   font-weight: 700;
   color: #c5a059;
 }
 
-/* The Main Grid Layout */
+/* --- Main Grid Layout --- */
 .contentLayout {
   display: grid;
-  grid-template-columns: 350px 1fr; 
+  grid-template-columns: 350px 1fr;
   gap: 30px;
   align-items: start;
 }
 
-/* Sidebar Styling */
+/* --- Sidebar Styling --- */
 .formSidebar {
   position: sticky;
   top: 20px;
@@ -57,9 +61,10 @@
   border-radius: 12px;
   padding: 24px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow: hidden;
 }
 
-/* Compact Form */
+/* --- Form Elements --- */
 .compactForm {
   display: flex;
   flex-direction: column;
@@ -69,40 +74,69 @@
 .formRow {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 15px;
+  width: 100%;
 }
 
-/* Table Area */
+.fullWidth {
+  grid-column: span 1;
+}
+
+/* Global Input Selector */
+.adminPanelPage input,
+.adminPanelPage select,
+.adminPanelPage textarea {
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  background: #fdfdfd;
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 16px; /* Prevents auto-zoom on iPhones */
+}
+
+.formGroup textarea {
+  min-height: 80px;
+  resize: vertical;
+}
+
+.noArrows::-webkit-outer-spin-button,
+.noArrows::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* --- Table Area --- */
 .tableMainContent {
-  min-width: 0; 
+  min-width: 0; /* Prevents grid blowout */
 }
 
 .tableContainer {
   background: white;
   border-radius: 12px;
   border: 1px solid #e0e0e0;
-  overflow: hidden;
+  /* CRITICAL FOR MOBILE: Allows table to scroll horizontally */
+  overflow-x: auto; 
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 .tableHeader {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 15px 20px;
   background: #f8f9fa;
   font-weight: 700;
   border-bottom: 1px solid #eee;
-}
-
-.refreshHint {
-  font-size: 0.75rem;
-  color: #2e7d32;
-  font-weight: 400;
+  flex-wrap: wrap;
+  gap: 10px;
 }
 
 .userTable {
   width: 100%;
   border-collapse: collapse;
+  min-width: 600px; /* Forces scroll if screen is smaller than 600px */
 }
 
 .userTable th {
@@ -111,14 +145,16 @@
   font-size: 0.75rem;
   color: #999;
   text-transform: uppercase;
+  text-align: left;
 }
 
 .userTable td {
   padding: 16px 20px;
   border-bottom: 1px solid #f4f4f4;
+  white-space: nowrap; /* Keeps content on one line for cleaner scrolling */
 }
 
-/* Actions */
+/* --- Actions & Buttons --- */
 .formActionsVertical {
   display: flex;
   flex-direction: column;
@@ -136,7 +172,6 @@
   cursor: pointer;
 }
 
-/* Base styles for both buttons */
 .editBtn, .deleteBtn {
   border: none;
   padding: 8px 16px;
@@ -144,35 +179,28 @@
   font-size: 0.85rem;
   font-weight: 600;
   cursor: pointer;
-  margin-left: 10px; 
+  margin-left: 10px;
 }
 
-/* 1. EDIT BUTTON: Blue/Indigo Theme */
 .editBtn {
   background-color: #f5fff8;
-  color: #000000; 
+  color: #000000;
 }
-
 .editBtn:hover {
-  background-color: #3aca38; 
-  color: #ffffff; 
-  transform: translateY(-2px); 
+  background-color: #3aca38;
+  color: #ffffff;
 }
 
-/* 2. DELETE BUTTON: Red/Danger Theme */
 .deleteBtn {
-  background-color: #fee2e2; 
-  color: #dc2626; 
+  background-color: #fee2e2;
+  color: #dc2626;
 }
-
 .deleteBtn:hover {
-  background-color: #dc2626; 
-  color: #ffffff; 
-  transform: translateY(-2px); 
-  box-shadow: 0 4px 6px rgba(220, 38, 38, 0.2); 
+  background-color: #dc2626;
+  color: #ffffff;
 }
 
-/* Status Badges */
+/* --- Status Badges --- */
 .statusBadge {
   padding: 4px 12px;
   border-radius: 20px;
@@ -181,87 +209,75 @@
   text-transform: capitalize;
   display: inline-block;
 }
-.available {
-  background-color: #e6f4ea;
-  color: #1e7e34;
-  border: 1px solid #1e7e34;
-}
+.available { background-color: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
+.occupied { background-color: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
+.maintenance { background-color: #fff0d1; color: #b07404; border: 1px solid #b05c04; }
+.pending { background-color: #fcfee0; color: #aeb81d; border: 1px solid #cec103; }
 
-.occupied {
-  background-color: #fce8e6;
-  color: #c5221f;
-  border: 1px solid #c5221f;
-}
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
 
-.maintenance {
-  background-color: #fff0d1;
-  color: #b07404;
-  border: 1px solid #b05c04;
-}
-
-.pending {
-  background-color: #fcfee0;
-  color: #aeb81d;
-  border: 1px solid #cec103;
-}
-
-/* Inputs */
-.adminPanelPage input,
-.adminPanelPage select,
-.adminPanelPage textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fdfdfd;
-}
-
-/* Update your global input selector */
-.adminPanelPage input,
-.adminPanelPage select,
-.adminPanelPage textarea {
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fdfdfd;
-  width: 100%; 
-  box-sizing: border-box; 
-  font-family: inherit;
-}
-
-/* Ensure the grid row doesn't force things out */
-.formRow {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 15px; 
-  width: 100%;
-}
-
-/* Optional: Improve the spacing of the sidebar container */
-.adminSection {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
-  border-radius: 12px;
-  padding: 20px; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-  overflow: hidden; 
-}
-
-.fullWidth {
-  grid-column: span 1; 
-}
-
-
-.formGroup textarea {
-  min-height: 80px;
-  resize: vertical;
-}
-
-/* Media Query for Mobile */
+/* Tablet Portrait & Large Phones (max-width: 900px) */
 @media (max-width: 900px) {
   .contentLayout {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr; /* Stack Sidebar above Table */
   }
+  
   .formSidebar {
-    position: static;
+    position: static; /* Remove sticky behavior */
+    margin-bottom: 30px;
+  }
+  
+  .adminPanelPage {
+    padding: 20px;
+  }
+}
+
+/* Mobile Phones (max-width: 600px) */
+@media (max-width: 600px) {
+  .adminPanelPage {
+    padding: 15px; /* Tighter padding for small screens */
+  }
+
+  /* Header Stacking */
+  .headerArea {
+    flex-direction: column;
+    align-items: stretch; /* Stretch children to full width */
+    text-align: center;
+    gap: 15px;
+  }
+
+  .headerTitle h1 {
+    font-size: 1.5rem; /* Slightly smaller title */
+  }
+
+  .statCard {
+    align-items: center; /* Center text in card */
+    width: 100%; /* Full width card */
+    flex-direction: row;
+    justify-content: space-between;
+    box-sizing: border-box;
+  }
+
+  /* Form Adjustments */
+  .adminSection {
+    padding: 15px; /* Less padding inside form card */
+  }
+
+  .formRow {
+    grid-template-columns: 1fr; /* Stack inputs vertically */
+    gap: 10px;
+  }
+  
+  /* Table Actions */
+  .editBtn, .deleteBtn {
+    padding: 8px 12px; /* Slightly smaller buttons */
+    margin-left: 5px;
+    margin-top: 5px; /* Wrap if needed */
+  }
+  
+  .userTable th, .userTable td {
+    padding: 12px 10px; /* Tighter cell padding */
   }
 }

@@ -11,6 +11,8 @@
   align-items: center;
   z-index: 2000;
   animation: fadeIn 0.3s ease;
+  padding: 1rem; /* Adds safe space around edges on tiny screens */
+  box-sizing: border-box;
 }
 
 .modalContent {
@@ -22,11 +24,13 @@
   width: 90%;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   animation: slideUp 0.3s ease;
+  position: relative; /* Keeps z-index stacking correct */
 }
 
 .icon {
   font-size: 3rem;
   margin-bottom: 15px;
+  display: block; /* Ensures icon sits on its own line */
 }
 
 .success .icon { color: #2e7d32; }
@@ -36,11 +40,14 @@
   margin: 0 0 10px;
   color: #1a1a1a;
   font-size: 1.5rem;
+  line-height: 1.3;
 }
 
 .modalContent p {
   color: #666;
   margin-bottom: 25px;
+  line-height: 1.5;
+  font-size: 1rem;
 }
 
 .closeBtn {
@@ -51,12 +58,49 @@
   border-radius: 6px;
   font-weight: 600;
   cursor: pointer;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s, transform 0.1s;
+  font-size: 1rem;
 }
 
 .closeBtn:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+.closeBtn:active {
+  transform: translateY(0);
 }
 
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 480px) {
+  .modalContent {
+    padding: 30px 20px; /* Reduces padding to give content more room */
+    width: 95%; /* Use almost full width on phones */
+    border-radius: 16px; /* Slightly rounder corners look better on mobile */
+  }
+
+  .icon {
+    font-size: 2.5rem; /* Slightly smaller icon */
+    margin-bottom: 12px;
+  }
+
+  .modalContent h3 {
+    font-size: 1.25rem; /* Smaller heading */
+  }
+
+  .modalContent p {
+    font-size: 0.9rem; /* Smaller text */
+    margin-bottom: 20px;
+  }
+
+  .closeBtn {
+    width: 100%; /* Full width button is easier to tap */
+    padding: 14px;
+  }
+}

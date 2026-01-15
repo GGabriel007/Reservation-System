@@ -1,6 +1,6 @@
 /* Container */
 .container {
-  padding: 20px; /* Let the parent container handle padding if needed, or keep uniform */
+  padding: 20px;
   font-family: 'Inter', sans-serif;
   color: #374151;
   animation: fadeIn 0.4s ease-out;
@@ -12,6 +12,8 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 1.5rem;
+  flex-wrap: wrap; /* Allows wrapping on small screens */
+  gap: 15px;       /* Adds space between wrapped items */
 }
 
 .title {
@@ -29,7 +31,7 @@
 
 /* Add Button */
 .addBtn {
-  background-color: #10b981; /* Green for "Create" actions is standard */
+  background-color: #10b981;
   color: white;
   padding: 0.7rem 1.4rem;
   border-radius: 8px;
@@ -41,6 +43,7 @@
   align-items: center;
   gap: 8px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  white-space: nowrap; /* Prevents text wrapping inside button */
 }
 
 .addBtn:hover {
@@ -55,13 +58,17 @@
   border-radius: 12px;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   border: 1px solid #f3f4f6;
-  overflow: hidden; /* Clips the table corners */
+  
+  /* CRITICAL FOR MOBILE: Enables horizontal scrolling */
+  overflow-x: auto; 
+  -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
 }
 
 .table {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
+  min-width: 600px; /* Forces scrollbar if screen is smaller than 600px */
 }
 
 .table thead {
@@ -76,6 +83,7 @@
   text-transform: uppercase;
   color: #6b7280;
   letter-spacing: 0.05em;
+  white-space: nowrap; /* Keeps headers on one line */
 }
 
 .table td {
@@ -102,6 +110,7 @@
   cursor: pointer;
   text-decoration: none;
   transition: color 0.2s;
+  min-width: 120px; /* Ensures name has space */
 }
 
 .nameCell:hover {
@@ -111,9 +120,15 @@
 
 /* Description Cell: Limits text width */
 .descCell {
-  max-width: 300px;
+  max-width: 300px; /* Default max-width */
+  min-width: 200px; /* Minimum width to prevent squashing */
   color: #4b5563;
   line-height: 1.4;
+  
+  /* Truncate text cleanly with ellipsis if too long */
+  white-space: nowrap; 
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .noDesc {
@@ -130,7 +145,7 @@
 
 /* Action Buttons */
 .editBtn {
-  color: #2563eb; /* Blue */
+  color: #2563eb;
   background: none;
   border: none;
   cursor: pointer;
@@ -146,7 +161,7 @@
 }
 
 .deleteBtn {
-  color: #ef4444; /* Red */
+  color: #ef4444;
   background: none;
   border: none;
   cursor: pointer;
@@ -177,4 +192,42 @@
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+
+@media (max-width: 600px) {
+  .container {
+    padding: 15px; /* Less padding on mobile */
+  }
+
+  .header {
+    flex-direction: column; /* Stack Title and Button */
+    align-items: stretch; /* Stretch to fill width */
+    gap: 15px;
+  }
+
+  .title {
+    font-size: 1.25rem; /* Smaller title */
+    text-align: center;
+  }
+
+  .subtitle {
+    text-align: center;
+    font-size: 0.85rem;
+  }
+
+  /* Make the Add Button full width for easy tapping */
+  .addBtn {
+    justify-content: center;
+    width: 100%; 
+    padding: 12px;
+  }
+
+  /* Adjust table padding for small screens */
+  .table th, .table td {
+    padding: 1rem 1rem; 
+  }
 }
