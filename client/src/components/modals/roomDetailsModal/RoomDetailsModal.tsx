@@ -10,7 +10,7 @@ interface Room {
     amenities: string[];
     description: string;
     availabilityStatus: string;
-    images: string[]; // <--- CHANGED: Now an array of strings
+    images: string[]; 
 }
 
 interface RoomDetailsModalProps {
@@ -21,9 +21,9 @@ interface RoomDetailsModalProps {
 export default function RoomDetailsModal({ room, onClose }: RoomDetailsModalProps) {
     if (!room) return null;
 
-    // Determine the base URL for images
+    // Determine the base URL
     const baseUrl = typeof window !== "undefined" && window.location.hostname === "localhost"
-        ? "http://localhost:8080" // Or whatever your backend port is
+        ? "http://localhost:8080" 
         : "";
 
     return (
@@ -49,8 +49,18 @@ export default function RoomDetailsModal({ room, onClose }: RoomDetailsModalProp
                             marginBottom: '20px' 
                         }}>
                             {room.images.map((img, idx) => {
-                                // Construct full URL for each image
-                                const src = img.startsWith("http") ? img : `${baseUrl}${img}`;
+                                // FIX: Logic to handle both external URLs and local uploads
+                                let src = "";
+                                
+                                if (img.startsWith("http") || img.startsWith("blob:")) {
+                                    // If it's already a full URL (e.g., from cloud or preview), use it as is
+                                    src = img;
+                                } else {
+                                    // If it's a filename, assume it lives in the /uploads/ folder
+                                    // Clean any leading slashes just in case
+                                    const cleanFilename = img.startsWith('/') ? img.slice(1) : img;
+                                    src = `${baseUrl}/uploads/${cleanFilename}`;
+                                }
                                 
                                 return (
                                     <img
@@ -65,8 +75,10 @@ export default function RoomDetailsModal({ room, onClose }: RoomDetailsModalProp
                                             borderRadius: '6px',
                                             border: '1px solid #eee'
                                         }}
+                                        // I removed the onError hiding so you can see if the link is broken
                                         onError={(e) => {
-                                            (e.target as HTMLImageElement).style.display = 'none';
+                                             console.error("Failed to load image:", src);
+                                             e.currentTarget.src = "https://placehold.co/400?text=No+Image"; // Fallback placeholder
                                         }}
                                     />
                                 );

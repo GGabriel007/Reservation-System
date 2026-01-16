@@ -14,27 +14,15 @@ export const RoomController = {
       const { name, price, search, ...filters } = req.query;
       let rooms;
       if (name) {
-        rooms = await RoomService.getAllRoomsSorted(
-          name,
-          "name",
-          search,
-          Object.keys(filters)
-        );
+        rooms = await RoomService.getAllRoomsSorted(name, "name", search, Object.keys(filters));
       } else if (price) {
-        rooms = await RoomService.getAllRoomsSorted(
-          price,
-          "price",
-          search,
-          Object.keys(filters)
-        );
+        rooms = await RoomService.getAllRoomsSorted(price, "price", search, Object.keys(filters));
       } else {
         rooms = await RoomService.getAllRooms();
       }
       res.status(200).json(rooms);
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error fetching rooms", error: error.message });
+      res.status(500).json({ message: "Error fetching rooms", error: error.message });
     }
   },
 
@@ -44,9 +32,7 @@ export const RoomController = {
       const amenities = await RoomService.getAllRoomAmenities();
       res.status(200).json({ amenities: amenities });
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error fetching room details", error: error.message });
+      res.status(500).json({ message: "Error fetching room details", error: error.message });
     }
   },
 
@@ -57,9 +43,7 @@ export const RoomController = {
       if (!room) return res.status(404).json({ message: "Room not found" });
       res.status(200).json(room);
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error fetching room details", error: error.message });
+      res.status(500).json({ message: "Error fetching room details", error: error.message });
     }
   },
 
@@ -73,10 +57,7 @@ export const RoomController = {
       }
 
       // Security: Manager check
-      if (
-        req.user.role === "manager" &&
-        req.user.assignedHotel?.toString() !== hotelId
-      ) {
+      if (req.user.role === "manager" && req.user.assignedHotel?.toString() !== hotelId) {
         return res.status(403).json({ message: "Unauthorized for this hotel" });
       }
 
@@ -91,19 +72,22 @@ export const RoomController = {
   // CREATE NEW ROOM
   createRoom: async (req, res) => {
     try {
+      // 1. Capture Uploaded Files
+      let imageFilenames = [];
+      if (req.files && req.files.length > 0) {
+        imageFilenames = req.files.map((file) => file.filename);
+      }
+
+      // 2. Merge Body and Images
       const roomData = {
         ...req.body,
+        images: imageFilenames, // <--- IMPORTANT: Add the images here
         hotel: req.body.hotel || req.body.hotelId,
       };
 
-      // Security: Ensure a manager can only create rooms for their assigned hotel
-      if (
-        req.user.role === "manager" &&
-        req.user.assignedHotel?.toString() !== roomData.hotel
-      ) {
-        return res
-          .status(403)
-          .json({ message: "You can only add rooms to your own hotel." });
+      // Security: Manager check
+      if (req.user.role === "manager" && req.user.assignedHotel?.toString() !== roomData.hotel) {
+        return res.status(403).json({ message: "You can only add rooms to your own hotel." });
       }
 
       const newRoom = await RoomService.createRoom(roomData);
@@ -123,28 +107,41 @@ export const RoomController = {
       if (!room) return res.status(404).json({ message: "Room not found" });
 
       // 2. SAFE ID EXTRACTION
-      // Handle case where room.hotel is populated (Object) or not (String)
-      const roomHotelId = room.hotel._id
-        ? room.hotel._id.toString()
-        : room.hotel.toString();
-
-      const userHotelId = req.user.assignedHotel
-        ? req.user.assignedHotel.toString()
-        : "";
+      const roomHotelId = room.hotel._id ? room.hotel._id.toString() : room.hotel.toString();
+      const userHotelId = req.user.assignedHotel ? req.user.assignedHotel.toString() : "";
 
       // 3. SECURITY: Manager check
       if (req.user.role === "manager" && roomHotelId !== userHotelId) {
-        return res.status(403).json({
-          message: "Unauthorized: You do not manage this room's hotel.",
-        });
+        return res.status(403).json({ message: "Unauthorized: You do not manage this room's hotel." });
       }
 
-      const updatedRoom = await RoomService.updateRoom(roomId, req.body);
+      // 4. HANDLE IMAGES (Merge New + Existing)
+      
+      // A. Get new uploads
+      let newImages = [];
+      if (req.files && req.files.length > 0) {
+        newImages = req.files.map((file) => file.filename);
+      }
+
+      // B. Get existing kept images (handle if string or array)
+      let existingImages = req.body.existingImages || [];
+      if (!Array.isArray(existingImages)) {
+        existingImages = [existingImages];
+      }
+
+      // C. Combine them
+      const finalImages = [...existingImages, ...newImages];
+
+      // 5. Update Data
+      const updateData = {
+        ...req.body,
+        images: finalImages, // <--- IMPORTANT: Send combined list
+      };
+
+      const updatedRoom = await RoomService.updateRoom(roomId, updateData);
       res.status(200).json(updatedRoom);
     } catch (error) {
-      res
-        .status(400)
-        .json({ message: "Failed to update room", error: error.message });
+      res.status(400).json({ message: "Failed to update room", error: error.message });
     }
   },
 
@@ -156,20 +153,11 @@ export const RoomController = {
       const room = await RoomService.getRoomById(id);
       if (!room) return res.status(404).json({ message: "Room not found" });
 
-      // 1. SAFE ID EXTRACTION
-      const roomHotelId = room.hotel._id
-        ? room.hotel._id.toString()
-        : room.hotel.toString();
+      const roomHotelId = room.hotel._id ? room.hotel._id.toString() : room.hotel.toString();
+      const userHotelId = req.user.assignedHotel ? req.user.assignedHotel.toString() : "";
 
-      const userHotelId = req.user.assignedHotel
-        ? req.user.assignedHotel.toString()
-        : "";
-
-      // 2. SECURITY: Manager check
       if (req.user.role === "manager" && roomHotelId !== userHotelId) {
-        return res.status(403).json({
-          message: "Access denied: This room belongs to another property.",
-        });
+        return res.status(403).json({ message: "Access denied: This room belongs to another property." });
       }
 
       await RoomService.deleteRoom(id);

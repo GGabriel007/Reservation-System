@@ -88,7 +88,26 @@ app.use((req, res, next) => {
 
 // API Routes
 
-app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
+const uploadsPath = path.join(__dirname, "../uploads");
+
+// Debugging Log: tells us exactly where the server is looking
+console.log("------------------------------------------------");
+console.log("📂 STATIC FILES DEBUG");
+console.log("Looking for uploads at:", uploadsPath);
+
+if (fs.existsSync(uploadsPath)) {
+  console.log("✅ Folder exists!");
+  const files = fs.readdirSync(uploadsPath);
+  console.log(`📄 File count: ${files.length}`);
+  if (files.length > 0) console.log("Example file:", files[0]);
+} else {
+  console.error("❌ ERROR: The 'uploads' folder does NOT exist at this path.");
+  console.error("   Please check if your uploads are saving to the project root instead.");
+}
+console.log("------------------------------------------------");
+
+app.use("/uploads", express.static(uploadsPath));
+
 app.use("/uploads", (req, res) => {
   console.log(`[Warning] Missing image requested: ${req.originalUrl}`);
   return res.status(404).send("Image not found");
