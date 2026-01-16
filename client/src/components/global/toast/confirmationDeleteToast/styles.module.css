@@ -18,13 +18,13 @@
 }
 
 .container {
-  background: white;
+  background: #fff9f0;
+  box-shadow: var(--light-grey) 0 2px 8px 2px;
   padding: 40px;
   border-radius: 12px;
   text-align: center;
   max-width: 400px;
   width: 90%;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   animation: slideUp 0.3s ease;
   display: flex;
   flex-direction: column;
@@ -62,7 +62,8 @@
 }
 
 /* --- Buttons --- */
-.cancelBtn, .deleteBtn {
+.cancelBtn,
+.deleteBtn {
   padding: 12px 30px;
   border-radius: 6px;
   font-weight: 600;
@@ -74,7 +75,7 @@
 }
 
 .cancelBtn {
-  background: #c5a059; 
+  background: #c5a059;
   color: white;
 }
 
@@ -92,8 +93,24 @@
   transform: translateY(-1px);
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
 /* =========================================
    MOBILE RESPONSIVENESS
@@ -119,7 +136,8 @@
     gap: 10px;
   }
 
-  .cancelBtn, .deleteBtn {
+  .cancelBtn,
+  .deleteBtn {
     width: 100%; /* Full width buttons */
     padding: 14px; /* Taller touch target */
     font-size: 1rem; /* Slightly larger text for readability */

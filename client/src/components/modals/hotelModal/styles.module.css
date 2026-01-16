@@ -14,7 +14,7 @@
 
 /* The Modal Box */
 .modal {
-  background-color: white;
+  background-color: var(--white);
   padding: 2rem;
   border-radius: 12px;
   width: 90%; /* Responsive width */
@@ -22,7 +22,7 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
   max-height: 90vh;
   overflow-y: auto;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   box-sizing: border-box;
 }
@@ -57,11 +57,11 @@
   letter-spacing: 0.01em;
 }
 
-.input, .textarea {
+.input,
+.textarea {
   display: block;
   width: 100%;
-  border: 1px solid #d1d5db;
-  border-radius: 8px; /* Slightly softer corners */
+  border: 1px solid var(--black);
   padding: 0.75rem;
   font-size: 0.95rem;
   transition: all 0.2s ease;
@@ -70,7 +70,8 @@
 }
 
 /* Brand Focus State */
-.input:focus, .textarea:focus {
+.input:focus,
+.textarea:focus {
   outline: none;
   border-color: #c5a059; /* Gold Border */
   box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.2); /* Gold Glow */
@@ -130,14 +131,14 @@
 
 .saveBtn {
   padding: 0.625rem 1.5rem;
-  background-color: #10b981; /* Green to match 'Add' button */
+  background-color: var(--lighter-green); /* Green to match 'Add' button */
   color: white;
   border-radius: 8px;
   border: none;
   font-weight: 600;
   cursor: pointer;
   transition: transform 0.1s, background-color 0.2s;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .saveBtn:hover {
@@ -153,13 +154,23 @@
 
 /* Animations */
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =========================================
@@ -178,7 +189,8 @@
   }
 
   /* Stack the grids vertically on phone */
-  .gridTwo, .gridThree {
+  .gridTwo,
+  .gridThree {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
@@ -189,14 +201,16 @@
     gap: 0.75rem;
   }
 
-  .cancelBtn, .saveBtn {
+  .cancelBtn,
+  .saveBtn {
     width: 100%; /* Full width buttons */
     text-align: center;
     padding: 0.8rem; /* Taller touch target */
   }
-  
+
   /* Make inputs slightly taller for touch */
-  .input, .textarea {
+  .input,
+  .textarea {
     font-size: 16px; /* Prevents iOS auto-zoom */
     padding: 0.85rem;
   }

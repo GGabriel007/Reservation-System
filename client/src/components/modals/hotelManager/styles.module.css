@@ -1,7 +1,7 @@
 /* Container */
 .container {
   padding: 20px;
-  font-family: 'Inter', sans-serif;
+  font-family: "Inter", sans-serif;
   color: #374151;
   animation: fadeIn 0.4s ease-out;
 }
@@ -13,7 +13,7 @@
   align-items: center;
   margin-bottom: 1.5rem;
   flex-wrap: wrap; /* Allows wrapping on small screens */
-  gap: 15px;       /* Adds space between wrapped items */
+  gap: 15px; /* Adds space between wrapped items */
 }
 
 .title {
@@ -31,7 +31,7 @@
 
 /* Add Button */
 .addBtn {
-  background-color: #10b981;
+  background-color: var(--lighter-green);
   color: white;
   padding: 0.7rem 1.4rem;
   border-radius: 8px;
@@ -42,26 +42,60 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   white-space: nowrap; /* Prevents text wrapping inside button */
 }
 
 .addBtn:hover {
   background-color: #059669;
   transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Table Card */
 .tableContainer {
-  background: white;
+  background: #f9eedd;
+  box-shadow: var(--light-grey) 0 2px 8px 2px;
   border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
   border: 1px solid #f3f4f6;
-  
+
   /* CRITICAL FOR MOBILE: Enables horizontal scrolling */
-  overflow-x: auto; 
+  overflow-x: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
+}
+
+.tableContainer select {
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
+
+  border-radius: 0;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.tableContainer select::picker-icon {
+  content: url("/arrow-down.png");
+  position: relative;
+  bottom: -3px;
+}
+
+.tableContainer option {
+  height: 50px;
+}
+
+.tableContainer option::checkmark {
+  display: none;
+}
+
+.tableContainer input:focus,
+.tableContainer input:hover,
+.tableContainer select:hover,
+.tableContainer option:hover {
+  background-color: var(--beige);
 }
 
 .table {
@@ -69,11 +103,16 @@
   border-collapse: collapse;
   text-align: left;
   min-width: 600px; /* Forces scrollbar if screen is smaller than 600px */
+  box-shadow: (--light-grey) 0 2px 8px 2px;
 }
 
 .table thead {
-  background-color: #f9fafb;
+  background-color: #f8f0e5;
   border-bottom: 2px solid #e5e7eb;
+}
+
+.table tbody {
+  background-color: #fff8ed;
 }
 
 .table th {
@@ -124,9 +163,9 @@
   min-width: 200px; /* Minimum width to prevent squashing */
   color: #4b5563;
   line-height: 1.4;
-  
+
   /* Truncate text cleanly with ellipsis if too long */
-  white-space: nowrap; 
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
@@ -180,6 +219,7 @@
   text-align: center;
   padding: 4rem 2rem;
   color: #9ca3af;
+  background-color: #fff9f0;
 }
 
 .loading {
@@ -190,8 +230,14 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* =========================================
@@ -222,12 +268,13 @@
   /* Make the Add Button full width for easy tapping */
   .addBtn {
     justify-content: center;
-    width: 100%; 
+    width: 100%;
     padding: 12px;
   }
 
   /* Adjust table padding for small screens */
-  .table th, .table td {
-    padding: 1rem 1rem; 
+  .table th,
+  .table td {
+    padding: 1rem 1rem;
   }
 }

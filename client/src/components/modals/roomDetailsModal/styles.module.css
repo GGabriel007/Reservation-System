@@ -16,18 +16,18 @@
 }
 
 .container {
-  background: white;
   width: 90%;
   max-width: 600px;
   border-radius: 12px;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  background: #fff9f0;
+  box-shadow: var(--light-grey) 0 2px 8px 2px;
   display: flex;
   flex-direction: column;
   overflow: hidden; /* Keeps the header/footer neat */
   animation: slideUp 0.3s ease;
-  
+
   /* IMPORTANT: Ensures modal never exceeds screen height */
-  max-height: 90vh; 
+  max-height: 90vh;
 }
 
 /* Header with Gold accent */
@@ -92,7 +92,7 @@
   object-fit: cover;
   border-radius: 8px;
   margin-bottom: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .section {
@@ -123,7 +123,7 @@
 
 .amenityTag {
   background: #f9f3e5; /* Light Gold */
-  color: #c5a059;     /* Dark Gold */
+  color: #c5a059; /* Dark Gold */
   padding: 6px 12px;
   border-radius: 20px;
   font-size: 0.9rem;
@@ -152,8 +152,24 @@
   background: #000;
 }
 
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
 
 /* =========================================
    MOBILE RESPONSIVENESS
@@ -188,7 +204,8 @@
   }
 
   /* Adjust Image Size */
-  .roomImage, .imagePlaceholder {
+  .roomImage,
+  .imagePlaceholder {
     height: 180px; /* Shorter image so we can see more text details */
     margin-bottom: 15px;
   }
@@ -198,7 +215,7 @@
     font-size: 0.8rem;
     padding: 4px 10px;
   }
-  
+
   /* Full width button on mobile for easier tapping */
   .closeBtn {
     width: 100%;

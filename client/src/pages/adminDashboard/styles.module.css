@@ -1,8 +1,8 @@
 .mainPage {
   min-height: 100vh;
-  background-color: #f3f4f6; /* Light Gray Background */
-  padding: 2rem;
-  font-family: 'Inter', sans-serif;
+  background-color: var(--white); /* Light Gray Background */
+  padding-block: 2rem;
+  font-family: "Inter", sans-serif;
 }
 
 .dashboardContainer {
@@ -17,7 +17,7 @@
   align-items: center;
   margin-bottom: 2rem;
   flex-wrap: wrap; /* Allows items to wrap if screen is narrow */
-  gap: 15px;       /* Adds space between wrapped items */
+  gap: 15px; /* Adds space between wrapped items */
 }
 
 .adminBadge {
@@ -37,12 +37,12 @@
   gap: 1.5rem;
   border-bottom: 2px solid #e5e7eb;
   margin-bottom: 2rem;
-  
+
   /* Mobile Magic: Horizontal Scroll */
-  overflow-x: auto; 
-  white-space: nowrap; 
+  overflow-x: auto;
+  white-space: nowrap;
   -webkit-overflow-scrolling: touch; /* Smooth scroll on iOS */
-  
+
   /* Hide scrollbar for cleaner look */
   scrollbar-width: none; /* Firefox */
 }
@@ -75,7 +75,7 @@
 }
 
 .active::after {
-  content: '';
+  content: "";
   position: absolute;
   bottom: -2px; /* Moves line down to cover the border-bottom */
   left: 0;
@@ -86,13 +86,12 @@
 
 /* --- CONTENT AREA --- */
 .contentArea {
-  background-color: white;
+  background-color: #fff9f0;
   border-radius: 0.5rem;
-  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+  box-shadow: var(--light-grey) 0 5px 10px 5px;
   min-height: 500px;
   border: 1px solid #e5e7eb;
-  /* Ensure content doesn't overflow container on mobile */
-  overflow: hidden; 
+  overflow: hidden;
 }
 
 /* =========================================

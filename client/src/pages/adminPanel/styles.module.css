@@ -13,13 +13,14 @@
   align-items: center;
   margin-bottom: 30px;
   padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid var(--white);
   flex-wrap: wrap; /* Allows wrapping on medium screens */
   gap: 20px;
 }
 
 .statCard {
-  background: white;
+  background: #fff8ed;
+  box-shadow: var(--light-grey) 0 2px 8px 2px;
   padding: 10px 20px;
   border-radius: 8px;
   border: 1px solid #e0e0e0;
@@ -56,11 +57,11 @@
 }
 
 .adminSection {
-  background: #ffffff;
+  background: var(--white);
   border: 1px solid #e0e0e0;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  box-shadow: var(--light-grey) 0 5px 10px 2px;
   overflow: hidden;
 }
 
@@ -87,13 +88,45 @@
 .adminPanelPage select,
 .adminPanelPage textarea {
   padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  background: #fdfdfd;
+  border: 1px solid var(--black);
   width: 100%;
   box-sizing: border-box;
   font-family: inherit;
   font-size: 16px; /* Prevents auto-zoom on iPhones */
+}
+
+.adminPanelPage select {
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
+
+  border-radius: 0;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.adminPanelPage select::picker-icon {
+  content: url("/arrow-down.png");
+  position: relative;
+  bottom: -3px;
+}
+
+.adminPanelPage option {
+  height: 50px;
+}
+
+.adminPanelPage option::checkmark {
+  display: none;
+}
+
+.adminPanelPage input:focus,
+.adminPanelPage input:hover,
+.adminPanelPage select:hover,
+.adminPanelPage option:hover {
+  background-color: var(--beige);
 }
 
 .formGroup textarea {
@@ -113,12 +146,46 @@
 }
 
 .tableContainer {
-  background: white;
+  background: #f9eedd;
   border-radius: 12px;
   border: 1px solid #e0e0e0;
   /* CRITICAL FOR MOBILE: Allows table to scroll horizontally */
-  overflow-x: auto; 
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+  overflow-x: auto;
+  box-shadow: var(--light-grey) 0 2px 8px 2px;
+}
+
+.tableContainer select {
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
+
+  border-radius: 0;
+  height: 40px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.tableContainer select::picker-icon {
+  content: url("/arrow-down.png");
+  position: relative;
+  bottom: -3px;
+}
+
+.tableContainer option {
+  height: 50px;
+}
+
+.tableContainer option::checkmark {
+  display: none;
+}
+
+.tableContainer input:focus,
+.tableContainer input:hover,
+.tableContainer select:hover,
+.tableContainer option:hover {
+  background-color: var(--beige);
 }
 
 .tableHeader {
@@ -126,11 +193,15 @@
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background: #f8f9fa;
+  background: #f8f0e5;
   font-weight: 700;
   border-bottom: 1px solid #eee;
   flex-wrap: wrap;
   gap: 10px;
+}
+
+.tableHeader span {
+  font-size: 1.35rem;
 }
 
 .userTable {
@@ -139,8 +210,13 @@
   min-width: 600px; /* Forces scroll if screen is smaller than 600px */
 }
 
+.userTable tbody {
+  background-color: #fff8ed;
+}
+
 .userTable th {
-  background: #fafafa;
+  background: #f8f0e5;
+  border-block-end: 2px solid var(--light-grey);
   padding: 12px 20px;
   font-size: 0.75rem;
   color: #999;
@@ -172,7 +248,8 @@
   cursor: pointer;
 }
 
-.editBtn, .deleteBtn {
+.editBtn,
+.deleteBtn {
   border: none;
   padding: 8px 16px;
   border-radius: 6px;
@@ -209,10 +286,26 @@
   text-transform: capitalize;
   display: inline-block;
 }
-.available { background-color: #e6f4ea; color: #1e7e34; border: 1px solid #1e7e34; }
-.occupied { background-color: #fce8e6; color: #c5221f; border: 1px solid #c5221f; }
-.maintenance { background-color: #fff0d1; color: #b07404; border: 1px solid #b05c04; }
-.pending { background-color: #fcfee0; color: #aeb81d; border: 1px solid #cec103; }
+.available {
+  background-color: #e6f4ea;
+  color: #1e7e34;
+  border: 1px solid #1e7e34;
+}
+.occupied {
+  background-color: #fce8e6;
+  color: #c5221f;
+  border: 1px solid #c5221f;
+}
+.maintenance {
+  background-color: #fff0d1;
+  color: #b07404;
+  border: 1px solid #b05c04;
+}
+.pending {
+  background-color: #fcfee0;
+  color: #aeb81d;
+  border: 1px solid #cec103;
+}
 
 /* =========================================
    MOBILE RESPONSIVENESS
@@ -223,12 +316,12 @@
   .contentLayout {
     grid-template-columns: 1fr; /* Stack Sidebar above Table */
   }
-  
+
   .formSidebar {
     position: static; /* Remove sticky behavior */
     margin-bottom: 30px;
   }
-  
+
   .adminPanelPage {
     padding: 20px;
   }
@@ -269,15 +362,17 @@
     grid-template-columns: 1fr; /* Stack inputs vertically */
     gap: 10px;
   }
-  
+
   /* Table Actions */
-  .editBtn, .deleteBtn {
+  .editBtn,
+  .deleteBtn {
     padding: 8px 12px; /* Slightly smaller buttons */
     margin-left: 5px;
     margin-top: 5px; /* Wrap if needed */
   }
-  
-  .userTable th, .userTable td {
+
+  .userTable th,
+  .userTable td {
     padding: 12px 10px; /* Tighter cell padding */
   }
 }
