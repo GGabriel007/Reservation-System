@@ -8,6 +8,7 @@
     "dev-mac": "NODE_ENV=development vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "type-check": "tsc --noEmit",
     "preview": "vite preview"
   },
   "dependencies": {

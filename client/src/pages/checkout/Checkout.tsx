@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import Breadcrumbs from "@/components/global/breadcumbs/Breadcumbs";
 
 export default function Checkout() {
+  const [postReservation] = usePostRerservationMutation();
   const reservation = useAppSelector(selectReservation);
   const room = useAppSelector(selectRoom);
   const preference = useAppSelector(selectPreference);
@@ -39,7 +40,7 @@ export default function Checkout() {
     const b = new Date(preference.endDate);
 
     setDifference(dateDiffInDays(a, b));
-  }, []);
+  }, [preference.startDate, preference.endDate]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -52,48 +53,33 @@ export default function Checkout() {
   };
 
   const validateForm = () => {
-    let newErrors = {};
     if (!reservation.firstName) {
-      (
-        document.querySelector('input[name="firstName"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("First Name is required");
+      toast.error("First Name is required");
+      return false;
     }
     if (!reservation.lastName) {
-      (
-        document.querySelector('input[name="firstName"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("Last Name is required");
+      toast.error("Last Name is required");
+      return false;
     }
     if (!reservation.phone) {
-      (
-        document.querySelector('input[name="phone"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("Phone Number is required");
+      toast.error("Phone Number is required");
+      return false;
     }
     if (!reservation.email) {
-      (
-        document.querySelector('input[name="email"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("Email is required");
+      toast.error("Email is required");
+      return false;
     }
     if (!reservation.email.includes("@")) {
-      (
-        document.querySelector('input[name="email"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("Email is invalid");
+      toast.error("Email is invalid");
+      return false;
     }
     if (!reservation.city) {
-      (
-        document.querySelector('input[name="city"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("City is required");
+      toast.error("City is required");
+      return false;
     }
     if (!reservation.zipCode) {
-      (
-        document.querySelector('input[name="zipCode"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("Zip Code is required");
+      toast.error("Zip Code is required");
+      return false;
     }
     if (
       !reservation.cardNumber ||
@@ -101,20 +87,83 @@ export default function Checkout() {
       !reservation.cvv ||
       !reservation.nameOnCard
     ) {
-      (
-        document.querySelector('input[name="cardNumber"]') as HTMLInputElement
-      )?.focus();
-      return toast.error("Card Information is required");
+      toast.error("Card Information is required");
+      return false;
     }
-    return Object.keys(newErrors).length === 0; // Return true if no errors
+
+    if (!room.roomId || !room.hotelId) {
+      toast.error("Session expired or invalid room selection. Please go back and select a room.");
+      return false;
+    }
+
+    return true; // Return true if no errors
   };
 
-  const handleConfirmBooking = (event: React.FormEvent) => {
+  const handleConfirmBooking = async (event: React.FormEvent) => {
     event.preventDefault();
     if (validateForm()) {
-      const data = usePostRerservationMutation({});
-      toast.success("Booking Confirmed!");
-      navigate("/booking/confirmation");
+      try {
+
+        // Safe extraction of IDs
+        // @ts-ignore - Handle case where hotelId might be an object at runtime
+        const hotelIdString = typeof room.hotelId === 'object' ? room.hotelId?._id : room.hotelId;
+        const roomIdString = room.roomId;
+
+        // Calculate calculated values for payload and state
+        const basePrice = Number(room.basePrice) || 0;
+        const calculatedTotal = (basePrice * 1.075 + 100).toFixed(2);
+
+        const bookingPayload = {
+          guestFirstName: reservation.firstName,
+          guestLastName: reservation.lastName,
+          guestEmail: reservation.email,
+          guestPhone: reservation.phone,
+          country: reservation.country || 'USA',
+          city: reservation.city,
+          zipCode: reservation.zipCode,
+          roomId: roomIdString,
+          hotelId: hotelIdString,
+          checkIn: preference.startDate,
+          checkOut: preference.endDate,
+          adults: Number(preference.adults) || 1,
+          children: Number(preference.children) || 0,
+          roomPrice: basePrice,
+          tax: (basePrice * 0.075).toFixed(2),
+          fees: 100,
+          totalAmount: calculatedTotal,
+          nameOnCard: reservation.nameOnCard,
+          cardNumber: reservation.cardNumber,
+          newsletter: false
+        };
+
+        const response = await postReservation(bookingPayload).unwrap();
+        toast.success("Booking Confirmed!");
+
+        // Enrich the state with hotel details for display
+        // @ts-ignore - Accessing runtime properties
+        const hotelDetails = typeof room.hotelId === 'object' ? room.hotelId : { _id: hotelIdString, name: "Luxury Hotel", location: "Prime Location" };
+
+        // Merge response with payload to ensure we have all data for display immediately
+        // Response should provide _id and confirmationCode
+        const reservationForState = {
+          ...bookingPayload, // Has checkIn, checkOut, prices, guests
+          ...response,       // Has _id, confirmationCode (and should have the rest, but safe backup)
+          hotelId: hotelDetails, // Enriched hotel object
+          roomId: {
+            _id: roomIdString,
+            roomName: room.roomName,
+            roomType: room.roomType
+          }
+        };
+
+        // Give the toast a moment to breathe before navigating
+        setTimeout(() => {
+          navigate("/found-reservation", { state: { reservation: reservationForState } });
+        }, 1000);
+      } catch (error) {
+        toast.error("Booking Failed. Please try again.");
+        console.error("Booking failed", error);
+      }
     }
   };
 
@@ -135,7 +184,14 @@ export default function Checkout() {
             </NavLink>
           </div>
           <div className={styles.headerImage}>
-            <img src={room.image || "/burmont-suit.jpg"} alt={room.roomName} />
+            <img
+              src={
+                room.image
+                  ? `${import.meta.env.PROD ? "http://liore.us-east-1.elasticbeanstalk.com" : "http://localhost:8080"}/uploads/${room.image}`
+                  : "/burmont-suit.jpg"
+              }
+              alt={room.roomName}
+            />
           </div>
         </section>
 
@@ -356,23 +412,19 @@ export default function Checkout() {
                       new Date(preference.endDate).toLocaleDateString()}
                   </p>
 
-                  <p>{`${difference} Night${
-                    difference > 1 ? "s" : ""
-                  } stay`}</p>
+                  <p>{`${difference} Night${difference > 1 ? "s" : ""
+                    } stay`}</p>
                   {preference.adults > 0 && (
-                    <p>{`${preference.adults} Adult${
-                      preference.adults > 1 ? "s" : ""
-                    }`}</p>
+                    <p>{`${preference.adults} Adult${preference.adults > 1 ? "s" : ""
+                      }`}</p>
                   )}
                   {preference.children > 0 && (
-                    <p>{`${preference.children} ${
-                      preference.children > 1 ? "Children" : "Child"
-                    }`}</p>
+                    <p>{`${preference.children} ${preference.children > 1 ? "Children" : "Child"
+                      }`}</p>
                   )}
                   {preference.beds > 0 && (
-                    <p>{`${preference.beds} Bed${
-                      preference.beds > 1 ? "s" : ""
-                    }`}</p>
+                    <p>{`${preference.beds} Bed${preference.beds > 1 ? "s" : ""
+                      }`}</p>
                   )}
                 </div>
 

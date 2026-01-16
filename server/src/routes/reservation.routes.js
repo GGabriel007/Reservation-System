@@ -8,10 +8,8 @@ const router = Router();
 //  PUBLIC ROUTES
 
 // Create a new reservation (Guest or User)
-router.post("/", (req, res) => {
-  console.log("in post");
-  res.send("");
-});
+// Create a new reservation (Guest or User)
+router.post("/", ReservationController.createReservation);
 
 // Anyone can look up a reservation with a confirmation code
 router.get("/lookup", ReservationController.getReservationByLookup);

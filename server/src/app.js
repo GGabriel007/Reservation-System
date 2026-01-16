@@ -27,20 +27,18 @@ const app = express();
 // Required for AWS EC2/ALB to pass through headers (essential for cookies)
 app.set("trust proxy", 1);
 
+// TOP LEVEL LOGGER
+app.use((req, res, next) => {
+  console.log(`[RAW REQUEST] ${req.method} ${req.url} | Origin: ${req.headers.origin}`);
+  next();
+});
+
 app.use(
   cors({
     origin: (origin, callback) => {
-      const allowedOrigins = [
-        "http://localhost:5173",
-         
-        "http://liore.us-east-1.elasticbeanstalk.com",
-      ];
-      
-      if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
+      // DEBUG: Allow all origins temporarily to isolate the issue
+      console.log(`[CORS] Checking origin: ${origin}`);
+      return callback(null, true);
     },
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -59,8 +57,8 @@ app.use(
     cookie: {
       httpOnly: true,
       maxAge: 1000 * 60 * 60,
-      secure: false,  
-      sameSite: "lax", 
+      secure: false,
+      sameSite: "lax",
     },
     store: MongoStore.create({
       mongoUrl: process.env.NODE_ENV === "production" ? process.env.MONGO_URL : process.env.MONGO_LOCAL_URL,
@@ -114,15 +112,22 @@ app.use("/uploads", (req, res) => {
 });
 app.use("/auth", authRoutes);
 app.use("/admin", adminRoutes);
-app.use("/hotels", hotelRoutes);      
-app.use("/rooms", roomRoutes);   
-app.use("/reservations", reservationRoutes); 
-app.use("/transactions", transactionRoutes); 
+app.use("/hotels", hotelRoutes);
+app.use("/rooms", roomRoutes);
+app.use("/reservations", reservationRoutes);
+app.use("/transactions", transactionRoutes);
 app.use("/users", userRoutes);
 app.use("/analytics", analyticsRoutes);
 
 app.get("/api/health", (req, res) => {
   res.send("Online and Connected!");
+});
+
+// GLOBAL ERROR HANDLER
+app.use((err, req, res, next) => {
+  console.error("!!! GLOBAL ERROR HANDLER !!!");
+  console.error(err.stack);
+  res.status(500).json({ error: "Internal Server Error", details: err.message });
 });
 
 // --- ALL-IN-ONE FRONTEND SERVING ---
@@ -136,12 +141,12 @@ app.use(express.static(distPath));
  * This sends the index.html for any request that isn't an API call.
  */
 app.get(/.*/, (req, res) => {
-    res.sendFile(path.join(distPath, 'index.html'), (err) => {
-        if (err) {
-            console.error("ERROR: index.html not found at:", path.join(distPath, 'index.html'));
-            res.status(500).send("Frontend files missing. Check if client-build/dist exists.");
-        }
-    });
+  res.sendFile(path.join(distPath, 'index.html'), (err) => {
+    if (err) {
+      console.error("ERROR: index.html not found at:", path.join(distPath, 'index.html'));
+      res.status(500).send("Frontend files missing. Check if client-build/dist exists.");
+    }
+  });
 });
 
 

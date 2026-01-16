@@ -9,6 +9,7 @@ export interface UserState {
   roomName: string;
   basePrice: string;
   image: string;
+  roomType: string;
 
   // NEW: Logged in user information
   userInfo: User | null;
@@ -21,6 +22,7 @@ const initialState: UserState = {
   roomName: "",
   basePrice: "",
   image: "",
+  roomType: "",
   userInfo: null,
   isAuthenticated: false,
 };
@@ -36,6 +38,7 @@ export const userSlice = createSlice({
       state.roomName = action.payload.roomName;
       state.basePrice = action.payload.basePrice;
       state.image = action.payload.image;
+      state.roomType = action.payload.roomType;
     },
     // Reducer to handle Login
     setUser: (state, action: PayloadAction<User>) => {

@@ -5,14 +5,14 @@ import type { RootState } from "@/redux/store";
 export interface ReservationState {
   firstName: string;
   lastName: string;
-  phone: number;
+  phone: string;
   email: string;
   country: string;
   city: string;
-  zipCode: number;
-  cardNumber: number;
+  zipCode: string;
+  cardNumber: string;
   expiry: string;
-  cvv: number;
+  cvv: string;
   nameOnCard: string;
   checkIn: Date | null;
   checkOut: Date | null;
@@ -24,14 +24,14 @@ export interface ReservationState {
 const initialState: ReservationState = {
   firstName: "",
   lastName: "",
-  phone: 0,
+  phone: "",
   email: "",
   country: "",
   city: "",
-  zipCode: 0,
-  cardNumber: 0,
+  zipCode: "",
+  cardNumber: "",
   expiry: "",
-  cvv: 0,
+  cvv: "",
   nameOnCard: "",
   checkIn: null,
   checkOut: null,

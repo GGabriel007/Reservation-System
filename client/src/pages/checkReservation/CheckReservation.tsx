@@ -29,7 +29,7 @@ export default function CheckReservation() {
       }).unwrap(); // .unwrap() allows us to catch errors in the try/catch block
 
       // Success: Navigate and pass data
-      navigate("/foundreservation", {
+      navigate("/found-reservation", {
         state: { reservation: reservationData },
       });
     } catch (err: any) {

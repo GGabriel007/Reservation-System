@@ -33,10 +33,10 @@ export const ReservationService = {
 
     // 2. FINANCIAL CALCULATIONS
     const roomSubtotal = nights * room.basePrice;
-    
+
     // Simulate realistic hotel math
-    const tax = parseFloat((roomSubtotal * 0.12).toFixed(2)); 
-    const fees = 25.00; 
+    const tax = parseFloat((roomSubtotal * 0.12).toFixed(2));
+    const fees = 25.00;
     const totalAmount = roomSubtotal + tax + fees;
 
     // 3. GENERATE UNIQUE CONFIRMATION CODE
@@ -46,12 +46,12 @@ export const ReservationService = {
     const finalData = {
       ...data,
       hotelId: room.hotel,
-      roomPrice: roomSubtotal, 
+      roomPrice: roomSubtotal,
       tax,
       fees,
       totalAmount,
       confirmationCode,
-      status: "confirmed" 
+      status: "confirmed"
     };
 
     return await ReservationRepository.create(finalData);
@@ -68,21 +68,28 @@ export const ReservationService = {
       throw new Error("No reservation found with that confirmation code.");
     }
 
-    let matches = false;
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanLastName = lastName.trim().toLowerCase();
 
-    if (reservation.userId) {
-        // Path A: Registered User (Check related user model)
-        const user = reservation.userId;
-        matches = user.email.toLowerCase() === email.toLowerCase() && 
-                  user.lastName.toLowerCase() === lastName.toLowerCase();
-    } else {
-        // Path B: Anonymous Guest (Check fields directly on reservation)
-        matches = reservation.guestEmail.toLowerCase() === email.toLowerCase() && 
-                  reservation.guestLastName.toLowerCase() === lastName.toLowerCase();
+    // MATCHING STRATEGY: 
+    // We allow "Cross-Matching". If the provided Email matches (Guest OR User Record) 
+    // AND the provided LastName matches (Guest OR User Record), we consider it a match.
+    // This is more user-friendly if they logged in but used a different email/name during checkout.
+
+    const emailMatches =
+      (reservation.guestEmail?.trim().toLowerCase() === cleanEmail) ||
+      (reservation.userId?.email?.trim().toLowerCase() === cleanEmail);
+
+    const lastNameMatches =
+      (reservation.guestLastName?.trim().toLowerCase() === cleanLastName) ||
+      (reservation.userId?.lastName?.trim().toLowerCase() === cleanLastName);
+
+    if (reservation.status === "cancelled") {
+      throw new Error("This reservation has been cancelled and is no longer available for lookup.");
     }
 
-    if (!matches) {
-        throw new Error("The details provided do not match our records.");
+    if (!emailMatches || !lastNameMatches) {
+      throw new Error("The details provided do not match our records.");
     }
 
     return reservation;
@@ -106,7 +113,7 @@ export const ReservationService = {
       const ownerId = reservation.userId?._id?.toString() || reservation.userId?.toString();
 
       if (ownerId !== userId) {
-         throw new Error("You do not have permission to cancel this booking");
+        throw new Error("You do not have permission to cancel this booking");
       }
     }
 
@@ -119,7 +126,7 @@ export const ReservationService = {
    */
   cancelReservationByGuest: async (id, confirmationCode, email) => {
     const reservation = await ReservationRepository.findById(id);
-    
+
     if (!reservation) throw new Error("Reservation not found");
 
     // Safety check: ensure the code matches
@@ -130,9 +137,9 @@ export const ReservationService = {
     // Additional check: Ensure email matches (for security)
     const storedEmail = reservation.guestEmail || reservation.userId?.email;
     if (storedEmail && storedEmail.toLowerCase() !== email.toLowerCase()) {
-        throw new Error("Email address does not match reservation records.");
+      throw new Error("Email address does not match reservation records.");
     }
-    
+
     return await ReservationRepository.updateStatus(id, "cancelled");
   },
 

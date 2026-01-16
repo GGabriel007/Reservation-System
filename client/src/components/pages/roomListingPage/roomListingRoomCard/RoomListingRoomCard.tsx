@@ -4,21 +4,10 @@ import { setRoom } from "@/redux/features/user/userSlice";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { selectPreference } from "@/redux/features/preference/preferenceSlice";
+import type { Room } from "@/redux/types/Room";
 
-interface Room {
-  room: {
-    _id: string;
-    hotelId: string;
-    roomName: string;
-    description: string;
-    roomType: string;
-    basePrice: number;
-    maxOccupancy: number;
-    amenities: string[];
-    availabilityStatus: string;
-    images: string[];
-    hotel: string;
-  };
+interface RoomListingRoomCardProps {
+  room: Room;
 }
 
 /**
@@ -26,7 +15,7 @@ interface Room {
  * @param room: Room interface
  * @returns RoomCard component
  */
-export default function RoomListingRoomCard({ room }: Room) {
+export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const preference = useAppSelector(selectPreference);
@@ -39,6 +28,7 @@ export default function RoomListingRoomCard({ room }: Room) {
         roomName: room.roomName,
         basePrice: room.basePrice,
         image: room.images[0],
+        roomType: room.roomType,
       })
     );
     console.log(room.images[0]);
@@ -72,7 +62,14 @@ export default function RoomListingRoomCard({ room }: Room) {
   return (
     <>
       <article className={styles.roomCard}>
-        <img src={room.images[0]} />
+        <img
+          src={
+            room.images.length > 0
+              ? `${import.meta.env.PROD ? "http://liore.us-east-1.elasticbeanstalk.com" : "http://localhost:8080"}/uploads/${room.images[0]}`
+              : "/placeholder.png"
+          }
+          alt={room.roomName}
+        />
         <div className={styles.roomAmenities}>
           <ul>
             {room.amenities.map((amenity) => {
@@ -90,6 +87,11 @@ export default function RoomListingRoomCard({ room }: Room) {
         <div className={styles.roomamenities}>
           <h3>{room.roomName}</h3>
           <p>{room.description}</p>
+          <div style={{ marginTop: "0.5rem", fontSize: "0.9rem", color: "#666" }}>
+            <p><strong>Type:</strong> {room.roomType}</p>
+            <p><strong>Max Occupancy:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
+            <p><strong>Status:</strong> {room.availabilityStatus}</p>
+          </div>
         </div>
         <div>
           <p className={styles.fee}>${room.basePrice} per night</p>
@@ -108,10 +110,22 @@ export default function RoomListingRoomCard({ room }: Room) {
               </picture>
             </button>
           </menu>
-          <img src={room.images[0]} />
+          <img
+            src={
+              room.images.length > 0
+                ? `${import.meta.env.PROD ? "http://liore.us-east-1.elasticbeanstalk.com" : "http://localhost:8080"}/uploads/${room.images[0]}`
+                : "/placeholder.png"
+            }
+            alt={room.roomName}
+          />
           <div className={styles.modalDetails}>
             <h2>{room.roomName}</h2>
             <p>{room.description}</p>
+            <div style={{ margin: "1rem 0" }}>
+              <p><strong>Type:</strong> {room.roomType}</p>
+              <p><strong>Max Occupancy:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
+              <p><strong>Status:</strong> {room.availabilityStatus}</p>
+            </div>
             <h3>Room Features Include:</h3>
             <ul>
               {room.amenities.map((amenity) => {

@@ -54,7 +54,7 @@ export default function PreferenceBar() {
       <div className={styles["inner-grid"]}>
         <div className={styles.preference}>
           <h4>Destination</h4>
-          <p>San Diego</p>
+          <p>USA</p>
         </div>
         <div>
           <label className={styles.datePicker}>

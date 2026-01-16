@@ -4,6 +4,8 @@ import {
   useGetRoomsQuery,
   useGetRoomsAmenitiesQuery,
 } from "@/redux/features/api/apiSlice";
+import { useAppSelector } from "@/redux/store";
+import { selectPreference } from "@/redux/features/preference/preferenceSlice";
 import {
   RoomListingRoomCard,
   RoomListingCarousel,
@@ -30,11 +32,14 @@ export default function RoomListing() {
     return () => clearTimeout(handler);
   }, [search]);
 
+  const { adults } = useAppSelector(selectPreference);
+
   const { data: rooms } = useGetRoomsQuery({
     option: sortedOption,
     method: sortedMethod,
     search: debouncedSearch || undefined,
     filters: filters || undefined,
+    capacity: adults,
   });
   return (
     <main className={styles.bookRoomPage}>

@@ -11,14 +11,15 @@ export const RoomController = {
   // GET ALL ROOMS
   getAllRooms: async (req, res) => {
     try {
-      const { name, price, search, ...filters } = req.query;
+      const { name, price, search, capacity, ...filters } = req.query;
       let rooms;
       if (name) {
-        rooms = await RoomService.getAllRoomsSorted(name, "name", search, Object.keys(filters));
+        rooms = await RoomService.getAllRoomsSorted(name, "name", search, Object.keys(filters), capacity);
       } else if (price) {
-        rooms = await RoomService.getAllRoomsSorted(price, "price", search, Object.keys(filters));
+        rooms = await RoomService.getAllRoomsSorted(price, "price", search, Object.keys(filters), capacity);
       } else {
-        rooms = await RoomService.getAllRooms();
+        // Even if default sort, apply capacity filter if present
+        rooms = await RoomService.getAllRoomsSorted(null, null, search, Object.keys(filters), capacity);
       }
       res.status(200).json(rooms);
     } catch (error) {
@@ -116,7 +117,7 @@ export const RoomController = {
       }
 
       // 4. HANDLE IMAGES (Merge New + Existing)
-      
+
       // A. Get new uploads
       let newImages = [];
       if (req.files && req.files.length > 0) {

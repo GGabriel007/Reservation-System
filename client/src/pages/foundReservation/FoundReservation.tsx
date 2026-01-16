@@ -9,7 +9,7 @@ import ConfirmDeleteToast from "@/components/global/toast/confirmationDeleteToas
 export default function FoundReservation() {
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // 1. State for the custom confirmation modal
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
 
@@ -33,11 +33,11 @@ export default function FoundReservation() {
 
   // UPDATED LOGIC: Use the new guestFirstName field if available
   const guestDisplay =
-    reservation.userId && typeof reservation.userId === "object"
-      ? `${reservation.userId.firstName} ${reservation.userId.lastName}`
-      : `${reservation.guestFirstName || ""} ${
-          reservation.guestLastName || ""
-        }`.trim();
+    (reservation.guestFirstName || reservation.guestLastName)
+      ? `${reservation.guestFirstName || ""} ${reservation.guestLastName || ""}`.trim()
+      : (reservation.userId && typeof reservation.userId === "object"
+        ? `${reservation.userId.firstName} ${reservation.userId.lastName}`
+        : "Guest");
 
   const checkInDate = new Date(reservation.checkIn);
   const checkOutDate = new Date(reservation.checkOut);
@@ -45,7 +45,7 @@ export default function FoundReservation() {
     1,
     Math.ceil(
       Math.abs(checkOutDate.getTime() - checkInDate.getTime()) /
-        (1000 * 60 * 60 * 24)
+      (1000 * 60 * 60 * 24)
     )
   );
 
@@ -66,7 +66,7 @@ export default function FoundReservation() {
             ? reservation.userId?.email
             : ""),
       }).unwrap();
-      
+
       toast.success("Reservation cancelled successfully");
       setIsCancelModalOpen(false); // Close modal
       navigate("/");
@@ -90,7 +90,14 @@ export default function FoundReservation() {
         <div className={styles.topInfoGrid}>
           <div className={styles.outlineBox}>
             <span className={styles.iconLabel}>⚲ Destination</span>
-            <p>{reservation.hotelId?.location || "No location found"}</p>
+            <p>
+              {reservation.hotelId?.name || "Hotel Name"} <br />
+              <span style={{ fontSize: '0.9em', color: '#666' }}>
+                {reservation.hotelId?.address
+                  ? `${reservation.hotelId.address.city}, ${reservation.hotelId.address.country}`
+                  : reservation.hotelId?.location || "No location found"}
+              </span>
+            </p>
           </div>
           <div className={styles.outlineBox}>
             <span className={styles.iconLabel}>🗒 Check In/Check out</span>
@@ -105,7 +112,7 @@ export default function FoundReservation() {
           <section className={styles.roomSection}>
             <div className={styles.roomHeader}>Room</div>
             <div className={styles.roomBody}>
-              <h3>{reservation.hotelId?.name || "Fairmont Resort"}</h3>
+              <h3>{reservation.roomId?.roomName || "Luxury Room"}</h3>
               <ul className={styles.detailsList}>
                 <li>
                   <span>Adults</span> <strong>{reservation.adults || 1}</strong>
@@ -132,7 +139,7 @@ export default function FoundReservation() {
             <div className={styles.priceSummaryBox}>
               <div className={styles.priceItem}>
                 <strong>Room:</strong>
-                <span>{reservation.roomId?.type || "Standard Room"}</span>
+                <span>{reservation.roomId?.roomType || "Standard Room"}</span>
               </div>
               <div className={styles.priceItem}>
                 <strong>Price:</strong>
@@ -140,7 +147,7 @@ export default function FoundReservation() {
               </div>
               <div className={styles.priceDetailsText}>
                 <p>{nights} {nights === 1 ? 'Night' : 'Nights'} stay</p>
-                <p>Taxes and fees: ${(reservation.tax || 0) + (reservation.fees || 0)}</p>
+                <p>Taxes and fees: ${(Number(reservation.tax) || 0) + (Number(reservation.fees) || 0)}</p>
               </div>
             </div>
 
@@ -164,11 +171,11 @@ export default function FoundReservation() {
         </div>
 
         <div className={styles.footerdivActions}>
-          <Link to="/check-reservation" className={styles.backLink}><span>&larr;</span> Back</Link>
-          
+          <Link to="/" className={styles.backLink}><span>&larr;</span> Back</Link>
+
           {/* 4. Update Button to trigger Modal */}
-          <button 
-            onClick={handleCancelClick} 
+          <button
+            onClick={handleCancelClick}
             className={styles.cancelBtn}
             disabled={isLoading}
           >

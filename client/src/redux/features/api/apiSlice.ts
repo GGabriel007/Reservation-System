@@ -37,12 +37,15 @@ export const apiSlice = createApi({
     }),
     getRooms: builder.query<
       Room[],
-      { option: string; method: string; search?: string; filters?: string[] }
+      { option: string; method: string; search?: string; filters?: string[]; capacity?: number }
     >({
-      query: ({ option, method, search, filters }) => {
+      query: ({ option, method, search, filters, capacity }) => {
         let finalURL = `/rooms?${option}=${method}`;
         if (search && search.trim() !== "") {
           finalURL += `&search=${search.trim()}`;
+        }
+        if (capacity && capacity > 0) {
+          finalURL += `&capacity=${capacity}`;
         }
         if (Array.isArray(filters) && filters.length > 0) {
           for (let filter of filters) {

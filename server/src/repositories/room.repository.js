@@ -18,7 +18,7 @@ export const RoomRepository = {
   /**
    * Get all active rooms
    */
-  findAllSorted: async (sorted, option, search, filters) => {
+  findAllSorted: async (sorted, option, search, filters, capacity) => {
     const sortOrder = sorted?.toLowerCase() === "desc" ? -1 : 1;
     const sortField = option === "name" ? "roomName" : "basePrice";
 
@@ -30,6 +30,10 @@ export const RoomRepository = {
 
     if (Array.isArray(filters) && filters.length > 0) {
       query.amenities = { $all: filters };
+    }
+
+    if (capacity) {
+      query.maxOccupancy = { $gte: Number(capacity) };
     }
 
     const rooms = await Room.find(query)

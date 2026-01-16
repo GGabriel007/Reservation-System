@@ -63,9 +63,9 @@ export const ReservationRepository = {
 
   findByCodeWithUser: async (code) => {
     // This finds the reservation and "joins" the User document
-    return await Reservation.findOne({ 
+    return await Reservation.findOne({
       confirmationCode: code.toUpperCase(),
-      isDeleted: { $ne: true } 
+      isDeleted: { $ne: true }
     }).populate("userId");
   },
 
@@ -74,13 +74,13 @@ export const ReservationRepository = {
    * This handles the core requirement: Guest lookup without a userId.
    */
   findForGuestLookup: (code) => {
-    return Reservation.findOne({ 
+    return Reservation.findOne({
       confirmationCode: code.toUpperCase(),
-      isDeleted: { $ne: true } 
+      isDeleted: { $ne: true }
     })
-    .populate("userId", "name email lastName") // If it's a member
-    .populate("roomId", "roomName")
-    .populate("hotelId", "name");
+      .populate("userId", "firstName lastName email") // If it's a member
+      .populate("roomId", "roomName roomType")
+      .populate("hotelId", "name address");
   },
 
   /**

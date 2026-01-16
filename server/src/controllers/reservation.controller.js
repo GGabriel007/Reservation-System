@@ -10,7 +10,7 @@ export const ReservationController = {
   createReservation: async (req, res) => {
     try {
       const {
-        firstName, lastName, email, phone, // Box 1: Guest Info
+        guestFirstName, guestLastName, guestEmail, guestPhone, // Box 1: Guest Info
         country, city, zipCode,           // Box 1: Address
         nameOnCard, cardNumber,           // Box 1: Payment
         newsletter,                       // Box 3: Acknowledgment
@@ -18,13 +18,15 @@ export const ReservationController = {
         roomPrice, tax, fees, totalAmount
       } = req.body;
 
+      console.log("Creating reservation for:", guestFirstName, guestLastName);
+
       const reservationData = {
         // 1. Identity
         userId: req.user ? req.user.id : null,
-        guestFirstName: firstName,
-        guestLastName: lastName,
-        guestEmail: email,
-        guestPhone: phone,
+        guestFirstName,
+        guestLastName,
+        guestEmail,
+        guestPhone,
 
         // 2. Structured Address
         guestAddress: {
@@ -53,11 +55,14 @@ export const ReservationController = {
 
         // 6. Preferences
         newsletterSubscription: newsletter === true || newsletter === 'true',
-        
-        // Pass the rest (adults, children, etc.)
-        ...req.body
+
+        // 7. Guests & Options
+        adults: req.body.adults || 1,
+        children: req.body.children || 0,
+        bedPreference: req.body.bedPreference || "Standard",
+        specialRequests: req.body.specialRequests || "None"
       };
-      
+
       const newReservation = await ReservationService.createReservation(reservationData);
       res.status(201).json(newReservation);
     } catch (error) {
@@ -79,27 +84,27 @@ export const ReservationController = {
   },
 
   getHotelReservations: async (req, res) => {
-  try {
-    const { hotelId } = req.params; // Or get from req.user.assignedHotel
-    
-    // Find all reservations for this hotel
-    // We populate 'user' to get guest name and 'room' to get room number
-    const reservations = await Reservation.find({ hotel: hotelId })
-      .populate("user", "firstName lastName email")
-      .populate("room", "roomName roomType")
-      .sort({ checkInDate: -1 }); // Newest first
+    try {
+      const { hotelId } = req.params; // Or get from req.user.assignedHotel
 
-    res.status(200).json(reservations);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching reservations", error: err.message });
-  }
-},
+      // Find all reservations for this hotel
+      // We populate 'user' to get guest name and 'room' to get room number
+      const reservations = await Reservation.find({ hotelId: hotelId })
+        .populate("userId", "firstName lastName email")
+        .populate("room", "roomName roomType")
+        .sort({ checkInDate: -1 }); // Newest first
+
+      res.status(200).json(reservations);
+    } catch (err) {
+      res.status(500).json({ message: "Error fetching reservations", error: err.message });
+    }
+  },
 
   // GET RESERVATION BY ID
   getReservationById: async (req, res) => {
     try {
       const reservation = await ReservationService.getReservationById(req.params.id);
-      
+
       // Basic security check: Only the owner or staff can see details
       // Updated to check guestEmail for non-logged-in users
       const isOwner = req.user && (reservation.userId?.toString() === req.user.id || reservation.guestEmail === req.user.email);
@@ -184,11 +189,11 @@ export const ReservationController = {
       }
 
       const reservation = await ReservationService.lookupReservation(
-        confirmationCode.toUpperCase(), 
-        lastName, 
+        confirmationCode.toUpperCase(),
+        lastName,
         email.toLowerCase()
       );
-      
+
       res.status(200).json(reservation);
     } catch (error) {
       const status = error.message.includes("not match") ? 401 : 404;

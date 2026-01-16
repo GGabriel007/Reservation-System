@@ -17,12 +17,13 @@ export const RoomService = {
    * Fetches all active rooms across all rooms that's sorted
    * also provide search capabilities
    */
-  getAllRoomsSorted: async (sorted, option, search, filters) => {
+  getAllRoomsSorted: async (sorted, option, search, filters, capacity) => {
     const rooms = await RoomRepository.findAllSorted(
       sorted,
       option,
       search,
-      filters
+      filters,
+      capacity
     );
     return rooms;
   },
