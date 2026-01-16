@@ -5,6 +5,7 @@ import { selectReservation } from "@/redux/features/reservation/reservationSlice
 import { setReservation } from "@/redux/features/reservation/reservationSlice";
 import { selectRoom } from "@/redux/features/user/userSlice";
 import { selectPreference } from "@/redux/features/preference/preferenceSlice";
+import { usePostRerservationMutation } from "@/redux/features/api/apiSlice";
 import styles from "./styles.module.css";
 import toast from "react-hot-toast";
 import Breadcrumbs from "@/components/global/breadcumbs/Breadcumbs";
@@ -50,56 +51,70 @@ export default function Checkout() {
     dispatch(setReservation({ [name]: val }));
   };
 
-  const handleConfirmBooking = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // 1. Validation check for required checkboxes
-    if (!agreedToPolicies || !agreedToPrivacy) {
-      return toast.error("Please agree to the policies and privacy terms.");
+  const validateForm = () => {
+    let newErrors = {};
+    if (!reservation.firstName) {
+      (
+        document.querySelector('input[name="firstName"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("First Name is required");
     }
+    if (!reservation.lastName) {
+      (
+        document.querySelector('input[name="firstName"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("Last Name is required");
+    }
+    if (!reservation.phone) {
+      (
+        document.querySelector('input[name="phone"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("Phone Number is required");
+    }
+    if (!reservation.email) {
+      (
+        document.querySelector('input[name="email"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("Email is required");
+    }
+    if (!reservation.email.includes("@")) {
+      (
+        document.querySelector('input[name="email"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("Email is invalid");
+    }
+    if (!reservation.city) {
+      (
+        document.querySelector('input[name="city"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("City is required");
+    }
+    if (!reservation.zipCode) {
+      (
+        document.querySelector('input[name="zipCode"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("Zip Code is required");
+    }
+    if (
+      !reservation.cardNumber ||
+      !reservation.expiry ||
+      !reservation.cvv ||
+      !reservation.nameOnCard
+    ) {
+      (
+        document.querySelector('input[name="cardNumber"]') as HTMLInputElement
+      )?.focus();
+      return toast.error("Card Information is required");
+    }
+    return Object.keys(newErrors).length === 0; // Return true if no errors
+  };
 
-    // 2. Start booking process
-    const loadingToast = toast.loading("Processing your reservation...");
-
-    try {
-      const response = await fetch("http://localhost:8080/reservations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // Spread all form fields (firstName, lastName, phone, email, address, etc.)
-          ...reservation,
-
-          // Technical identifiers
-          roomId: room.roomId,
-          hotelId: "6961b840d52cfab927969b75",
-
-          // These should eventually come from location.state or context
-          checkIn: preference.startDate,
-          checkOut: preference.endDate,
-
-          // Financials: We send these, but the Service will verify the math on the backend
-          roomPrice: room?.basePrice || 0,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (response.ok) {
-        toast.dismiss(loadingToast);
-        toast.success("Booking Confirmed!");
-
-        // Navigate to the success page with the full reservation data
-        navigate("/foundreservation", { state: { reservation: result } });
-      } else {
-        toast.dismiss(loadingToast);
-        toast.error(
-          result.message || "Booking failed. Please check your details."
-        );
-      }
-    } catch (err) {
-      toast.dismiss(loadingToast);
-      console.error("Checkout error:", err);
-      toast.error("A network error occurred. Please try again.");
+  const handleConfirmBooking = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (validateForm()) {
+      const data = usePostRerservationMutation({});
+      toast.success("Booking Confirmed!");
+      navigate("/booking/confirmation");
     }
   };
 
@@ -120,11 +135,15 @@ export default function Checkout() {
             </NavLink>
           </div>
           <div className={styles.headerImage}>
-            <img src={room.image} alt={room.roomName} />
+            <img src={room.image || "/burmont-suit.jpg"} alt={room.roomName} />
           </div>
         </section>
 
-        <form onSubmit={handleConfirmBooking} className={styles.mainGrid}>
+        <form
+          onSubmit={handleConfirmBooking}
+          className={styles.mainGrid}
+          id="confirmBookingForm"
+        >
           {/* LEFT COLUMN */}
           <div className={styles.formColumn}>
             {/* BOX 1: GUEST INFORMATION */}
@@ -139,7 +158,6 @@ export default function Checkout() {
                   type="text"
                   name="firstName"
                   placeholder="First name *"
-                  required
                   value={reservation.firstName || ""}
                   onChange={handleChange}
                 />
@@ -147,7 +165,6 @@ export default function Checkout() {
                   type="text"
                   name="lastName"
                   placeholder="Last name *"
-                  required
                   value={reservation.lastName || ""}
                   onChange={handleChange}
                 />
@@ -157,7 +174,6 @@ export default function Checkout() {
                   type="tel"
                   name="phone"
                   placeholder="Phone Number *"
-                  required
                   value={reservation.phone || ""}
                   onChange={handleChange}
                 />
@@ -165,7 +181,6 @@ export default function Checkout() {
                   type="email"
                   name="email"
                   placeholder="Email Address *"
-                  required
                   value={reservation.email || ""}
                   onChange={handleChange}
                 />
@@ -178,7 +193,7 @@ export default function Checkout() {
                 value={reservation.country || ""}
                 onChange={handleChange}
               >
-                <option value="USA">Country</option>
+                <option value="USA">United States</option>
                 <option value="CAN">Canada</option>
               </select>
               <div className={styles.inputRow}>
@@ -186,7 +201,6 @@ export default function Checkout() {
                   type="text"
                   name="city"
                   placeholder="City *"
-                  required
                   value={reservation.city || ""}
                   onChange={handleChange}
                 />
@@ -194,12 +208,10 @@ export default function Checkout() {
                   type="text"
                   name="zipCode"
                   placeholder="Zip Code *"
-                  required
                   value={reservation.zipCode || ""}
                   onChange={handleChange}
                 />
               </div>
-
               <h3 className={styles.subSectionTitle}>Payment</h3>
               <p className={styles.secureNote}>
                 We use secure transmission and encrypted storage to protect your
@@ -210,7 +222,6 @@ export default function Checkout() {
                 name="cardNumber"
                 placeholder="Card Number *"
                 className={styles.fullWidthInput}
-                required
                 value={reservation.cardNumber || ""}
                 onChange={handleChange}
               />
@@ -219,7 +230,6 @@ export default function Checkout() {
                   type="text"
                   name="expiry"
                   placeholder="Expiration Date (MM/YY) *"
-                  required
                   value={reservation.expiry || ""}
                   onChange={handleChange}
                 />
@@ -227,7 +237,6 @@ export default function Checkout() {
                   type="text"
                   name="cvv"
                   placeholder="CVV *"
-                  required
                   value={reservation.cvv || ""}
                   onChange={handleChange}
                 />
@@ -237,7 +246,6 @@ export default function Checkout() {
                 name="nameOnCard"
                 placeholder="Name on Card *"
                 className={styles.fullWidthInput}
-                required
                 value={reservation.nameOnCard || ""}
                 onChange={handleChange}
               />
@@ -293,7 +301,6 @@ export default function Checkout() {
                     type="checkbox"
                     name="agreedToPrivacy"
                     className={styles.customCheckbox}
-                    required
                     checked={agreedToPrivacy}
                     onChange={() => {
                       setAgreedToPrivacy((prev) => !prev);
@@ -313,7 +320,6 @@ export default function Checkout() {
                     type="checkbox"
                     name="agreedToPolicies"
                     className={styles.customCheckbox}
-                    required
                     checked={agreedToPolicies}
                     onChange={() => {
                       setAgreedToPolicies((prev) => !prev);
@@ -407,8 +413,8 @@ export default function Checkout() {
           </Link>
           <button
             type="submit"
-            onClick={handleConfirmBooking}
             className="btn-primary btn-medium"
+            form="confirmBookingForm"
           >
             Confirm Booking
           </button>

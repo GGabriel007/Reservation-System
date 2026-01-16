@@ -81,6 +81,15 @@ export const apiSlice = createApi({
       }),
       invalidatesTags: ["Reservation"],
     }),
+
+    postRerservation: builder.mutation<any, any>({
+      query: (reservation) => ({
+        url: "/reservations",
+        method: "POST",
+        body: reservation,
+      }),
+      invalidatesTags: ["Reservation"],
+    }),
   }),
 });
 
@@ -91,5 +100,6 @@ export const {
   useGetUsersQuery,
   useCreateUserMutation,
   useLazyLookupReservationQuery,
+  usePostRerservationMutation,
   useCancelReservationMutation,
 } = apiSlice;

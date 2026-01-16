@@ -8,6 +8,7 @@ import { selectPreference } from "@/redux/features/preference/preferenceSlice";
 interface Room {
   room: {
     _id: string;
+    hotelId: string;
     roomName: string;
     description: string;
     roomType: string;
@@ -34,6 +35,7 @@ export default function RoomListingRoomCard({ room }: Room) {
     dispatch(
       setRoom({
         _id: room._id,
+        hotelId: room.hotel,
         roomName: room.roomName,
         basePrice: room.basePrice,
         image: room.images[0],

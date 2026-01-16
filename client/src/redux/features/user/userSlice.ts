@@ -1,14 +1,15 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
 import type { RootState } from "@/redux/store";
-import type { User } from "@/redux/types/User"; 
+import type { User } from "@/redux/types/User";
 
 export interface UserState {
   // Existing room selection state
   roomId: string;
+  hotelId: string;
   roomName: string;
   basePrice: string;
   image: string;
-  
+
   // NEW: Logged in user information
   userInfo: User | null;
   isAuthenticated: boolean;
@@ -16,6 +17,7 @@ export interface UserState {
 
 const initialState: UserState = {
   roomId: "",
+  hotelId: "",
   roomName: "",
   basePrice: "",
   image: "",
@@ -30,6 +32,7 @@ export const userSlice = createSlice({
     // Existing reducer
     setRoom: (state, action) => {
       state.roomId = action.payload._id;
+      state.hotelId = action.payload.hotelId;
       state.roomName = action.payload.roomName;
       state.basePrice = action.payload.basePrice;
       state.image = action.payload.image;
@@ -43,7 +46,7 @@ export const userSlice = createSlice({
     clearUser: (state) => {
       state.userInfo = null;
       state.isAuthenticated = false;
-    }
+    },
   },
 });
 

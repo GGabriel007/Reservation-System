@@ -35,6 +35,10 @@
   margin-bottom: 2rem;
 }
 
+.borderedBox .inputError {
+  border: 2px solid red;
+}
+
 .boxHeader {
   display: flex;
   justify-content: space-between;
@@ -65,9 +69,49 @@
 .borderedBox select {
   border: none;
   border-bottom: 1px solid #000;
-  padding: 0.8rem 0;
+  padding: 0.8rem;
   font-size: 1rem;
   outline: none;
+}
+
+.borderedBox select {
+  &,
+  &::picker(select) {
+    appearance: base-select;
+  }
+
+  border-radius: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+
+  cursor: pointer;
+}
+
+.borderedBox select::picker-icon {
+  content: url("/arrow-down.png");
+  position: relative;
+  bottom: -3px;
+}
+
+.borderedBox option {
+  height: 50px;
+}
+
+.borderedBox option::checkmark {
+  display: none;
+}
+
+.borderedBox input:hover,
+.borderedBox select:hover,
+.borderedBox option:hover {
+  background-color: var(--beige);
+}
+
+.borderedBox input:focus,
+.borderedBox select:focus {
+  outline: 3px solid var(--dark-beige);
+  border: none;
 }
 
 .fullWidthInput {

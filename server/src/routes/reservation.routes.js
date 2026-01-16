@@ -5,17 +5,23 @@ import { authorize } from "../middleware/roleMiddleware.js";
 
 const router = Router();
 
-//  PUBLIC ROUTES  
+//  PUBLIC ROUTES
+
+// Create a new reservation (Guest or User)
+router.post("/", (req, res) => {
+  console.log("in post");
+  res.send("");
+});
+
 // Anyone can look up a reservation with a confirmation code
 router.get("/lookup", ReservationController.getReservationByLookup);
 
 // Cancel a reservation
 router.patch("/:id/cancel", ReservationController.cancelReservation);
 
-// THE SECURITY GATE 
+// THE SECURITY GATE
 // Everything below this line requires a valid login session
-router.use(protect); 
-
+router.use(protect);
 
 // STATIC ROUTES (Must come BEFORE dynamic /:id routes) ---
 
@@ -23,10 +29,13 @@ router.use(protect);
 router.get("/my-bookings", ReservationController.getMyReservations);
 
 // Admin: View every single reservation in the system
-router.get("/all", authorize('admin', 'manager'), ReservationController.getAllReservations);
+router.get(
+  "/all",
+  authorize("admin", "manager"),
+  ReservationController.getAllReservations
+);
 
-
-// DYNAMIC ROUTES (Using Parameters) 
+// DYNAMIC ROUTES (Using Parameters)
 
 // Get specific reservation details
 // Note: ReservationController.getReservationById should handle the logic
@@ -34,15 +43,15 @@ router.get("/:id", ReservationController.getReservationById);
 
 // Manager/Admin: View all reservations for a specific hotel location
 router.get(
-  "/hotel/:hotelId", 
-  authorize("admin", "manager"), 
+  "/hotel/:hotelId",
+  authorize("admin", "manager"),
   ReservationController.getReservationsByHotel
 );
 
 // Manager/Admin: Manually update booking status
 router.patch(
-  "/:id/status", 
-  authorize("admin", "manager"), 
+  "/:id/status",
+  authorize("admin", "manager"),
   ReservationController.updateStatus
 );
 
