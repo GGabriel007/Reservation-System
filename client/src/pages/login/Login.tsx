@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useLocation, Link } from "react-router-dom";
 import styles from "./styles.module.css";
+import toast from "react-hot-toast";
+import { useAppDispatch } from "@/redux/store";
+import { setUser } from "@/redux/features/user/userSlice";
 
 /**
  * Login Page Component
@@ -16,9 +19,20 @@ export default function Login() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useAppDispatch();
+  const hasShownToast = useRef(false);
 
   // Check if user was redirected here after a successful signup
   const signupSuccess = location.state?.signupSuccess;
+
+  useEffect(() => {
+    if (signupSuccess && !hasShownToast.current) {
+      hasShownToast.current = true;
+      toast.success("Account created successfully! Please log in.");
+      // Clear location state to prevent toast on refresh
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [signupSuccess, navigate, location.pathname]);
 
   // Environment-based API selection
   const baseUrl: string = import.meta.env.DEV
@@ -43,6 +57,19 @@ export default function Login() {
       });
 
       if (response.ok) {
+        // Fetch full user data to populate Redux
+        const statusRes = await fetch(`${baseUrl}/auth/status`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (statusRes.ok) {
+          const statusData = await statusRes.json();
+          if (statusData.user) {
+            dispatch(setUser(statusData.user));
+          }
+        }
+
         navigate("/user");
       } else {
         const errorData = await response
@@ -66,8 +93,6 @@ export default function Login() {
           Log In<span>* required</span>
         </h2>
         <div className="layout-grid">
-          {/* Success message from Signup page redirect */}
-          {signupSuccess && <p>Account created successfully! Please log in.</p>}
           {errorMessage && <p>{errorMessage}</p>}
           <form onSubmit={handleSubmit}>
             <label className={styles.flex}>
@@ -96,11 +121,10 @@ export default function Login() {
               type="submit"
               disabled={isSubmitting}
               className={`btn-primary btn-medium
-              ${
-                isSubmitting
+              ${isSubmitting
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 shadow-md"
-              }`}
+                }`}
             >
               {isSubmitting ? "Logging in..." : "Login with Email"}
             </button>

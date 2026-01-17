@@ -24,6 +24,21 @@ export const ReservationRepository = {
   },
 
   /**
+   * Get reservations by Email OR User ID
+   * Essential for consolidated dashboard view.
+   */
+  findByEmailOrUserId: (email, userId) => {
+    return Reservation.find({
+      $or: [
+        { userId: userId },
+        { guestEmail: email.toLowerCase() }
+      ]
+    })
+      .populate("roomId", "roomName roomType images")
+      .populate("hotelId", "name address");
+  },
+
+  /**
    * Get reservation by ID
    * Note: We use the MongoDB _id for consistency.
    */
@@ -79,7 +94,7 @@ export const ReservationRepository = {
       isDeleted: { $ne: true }
     })
       .populate("userId", "firstName lastName email") // If it's a member
-      .populate("roomId", "roomName roomType")
+      .populate("roomId", "roomName roomType images")
       .populate("hotelId", "name address");
   },
 

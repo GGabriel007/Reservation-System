@@ -50,11 +50,12 @@ export const preferenceSlice = createSlice({
     setReservation: (state, action) => {
       return { ...state, ...action.payload };
     },
+    resetReservation: () => initialState,
   },
 });
 
 // Export the generated action creators for use in components
-export const { setReservation } = preferenceSlice.actions;
+export const { setReservation, resetReservation } = preferenceSlice.actions;
 
 // preference state defined in store.ts
 export const selectReservation = (state: RootState) => state.reservation;

@@ -89,7 +89,7 @@ export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) 
           <p>{room.description}</p>
           <div style={{ marginTop: "0.5rem", fontSize: "0.9rem", color: "#666" }}>
             <p><strong>Type:</strong> {room.roomType}</p>
-            <p><strong>Max Occupancy:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
+            <p><strong>Guests:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
             <p><strong>Status:</strong> {room.availabilityStatus}</p>
           </div>
         </div>
@@ -123,7 +123,7 @@ export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) 
             <p>{room.description}</p>
             <div style={{ margin: "1rem 0" }}>
               <p><strong>Type:</strong> {room.roomType}</p>
-              <p><strong>Max Occupancy:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
+              <p><strong>Guests:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
               <p><strong>Status:</strong> {room.availabilityStatus}</p>
             </div>
             <h3>Room Features Include:</h3>

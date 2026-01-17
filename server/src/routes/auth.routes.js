@@ -1,9 +1,9 @@
 import { Router } from "express";
 import passport from "passport";
 import bcrypt from "bcrypt";
-import { User } from "../models/user.model.js"; 
-import localAuth from "../auth/passport-middleware/localAuth.js"; 
-import { protect } from "../middleware/authMiddleware.js"; 
+import { User } from "../models/user.model.js";
+import localAuth from "../auth/passport-middleware/localAuth.js";
+import { protect } from "../middleware/authMiddleware.js";
 
 const router = Router();
 
@@ -13,7 +13,7 @@ const router = Router();
  */
 router.post("/register", async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { username, password, firstName, lastName, phoneNumber } = req.body;
 
     // Check if user already exists to avoid duplicates
     const existingUser = await User.findOne({ email: username });
@@ -28,6 +28,9 @@ router.post("/register", async (req, res) => {
     const newUser = await User.create({
       email: username,
       password: hashedPassword,
+      firstName,
+      lastName,
+      phoneNumber,
       loginMethod: "local",
       role: "guest"
     });
@@ -52,18 +55,18 @@ router.post("/local/login", localAuth, (req, res) => {
     }
 
     console.log("Session saved to DB. Sending response to frontend.");
-    
+
     const userResponse = {
       _id: req.user._id,
       email: req.user.email,
       role: req.user.role || "guest",
-      firstName: req.user.firstName, 
-      assignedHotel: req.user.assignedHotel 
+      firstName: req.user.firstName,
+      assignedHotel: req.user.assignedHotel
     };
 
-    res.status(200).json({ 
-      message: "Logged in successfully", 
-      user: userResponse 
+    res.status(200).json({
+      message: "Logged in successfully",
+      user: userResponse
     });
   });
 });
@@ -81,19 +84,19 @@ router.get("/google/login", passport.authenticate("google", {
  * @route   GET /auth/google/callback
  * @desc    Google OAuth2 callback URL. Handles session persistence and redirection.
  */
-router.get("/google/callback", 
-  passport.authenticate("google", { 
+router.get("/google/callback",
+  passport.authenticate("google", {
     failureRedirect: "/login" // Relative paths are safer
   }),
   (req, res) => {
     req.session.save((err) => {
       if (err) return res.redirect("/login");
-      
+
       // Use a relative path if possible, or your S3 URL
-      const frontendUrl = process.env.NODE_ENV === "production" 
-        ? "http://liore.us-east-1.elasticbeanstalk.com" 
+      const frontendUrl = process.env.NODE_ENV === "production"
+        ? "http://liore.us-east-1.elasticbeanstalk.com"
         : "http://localhost:5173";
-        
+
       res.redirect(`${frontendUrl}/user`);
     });
   }
@@ -108,6 +111,30 @@ router.get("/need", protect, (req, res) => {
 });
 
 /**
+ * @route   GET /auth/status
+ * @desc    Check authentication status without requiring login.
+ */
+router.get("/status", (req, res) => {
+  if (req.isAuthenticated()) {
+    res.status(200).json({
+      isAuthenticated: true,
+      user: {
+        _id: req.user._id,
+        email: req.user.email,
+        role: req.user.role || "guest",
+        firstName: req.user.firstName,
+        lastName: req.user.lastName,
+        phoneNumber: req.user.phoneNumber,
+      }
+    });
+  } else {
+    res.status(200).json({
+      isAuthenticated: false
+    });
+  }
+});
+
+/**
  * @route   GET /auth/logout
  * @desc    Terminates the session and clears the client-side session cookie.
  */
@@ -117,7 +144,7 @@ router.post("/logout", (req, res, next) => {
     req.session.destroy((err) => {
       if (err) return next(err);
       // Clear the session cookie ('sid') 
-      res.clearCookie("sid"); 
+      res.clearCookie("sid");
       res.status(200).json({ message: "Logged out successfully" });
     });
   });

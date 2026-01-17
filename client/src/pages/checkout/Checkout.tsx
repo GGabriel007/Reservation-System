@@ -3,7 +3,7 @@ import { useNavigate, Link, NavLink } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/redux/store";
 import { selectReservation } from "@/redux/features/reservation/reservationSlice";
 import { setReservation } from "@/redux/features/reservation/reservationSlice";
-import { selectRoom } from "@/redux/features/user/userSlice";
+import { selectRoom, selectUserInfo } from "@/redux/features/user/userSlice";
 import { selectPreference } from "@/redux/features/preference/preferenceSlice";
 import { usePostRerservationMutation } from "@/redux/features/api/apiSlice";
 import styles from "./styles.module.css";
@@ -14,6 +14,7 @@ export default function Checkout() {
   const [postReservation] = usePostRerservationMutation();
   const reservation = useAppSelector(selectReservation);
   const room = useAppSelector(selectRoom);
+  const userInfo = useAppSelector(selectUserInfo);
   const preference = useAppSelector(selectPreference);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
@@ -41,6 +42,32 @@ export default function Checkout() {
 
     setDifference(dateDiffInDays(a, b));
   }, [preference.startDate, preference.endDate]);
+
+  /**
+   * Auto-fill Guest Information if User is Logged In
+   * This effect runs when the user object becomes available (e.g., after login or hydration).
+   */
+  useEffect(() => {
+    if (userInfo) {
+      const updates: any = {};
+
+      // Auto-fill fields only if they are currently empty
+      if (!reservation.firstName && userInfo.firstName) updates.firstName = userInfo.firstName;
+      if (!reservation.lastName && userInfo.lastName) updates.lastName = userInfo.lastName;
+      if (!reservation.email && userInfo.email) updates.email = userInfo.email;
+
+      // Handle phone number (mapping userInfo.phoneNumber to reservation.phone)
+      // @ts-ignore - phoneNumber exists in the data but might not be in the minimal TS interface
+      const userPhone = userInfo.phoneNumber || (userInfo as any).phone;
+      if (!reservation.phone && userPhone) {
+        updates.phone = userPhone;
+      }
+
+      if (Object.keys(updates).length > 0) {
+        dispatch(setReservation(updates));
+      }
+    }
+  }, [userInfo, dispatch]); // Only trigger when userInfo changes or on mount
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -176,12 +203,14 @@ export default function Checkout() {
         <section className={styles.header}>
           <div className={styles.titleArea}>
             <h1>Check Out</h1>
-            <NavLink
-              to="/login"
-              className="btn-secondary btn-medium btn-light-bs"
-            >
-              Sign In
-            </NavLink>
+            {!userInfo && (
+              <NavLink
+                to="/login"
+                className="btn-secondary btn-medium btn-light-bs"
+              >
+                Sign In
+              </NavLink>
+            )}
           </div>
           <div className={styles.headerImage}>
             <img

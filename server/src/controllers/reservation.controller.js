@@ -75,8 +75,8 @@ export const ReservationController = {
   // GET GUEST'S OWN BOOKINGS
   getMyReservations: async (req, res) => {
     try {
-      // Call getReservationsByUser instead of getAllReservations
-      const reservations = await ReservationService.getReservationsByUser(req.user.id);
+      // Pass both ID and email to consolidate bookings
+      const reservations = await ReservationService.getReservationsByUser(req.user.id, req.user.email);
       res.status(200).json(reservations);
     } catch (error) {
       res.status(500).json({ message: "Error fetching your history", error: error.message });

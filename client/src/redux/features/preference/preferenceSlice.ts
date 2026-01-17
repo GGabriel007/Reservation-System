@@ -37,19 +37,19 @@ export const preferenceSlice = createSlice({
       if (state.rooms > 1) state.rooms -= 1;
     },
     increaseAdults: (state) => {
-      if (state.adults < 4) state.adults += 1;
+      state.adults += 1;
     },
     descreaseAdults: (state) => {
       if (state.adults > 1) state.adults -= 1;
     },
     increaseChildren: (state) => {
-      if (state.children < 4) state.children += 1;
+      state.children += 1;
     },
     descreaseChildren: (state) => {
       if (state.children > 0) state.children -= 1;
     },
     increaseBeds: (state) => {
-      if (state.beds < 4) state.beds += 1;
+      state.beds += 1;
     },
     descreaseBeds: (state) => {
       if (state.beds > 1) state.beds -= 1;

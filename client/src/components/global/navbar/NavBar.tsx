@@ -1,6 +1,10 @@
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import { HashLink } from "react-router-hash-link";
+import { useState, useEffect } from "react";
 import styles from "./styles.module.css";
+import { useAppDispatch } from "@/redux/store";
+import { setUser, clearUser } from "@/redux/features/user/userSlice";
+import { resetReservation } from "@/redux/features/reservation/reservationSlice";
 
 /**
  * Navbar Component
@@ -8,56 +12,61 @@ import styles from "./styles.module.css";
  * Uses NavLink to provide visual feedback for the current active route.
  */
 export default function Navbar() {
-  // const navigate = useNavigate();
-
-  // Environment-based API selection for logout endpoint
-  // const baseUrl = import.meta.env.DEV
-  //   ? "http://localhost:8080"
-  //   : "http://liore.us-east-1.elasticbeanstalk.com";
-
-  /**
-   * Global Logout Handler
-   * Notifies the server to destroy the session and clear the 'sid' cookie.
-   * On success, it redirects the user to the login screen.
-   */
-  // const handleLogout = async (e: React.MouseEvent) => {
-  //   e.preventDefault();
-
-  //   try {
-  //     const response = await fetch(`${baseUrl}/auth/logout`, {
-  //       method: "GET",
-  //       credentials: "include", // Essential to send the session cookie for identification
-  //     });
-
-  //     if (response.ok) {
-  //       navigate("/login");
-  //     }
-  //   } catch (error) {
-  //     console.error("Logout request failed:", error);
-  //   }
-  // };
-
   const navigate = useNavigate();
   const location = useLocation();
   const currentPath = location.pathname;
-  /**
-   * Dynamic Styling Helper
-   * React Router's NavLink provides an 'isActive' boolean.
-   * This function ensures the user knows exactly which page they are currently viewing.
-   */
-  // const linkClass = ({ isActive }: { isActive: boolean }) =>
-  //   isActive ? styles.active : "";
+  const dispatch = useAppDispatch();
+
+  // Authentication state
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   // Define View States
   const isStaffLogin = currentPath === "/staffLogin";
   // Checks for /admin, /adminPanel, /manager, etc.
   const isStaffDashboard = currentPath.startsWith("/admin") || currentPath.startsWith("/manager");
-  const isUserDashboard = currentPath === "/user";
 
   // Environment Setup for Logout
   const baseUrl = import.meta.env.DEV
     ? "http://localhost:8080"
     : "http://liore.us-east-1.elasticbeanstalk.com";
+
+  // Check authentication status on mount and route changes
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await fetch(`${baseUrl}/auth/status`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const authStatus = data.isAuthenticated || false;
+          setIsAuthenticated(authStatus);
+
+          if (authStatus && data.user) {
+            dispatch(setUser(data.user));
+          } else {
+            dispatch(clearUser());
+            // Intentionally not resetting reservation here on initial load 
+            // to avoid clearing data if user refreshes page while booking
+          }
+        } else {
+          setIsAuthenticated(false);
+          dispatch(clearUser());
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+        setIsAuthenticated(false);
+        dispatch(clearUser());
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [currentPath, baseUrl, dispatch]);
 
   /**
    * Global Logout Handler
@@ -71,13 +80,21 @@ export default function Navbar() {
         credentials: "include",
       });
 
-      // Smart Redirect: Staff -> Staff Login, Guest -> Guest Login
-      const redirectPath = isStaffDashboard ? "/staffLogin" : "/login";
+      // Reset authentication state
+      setIsAuthenticated(false);
+      dispatch(clearUser());
+      dispatch(resetReservation());
+
+      // Smart Redirect: Staff -> Staff Login, User -> Home, Guest -> Login
+      const redirectPath = isStaffDashboard ? "/staffLogin" : "/";
       navigate(redirectPath);
 
     } catch (error) {
       console.error("Logout request failed:", error);
-      navigate("/login");
+      setIsAuthenticated(false);
+      dispatch(clearUser());
+      dispatch(resetReservation());
+      navigate("/");
     }
   };
 
@@ -130,10 +147,33 @@ export default function Navbar() {
                   </>
                 )}
 
-                {/* Hide "Sign In" if on Login page OR User Dashboard */}
-                {currentPath !== "/login" && !isUserDashboard && (
-                  <NavLink to="/login" className="btn-transparent">
-                    Sign In
+                {/* Show "Log Out" button if user is authenticated */}
+                {!isLoading && isAuthenticated ? (
+                  <button
+                    onClick={handleLogout}
+                    className="btn-secondary"
+                    style={{ cursor: 'pointer' }}
+                  >
+                    Log Out
+                  </button>
+                ) : (
+                  /* Hide "Sign Up" and "Log In" if on Login or Signup page, or if still loading */
+                  !isLoading && currentPath !== "/login" && currentPath !== "/signup" && (
+                    <>
+                      <NavLink to="/signup" className="btn-transparent">
+                        Sign Up
+                      </NavLink>
+                      <NavLink to="/login" className="btn-transparent">
+                        Log In
+                      </NavLink>
+                    </>
+                  )
+                )}
+
+                {/* Show "View Profile" button if user is authenticated and not on user page */}
+                {!isLoading && isAuthenticated && currentPath !== "/user" && (
+                  <NavLink to="/user" className="btn-secondary">
+                    View Profile
                   </NavLink>
                 )}
 

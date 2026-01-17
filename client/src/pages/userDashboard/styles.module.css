@@ -1,4 +1,4 @@
-.userDashboard > section {
+.userDashboard>section {
   margin-block: 3em;
 }
 
@@ -53,4 +53,45 @@
   display: flex;
   flex-direction: column;
   gap: 5px;
+}
+
+/* Profile Information Section */
+.profileSection {
+  margin-block: 2em;
+  padding: 2em;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: var(--light-grey) 0px 4px 10px 0px;
+}
+
+.profileSection h2 {
+  margin-block-end: 1.5em;
+  font-weight: 500;
+  color: var(--dark-grey);
+}
+
+.profileGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5em;
+}
+
+.profileItem {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
+}
+
+.profileItem h4 {
+  font-weight: 600;
+  font-size: 0.9em;
+  color: var(--medium-grey);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.profileItem p {
+  font-size: 1em;
+  color: var(--dark-grey);
+  font-weight: 400;
 }

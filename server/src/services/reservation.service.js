@@ -54,7 +54,12 @@ export const ReservationService = {
       status: "confirmed"
     };
 
-    return await ReservationRepository.create(finalData);
+    const reservation = await ReservationRepository.create(finalData);
+
+    // 5. UPDATE ROOM STATUS TO OCCUPIED
+    await RoomRepository.updateStatus(roomId, "occupied");
+
+    return reservation;
   },
 
   /**
@@ -117,7 +122,16 @@ export const ReservationService = {
       }
     }
 
-    return await ReservationRepository.updateStatus(id, "cancelled");
+    const cancelled = await ReservationRepository.updateStatus(id, "cancelled");
+
+    // 3. UPDATE ROOM STATUS TO AVAILABLE
+    if (reservation.roomId) {
+      // Handle populated roomId object or string ID
+      const roomId = reservation.roomId._id || reservation.roomId;
+      await RoomRepository.updateStatus(roomId, "available");
+    }
+
+    return cancelled;
   },
 
   /**
@@ -140,7 +154,16 @@ export const ReservationService = {
       throw new Error("Email address does not match reservation records.");
     }
 
-    return await ReservationRepository.updateStatus(id, "cancelled");
+    const cancelled = await ReservationRepository.updateStatus(id, "cancelled");
+
+    // 3. UPDATE ROOM STATUS TO AVAILABLE
+    if (reservation.roomId) {
+      // Handle populated roomId object or string ID
+      const roomId = reservation.roomId._id || reservation.roomId;
+      await RoomRepository.updateStatus(roomId, "available");
+    }
+
+    return cancelled;
   },
 
   /**
@@ -158,8 +181,8 @@ export const ReservationService = {
     return await ReservationRepository.update(id, updates);
   },
 
-  getReservationsByUser: async (userId) => {
-    return await ReservationRepository.findByUserId(userId);
+  getReservationsByUser: async (userId, email) => {
+    return await ReservationRepository.findByEmailOrUserId(email, userId);
   },
 
   getReservationsByHotel: async (hotelId) => {

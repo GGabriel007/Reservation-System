@@ -135,4 +135,16 @@ export const RoomRepository = {
       maxOccupancy: { $gte: guests },
     }).populate("hotel");
   },
+
+  /**
+   * Update Room Status
+   * Used when booking/cancelling
+   */
+  updateStatus: async (id, status) => {
+    return await Room.findByIdAndUpdate(
+      id,
+      { availabilityStatus: status },
+      { new: true }
+    );
+  },
 };

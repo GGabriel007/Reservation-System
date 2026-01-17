@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./styles.module.css";
-import { Visit } from "../../components/pages/userDashboardPage/index";
 
 /**
  * User Interface
@@ -13,10 +12,31 @@ interface User {
   email: string;
   role?: string;
   firstName?: string;
+  lastName?: string;
+  phoneNumber?: string;
+}
+
+interface Reservation {
+  _id: string;
+  confirmationCode: string;
+  checkIn: string;
+  checkOut: string;
+  totalAmount: number;
+  status: string;
+  roomId?: {
+    roomName: string;
+    roomType: string;
+    images?: string[];
+  };
+  hotelId?: {
+    name: string;
+    address: string;
+  };
 }
 
 export default function UserDashboard() {
   const [user, setUser] = useState<User | null>(null);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -26,82 +46,64 @@ export default function UserDashboard() {
     : "http://liore.us-east-1.elasticbeanstalk.com";
 
   /**
-   * Identity Check
-   * Runs on component mount to verify if the user has an active session.
-   * If the backend returns 401 (Unauthorized), the user is kicked to the login page.
+   * Data Fetching: Session & Reservations
    */
   useEffect(() => {
-    let isMounted = true; // Guard to prevent state updates if component unmounts
+    let isMounted = true;
 
-    const checkSession = async () => {
+    const fetchData = async () => {
       try {
-        const res = await fetch(`${baseUrl}/auth/need`, {
+        // 1. Verify Session
+        const sessionRes = await fetch(`${baseUrl}/auth/need`, {
           credentials: "include",
         });
 
-        if (res.status === 401) {
+        if (sessionRes.status === 401) {
           if (isMounted) navigate("/login");
           return;
         }
 
-        const data = await res.json();
-        if (isMounted) {
-          setUser(data);
-          setLoading(false);
+        const userData = await sessionRes.json();
+        if (isMounted) setUser(userData);
+
+        // 2. Fetch User Reservations
+        const resRes = await fetch(`${baseUrl}/reservations/my-bookings`, {
+          credentials: "include",
+        });
+
+        if (resRes.ok) {
+          const resData = await resRes.json();
+          if (isMounted) setReservations(resData);
         }
       } catch (err) {
-        if (isMounted) navigate("/login");
+        console.error("Dashboard data load failed:", err);
+      } finally {
+        if (isMounted) setLoading(false);
       }
     };
 
-    checkSession();
+    fetchData();
     return () => {
       isMounted = false;
     };
   }, [navigate, baseUrl]);
 
-  /**
-   * Session Termination
-   * Communicates with the backend to destroy the session and clear local user state.
-   */
-  // const handleLogout = async () => {
-  //   try {
-  //     // FIX: Removed the starting slash from "/auth/logout" to prevent "//"
-  //     await fetch(`${baseUrl}/auth/logout`, {
-  //       method: "GET",
-  //       credentials: "include",
-  //     });
-  //     setUser(null);
-  //     navigate("/login");
-  //   } catch (err) {
-  //     console.error("Logout failed", err);
-  //   }
-  // };
-
   // Prevent flashing of dashboard content before authentication check completes
   if (loading) {
     return (
       <div className="flex justify-center items-center h-screen">
-        <p className="text-gray-500 animate-pulse">Verifying session...</p>
+        <p className="text-gray-500 animate-pulse">Loading your dashboard...</p>
       </div>
     );
   }
 
-  const userData = {
-    reservationNumber: [123, 144],
-    roomList: ["one", "two"],
-  };
-
-  const roomData = {
-    roomName: "Fairmont Resort",
-    reservationNumber: "A1002933843",
-    checkIn: "12/18/2025",
-    checkOut: "12/19/2025",
-    room: 1,
-    adults: 1,
-    children: 2,
-    beds: 1,
-    specialRequest: "",
+  // Format date helper
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "2-digit",
+      day: "2-digit",
+      year: "numeric",
+    });
   };
 
   return (
@@ -109,42 +111,78 @@ export default function UserDashboard() {
       <section className="inner-grid">
         <div className={styles.flex}>
           <h2>Welcome back to Lioré, {user?.firstName}</h2>
-          <button className="btn-secondary btn-medium">Vew Profile</button>
         </div>
-        <section className={styles.current}>
-          <h2>Current Visit</h2>
-          <section className={styles.currentDisplay}>
-            <img src="/burmont-suit.jpg" alt="" />
-            <div className={styles.userData}>
-              <h3>{roomData.roomName}</h3>
-              <div className={styles.userDataDetail}>
-                <div>
-                  <h4>reservation number:</h4>
-                  <p>{roomData.reservationNumber}</p>
-                </div>
-                <div>
-                  <h4>check in:</h4>
-                  <p>{roomData.checkIn}</p>
-                </div>
-                <div>
-                  <h4>check out:</h4>
-                  <p>{roomData.checkOut}</p>
-                </div>
-              </div>
-              <div className={styles.userPreference}>
-                <h4>Preference: </h4>
-                <p>{roomData.room} room</p>
-                <p>
-                  {roomData.adults} adult, {roomData.children} Children
-                </p>
-                <p>{roomData.beds} beds</p>
-                {roomData.specialRequest && <p>{roomData.specialRequest}</p>}
-              </div>
+
+        {/* User Profile Information Section */}
+        <section className={styles.profileSection}>
+          <h2>Profile Information</h2>
+          <div className={styles.profileGrid}>
+            <div className={styles.profileItem}>
+              <h4>Email:</h4>
+              <p>{user?.email || "Not provided"}</p>
             </div>
-          </section>
+            <div className={styles.profileItem}>
+              <h4>First Name:</h4>
+              <p>{user?.firstName || "Not provided"}</p>
+            </div>
+            <div className={styles.profileItem}>
+              <h4>Last Name:</h4>
+              <p>{user?.lastName || "Not provided"}</p>
+            </div>
+            <div className={styles.profileItem}>
+              <h4>Phone Number:</h4>
+              <p>{user?.phoneNumber || "Not provided"}</p>
+            </div>
+          </div>
         </section>
-        <Visit timeline="past" userData={userData}></Visit>
-        <Visit timeline="future" userData={userData}></Visit>
+
+        <section className={styles.current}>
+          <h2>Your Reservations</h2>
+          {reservations.length === 0 ? (
+            <div style={{ padding: '2em', textAlign: 'center', background: '#f9f9f9', borderRadius: '8px', marginTop: '1em' }}>
+              <p className="text-gray-500">You have no active reservations at this time.</p>
+            </div>
+          ) : (
+            reservations.map((res) => (
+              <section key={res._id} className={styles.currentDisplay} style={{ marginBottom: '2em' }}>
+                <img
+                  src={
+                    res.roomId?.images && res.roomId.images.length > 0
+                      ? `${baseUrl}/uploads/${res.roomId.images[0]}`
+                      : "/placeholder.png"
+                  }
+                  alt={res.roomId?.roomName || "Room"}
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = "/placeholder.png";
+                  }}
+                />
+                <div className={styles.userData}>
+                  <h3>{res.hotelId?.name || "Lioré Resort"} - {res.roomId?.roomName || "Standard Room"}</h3>
+                  <div className={styles.userDataDetail}>
+                    <div>
+                      <h4>reservation number:</h4>
+                      <p>{res.confirmationCode}</p>
+                    </div>
+                    <div>
+                      <h4>check in:</h4>
+                      <p>{formatDate(res.checkIn)}</p>
+                    </div>
+                    <div>
+                      <h4>check out:</h4>
+                      <p>{formatDate(res.checkOut)}</p>
+                    </div>
+                  </div>
+                  <div className={styles.userPreference}>
+                    <h4>Status: </h4>
+                    <p style={{ textTransform: 'capitalize' }}>{res.status}</p>
+                    <h4 style={{ marginTop: '10px' }}>Total Amount: </h4>
+                    <p>${res.totalAmount.toFixed(2)}</p>
+                  </div>
+                </div>
+              </section>
+            ))
+          )}
+        </section>
       </section>
     </main>
   );
