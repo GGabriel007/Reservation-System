@@ -1,12 +1,26 @@
 import { ReservationService } from "../services/reservation.service.js";
 
 /**
- * ReservationController
- * Updated to handle the expanded Lioré checkout data.
+ * Controller: ReservationController
+ * ----------------------------------------------------------------------
+ * Handles HTTP requests for reservation operations. 
+ * Bridges the Express Router to the Business Logic (Service Layer).
+ * 
+ * Key Functions:
+ * - Create Booking (POST /)
+ * - Get My Bookings (GET /my)
+ * - Manager View (GET /hotel/:hotelId)
+ * - Guest Lookup (GET /lookup)
+ * - Cancel/Modify Operations
  */
 export const ReservationController = {
 
-  // CREATE RESERVATION (Supports Guest & User)
+  /**
+   * Creates a new reservation.
+   * Expects a full payload including guest info, payment details, and room selection.
+   * 
+   * @route POST /api/reservations
+   */
   createReservation: async (req, res) => {
     try {
       const {
@@ -72,7 +86,11 @@ export const ReservationController = {
 
 
 
-  // GET GUEST'S OWN BOOKINGS
+  /**
+   * Retrieves all reservations for the currently logged-in user.
+   * 
+   * @route GET /api/reservations/my
+   */
   getMyReservations: async (req, res) => {
     try {
       // Pass both ID and email to consolidate bookings
@@ -83,6 +101,12 @@ export const ReservationController = {
     }
   },
 
+  /**
+   * Retrieves all reservations for a specific hotel property.
+   * Used by Managers to view their property's booking list.
+   * 
+   * @route GET /api/reservations/hotel/:hotelId
+   */
   getHotelReservations: async (req, res) => {
     try {
       const { hotelId } = req.params; // Or get from req.user.assignedHotel
@@ -100,7 +124,12 @@ export const ReservationController = {
     }
   },
 
-  // GET RESERVATION BY ID
+  /**
+   * Gets specific details of a single reservation.
+   * Protected: Only the Owner, Admin, or Manager can view.
+   * 
+   * @route GET /api/reservations/:id
+   */
   getReservationById: async (req, res) => {
     try {
       const reservation = await ReservationService.getReservationById(req.params.id);
@@ -120,7 +149,14 @@ export const ReservationController = {
     }
   },
 
-  // CANCEL RESERVATION (Dual-Path)
+  /**
+   * Cancels a reservation.
+   * Handles two scenarios:
+   * 1. Logged-in User/Admin (Authenticated)
+   * 2. Anonymous Guest (Requires Confirmation Code + Email)
+   * 
+   * @route POST /api/reservations/:id/cancel
+   */
   cancelReservation: async (req, res) => {
     try {
       // Path A: Logged in User
@@ -142,7 +178,11 @@ export const ReservationController = {
     }
   },
 
-  // MODIFY RESERVATION 
+  /**
+   * Modifies an existing reservation.
+   * 
+   * @route PUT /api/reservations/:id
+   */
   modifyReservation: async (req, res) => {
     try {
       const reservationId = req.params.id;
@@ -160,7 +200,11 @@ export const ReservationController = {
     }
   },
 
-  // GET ALL (ADMIN ONLY)
+  /**
+   * Retrieves ALL reservations in the system (Super Admin).
+   * 
+   * @route GET /api/reservations/all
+   */
   getAllReservations: async (req, res) => {
     try {
       const allBookings = await ReservationService.getAllReservations();
@@ -171,6 +215,7 @@ export const ReservationController = {
   },
 
   // GET BY HOTEL (MANAGER/ADMIN)
+  // (Note: Duplicate function definition in original file? Leaving as is but documenting reuse)
   getReservationsByHotel: async (req, res) => {
     try {
       const bookings = await ReservationService.getReservationsByHotel(req.params.hotelId);
@@ -180,7 +225,12 @@ export const ReservationController = {
     }
   },
 
-  // GUEST LOOKUP
+  /**
+   * Lookup for guests to find a booking without logging in.
+   * 
+   * @route GET /api/reservations/lookup
+   * @query confirmationCode, lastName, email
+   */
   getReservationByLookup: async (req, res) => {
     try {
       const { confirmationCode, lastName, email } = req.query;
@@ -201,7 +251,11 @@ export const ReservationController = {
     }
   },
 
-  // UPDATE STATUS (ADMIN/MANAGER)
+  /**
+   * Manually updates the status of a reservation (Admin override).
+   * 
+   * @route PATCH /api/reservations/:id/status
+   */
   updateStatus: async (req, res) => {
     try {
       const updated = await ReservationService.updateStatus(req.params.id, req.body.status);

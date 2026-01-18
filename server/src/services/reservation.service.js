@@ -1,16 +1,33 @@
 import { ReservationRepository } from "../repositories/reservation.repository.js";
 import { RoomRepository } from "../repositories/room.repository.js";
+import { TransactionRepository } from "../repositories/transaction.repository.js";
 import crypto from "crypto";
 
 /**
- * ReservationService
- * The core logic engine for the hotel. Handles date math, 
- * pricing calculations, and booking rules.
+ * Service: ReservationService
+ * ----------------------------------------------------------------------
+ * The central business logic layer for handling all reservation operations.
+ * This service orchestrates interactions between Reservations, Rooms,
+ * and Transactions (Payments).
+ * 
+ * Key Responsibilities:
+ * - Creating reservations (calculating totals, taxes, fees)
+ * - Simulating payment processing via TransactionService
+ * - Handling Cancellations (including Refunds)
+ * - Guest Lookup functionality
  */
 export const ReservationService = {
 
   /**
-   * CREATE RESERVATION
+   * Creates a new reservation, updates room availability, and processes simulated payment.
+   * 
+   * @param {Object} data - The raw booking payload from the frontend.
+   * @param {string} data.roomId - The ID of the room being booked.
+   * @param {Date} data.checkIn - Check-in date.
+   * @param {Date} data.checkOut - Check-out date.
+   * @param {Object} [data.paymentInfo] - Payment card details (last 4 digits).
+   * @returns {Promise<Object>} The created Reservation document.
+   * @throws {Error} If room is not found, unavailable, or dates are invalid.
    */
   createReservation: async (data) => {
     const { roomId, checkIn, checkOut } = data;
@@ -59,12 +76,34 @@ export const ReservationService = {
     // 5. UPDATE ROOM STATUS TO OCCUPIED
     await RoomRepository.updateStatus(roomId, "occupied");
 
+    // 6. [NEW] CREATE SIMULATED TRANSACTION
+    // This connects the Booking to the "Payment Processing" requirement
+    await TransactionRepository.create({
+      reservationId: reservation._id,
+      hotelId: room.hotel, // Using the ID from the room relation
+      userId: reservation.userId || null, // Can be null for Guest
+      stripePaymentIntentId: `pi_mock_${crypto.randomBytes(12).toString('hex')}`,
+      amount: totalAmount,
+      currency: "usd",
+      status: "succeeded",
+      paymentMethodDetails: {
+        brand: "visa",
+        last4: data.paymentInfo?.lastFour || "4242"
+      }
+    });
+
     return reservation;
   },
 
   /**
-   * LOOKUP RESERVATION
-   * Handles both User and Guest paths for the "Find My Reservation" page.
+   * Retrieves a reservation for a guest using their Confirmation Code and Verification Details.
+   * Supports "Cross-Matching" (checking both Guest fields and User Profile fields).
+   * 
+   * @param {string} confirmationCode - The 6-character booking code.
+   * @param {string} lastName - The last name provided for verification.
+   * @param {string} email - The email address provided for verification.
+   * @returns {Promise<Object>} The matching Reservation document.
+   * @throws {Error} If not found, details mismatch, or reservation is cancelled.
    */
   lookupReservation: async (confirmationCode, lastName, email) => {
     const reservation = await ReservationRepository.findForGuestLookup(confirmationCode);
@@ -101,8 +140,14 @@ export const ReservationService = {
   },
 
   /**
-   * CANCEL RESERVATION (Logged-in User/Admin)
-   * FIXED: Now uses Repository and correctly allows Admins/Managers.
+   * Cancels a reservation on behalf of a Logged-in User or Admin.
+   * Handles permission checks, room release, and refund triggering.
+   * 
+   * @param {string} id - The Reservation ID.
+   * @param {string} userId - The ID of the user requesting cancellation.
+   * @param {string} userRole - The role of the user (e.g., 'admin', 'manager', 'guest').
+   * @returns {Promise<Object>} The updated (cancelled) Reservation.
+   * @throws {Error} If reservation not found or unauthorized.
    */
   cancelReservation: async (id, userId, userRole) => {
     // 1. FIX: Use ReservationRepository instead of undefined 'Reservation' model
@@ -131,12 +176,21 @@ export const ReservationService = {
       await RoomRepository.updateStatus(roomId, "available");
     }
 
+    // 4. [NEW] REFUND TRANSACTION
+    await TransactionRepository.updateStatusByReservationId(id, "refunded");
+
     return cancelled;
   },
 
   /**
-   * CANCEL RESERVATION (Anonymous Guest)
-   * This is used after the guest provides the code and email on the frontend.
+   * Cancels a reservation for an anonymous Guest using verification details.
+   * Used when a user is NOT logged in.
+   * 
+   * @param {string} id - The Reservation ID.
+   * @param {string} confirmationCode - The booking code for verification.
+   * @param {string} email - The email address for security verification.
+   * @returns {Promise<Object>} The updated (cancelled) Reservation.
+   * @throws {Error} If code/email don't match or reservation doesn't exist.
    */
   cancelReservationByGuest: async (id, confirmationCode, email) => {
     const reservation = await ReservationRepository.findById(id);
@@ -163,11 +217,18 @@ export const ReservationService = {
       await RoomRepository.updateStatus(roomId, "available");
     }
 
+    // 4. [NEW] REFUND TRANSACTION
+    await TransactionRepository.updateStatusByReservationId(id, "refunded");
+
     return cancelled;
   },
 
   /**
-   * MODIFY RESERVATION
+   * Modifies an existing reservation (e.g., changing dates or room type).
+   * 
+   * @param {string} id - Reservation ID.
+   * @param {Object} updates - Fields to update (e.g., checkIn, checkOut).
+   * @returns {Promise<Object>} Updated Reservation.
    */
   modifyReservation: async (id, updates) => {
     const reservation = await ReservationRepository.findById(id);
@@ -180,6 +241,8 @@ export const ReservationService = {
 
     return await ReservationRepository.update(id, updates);
   },
+
+  // --- GETTER HELPERS ---
 
   getReservationsByUser: async (userId, email) => {
     return await ReservationRepository.findByEmailOrUserId(email, userId);

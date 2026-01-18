@@ -307,8 +307,8 @@ export default function UserManager() {
                           <select
                             value={currentHotelValue}
                             onChange={(e) => handleHotelSelect(user._id, e.target.value)}
-                            className={styles.roleSelect} // Re-using same style for consistency
-                            style={{ marginLeft: '10px', maxWidth: '150px' }} // Tiny inline tweak for spacing
+                            className={styles.roleSelect}
+                            style={{ marginLeft: '10px', minWidth: '200px', backgroundColor: '#fff', color: '#333' }}
                           >
                             <option value="" disabled>Select Hotel</option>
                             {hotels.map(hotel => (

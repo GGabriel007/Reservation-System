@@ -16,12 +16,12 @@ interface Reservation {
   checkOut: string;
   totalAmount: number;
   status: "confirmed" | "cancelled" | "checked_in" | "completed" | "pending";
-  
+
   // Handle populated Hotel data
   hotelId: {
     name: string;
     _id: string;
-  } | string; 
+  } | string;
 
   userId?: {
     firstName: string;
@@ -32,28 +32,45 @@ interface Reservation {
   guestFirstName?: string;
   guestLastName?: string;
   guestEmail?: string;
+  paymentInfo?: {
+    lastFour: string;
+  };
+  paymentInfo?: {
+    lastFour: string;
+  };
 }
 
+/**
+ * Component: ReservationManager
+ * ----------------------------------------------------------------------
+ * The central dashboard for Admins and Managers to view and control bookings.
+ * 
+ * Features:
+ * - List all reservations with filtering (Hotel, Status, Search).
+ * - Multi-property view support (Tabbed Interface).
+ * - Cancellation actions with Refund triggers.
+ * - Real-time status updates (badges).
+ */
 export default function ReservationManager() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]); // 1. Store list of hotels
   const [loading, setLoading] = useState(true);
-  
+
   // 2. State for the selected Hotel Tab ("all" or specific ID)
   const [selectedHotelId, setSelectedHotelId] = useState<string>("all");
 
   const [reservationToCancel, setReservationToCancel] = useState<string | null>(null);
   const [filterStatus, setFilterStatus] = useState<"all" | "confirmed" | "cancelled" | "pending">("all");
   const [searchTerm, setSearchTerm] = useState("");
-  
+
   const [modalConfig, setModalConfig] = useState({
     isOpen: false,
     message: "",
     type: 'success' as 'success' | 'error'
   });
 
-  const baseUrl = import.meta.env.PROD 
-    ? "http://liore.us-east-1.elasticbeanstalk.com" 
+  const baseUrl = import.meta.env.PROD
+    ? "http://liore.us-east-1.elasticbeanstalk.com"
     : "http://localhost:8080";
 
   // 3. Fetch Hotels for the tabs
@@ -96,19 +113,19 @@ export default function ReservationManager() {
     if (!reservationToCancel) return;
 
     const targetReservation = reservations.find(r => r._id === reservationToCancel);
-    
+
     if (!targetReservation) {
       setModalConfig({ isOpen: true, message: "Error: Reservation data missing.", type: 'error' });
       return;
     }
 
-    const targetEmail = targetReservation.guestEmail || 
-      (typeof targetReservation.userId === 'object' ? targetReservation.userId?.email : "") || 
+    const targetEmail = targetReservation.guestEmail ||
+      (typeof targetReservation.userId === 'object' ? targetReservation.userId?.email : "") ||
       "";
 
     try {
       const res = await fetch(`${baseUrl}/reservations/${reservationToCancel}/cancel`, {
-        method: "PATCH", 
+        method: "PATCH",
         credentials: "include",
         headers: {
           "Content-Type": "application/json"
@@ -120,12 +137,17 @@ export default function ReservationManager() {
       });
 
       if (res.ok) {
-        setReservations(prev => prev.map(r => 
+        setReservations(prev => prev.map(r =>
           r._id === reservationToCancel ? { ...r, status: "cancelled" } : r
         ));
-        setModalConfig({ isOpen: true, message: "Reservation cancelled.", type: 'success' });
+        const last4 = targetReservation.paymentInfo?.lastFour || "xxxx";
+        setModalConfig({
+          isOpen: true,
+          message: `Reservation cancelled. A refund will be complete in 3 business days to the card ending in ${last4}.`,
+          type: 'success'
+        });
       } else {
-        const errData = await res.json(); 
+        const errData = await res.json();
         throw new Error(errData.message || "Failed");
       }
     } catch (error: any) {
@@ -142,10 +164,10 @@ export default function ReservationManager() {
     let matchesHotel = true;
     if (selectedHotelId !== "all") {
       // Safely check ID whether populated object or string
-      const resHotelId = typeof res.hotelId === 'object' && res.hotelId !== null 
-        ? res.hotelId._id 
+      const resHotelId = typeof res.hotelId === 'object' && res.hotelId !== null
+        ? res.hotelId._id
         : res.hotelId;
-      
+
       matchesHotel = resHotelId === selectedHotelId;
     }
 
@@ -156,16 +178,16 @@ export default function ReservationManager() {
     const firstName = res.userId?.firstName || res.guestFirstName || "";
     const lastName = res.userId?.lastName || res.guestLastName || "";
     const fullName = `${firstName} ${lastName}`.toLowerCase();
-    
-    const hotelName = typeof res.hotelId === 'object' && res.hotelId !== null 
-      ? res.hotelId.name 
+
+    const hotelName = typeof res.hotelId === 'object' && res.hotelId !== null
+      ? res.hotelId.name
       : "Unknown Property";
 
-    const matchesSearch = 
+    const matchesSearch =
       res.confirmationCode.toLowerCase().includes(searchTerm.toLowerCase()) ||
       fullName.includes(searchTerm.toLowerCase()) ||
       hotelName.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     return matchesHotel && matchesStatus && matchesSearch;
   });
 
@@ -184,51 +206,51 @@ export default function ReservationManager() {
       </div>
 
       <div className={styles.controls}>
-  
-  {/* ROW 1: Hotel Navigation Tabs (The "Sub-header") */}
-  <div className={styles.hotelTabsContainer}>
-    <button 
-      className={`${styles.hotelTab} ${selectedHotelId === "all" ? styles.activeHotelTab : ""}`}
-      onClick={() => setSelectedHotelId("all")}
-    >
-      All Properties
-    </button>
-    
-    {hotels.map(hotel => (
-      <button
-        key={hotel._id}
-        className={`${styles.hotelTab} ${selectedHotelId === hotel._id ? styles.activeHotelTab : ""}`}
-        onClick={() => setSelectedHotelId(hotel._id)}
-      >
-        {hotel.name}
-      </button>
-    ))}
-  </div>
 
-  {/* ROW 2: Status Filters & Search */}
-  <div className={styles.filterRow}>
-    <div className={styles.filterTabs}>
-      {['all', 'confirmed', 'pending', 'cancelled'].map(status => (
-        <button
-          key={status}
-          className={`${styles.filterBtn} ${filterStatus === status ? styles.activeFilter : ''}`}
-          onClick={() => setFilterStatus(status as any)}
-        >
-          {status.charAt(0).toUpperCase() + status.slice(1)}
-        </button>
-      ))}
-    </div>
-    
-    <input 
-      type="text" 
-      placeholder="Search ID, Guest, or Hotel..." 
-      className={styles.searchBar}
-      value={searchTerm}
-      onChange={(e) => setSearchTerm(e.target.value)}
-    />
-  </div>
+        {/* ROW 1: Hotel Navigation Tabs (The "Sub-header") */}
+        <div className={styles.hotelTabsContainer}>
+          <button
+            className={`${styles.hotelTab} ${selectedHotelId === "all" ? styles.activeHotelTab : ""}`}
+            onClick={() => setSelectedHotelId("all")}
+          >
+            All Properties
+          </button>
 
-</div>
+          {hotels.map(hotel => (
+            <button
+              key={hotel._id}
+              className={`${styles.hotelTab} ${selectedHotelId === hotel._id ? styles.activeHotelTab : ""}`}
+              onClick={() => setSelectedHotelId(hotel._id)}
+            >
+              {hotel.name}
+            </button>
+          ))}
+        </div>
+
+        {/* ROW 2: Status Filters & Search */}
+        <div className={styles.filterRow}>
+          <div className={styles.filterTabs}>
+            {['all', 'confirmed', 'pending', 'cancelled'].map(status => (
+              <button
+                key={status}
+                className={`${styles.filterBtn} ${filterStatus === status ? styles.activeFilter : ''}`}
+                onClick={() => setFilterStatus(status as any)}
+              >
+                {status.charAt(0).toUpperCase() + status.slice(1)}
+              </button>
+            ))}
+          </div>
+
+          <input
+            type="text"
+            placeholder="Search ID, Guest, or Hotel..."
+            className={styles.searchBar}
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+
+      </div>
 
       <div className={styles.tableContainer}>
         <table className={styles.table}>
@@ -258,8 +280,8 @@ export default function ReservationManager() {
                     <td>{hotelName}</td>
                     <td>{firstName} {lastName}</td>
                     <td>
-                      {res.checkIn ? new Date(res.checkIn).toLocaleDateString() : "TBD"} 
-                      {' - '} 
+                      {res.checkIn ? new Date(res.checkIn).toLocaleDateString() : "TBD"}
+                      {' - '}
                       {res.checkOut ? new Date(res.checkOut).toLocaleDateString() : "TBD"}
                     </td>
                     <td>
@@ -272,7 +294,7 @@ export default function ReservationManager() {
                     </td>
                     <td>
                       {(res.status === 'confirmed' || res.status === 'pending') && (
-                        <button 
+                        <button
                           onClick={() => initiateCancel(res._id)}
                           className={styles.cancelBtn}
                           title="Cancel Reservation"
@@ -289,7 +311,7 @@ export default function ReservationManager() {
         </table>
       </div>
 
-      <ConfirmDeleteToast 
+      <ConfirmDeleteToast
         isOpen={!!reservationToCancel}
         onClose={() => setReservationToCancel(null)}
         onConfirm={executeCancel}

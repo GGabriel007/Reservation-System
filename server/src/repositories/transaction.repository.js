@@ -1,7 +1,7 @@
 import { Transaction } from "../models/transaction.model.js";
 
 export const TransactionRepository = {
-  
+
   // CREATE
   create: async (data) => {
     return await Transaction.create(data);
@@ -11,7 +11,7 @@ export const TransactionRepository = {
   // We populate here so the dashboard shows real names
   findAll: async () => {
     return await Transaction.find()
-      .populate("userId", "firstName lastName email") 
+      .populate("userId", "firstName lastName email")
       .populate("hotelId", "name city")
       .populate("reservationId", "confirmationCode")
       .sort({ createdAt: -1 });
@@ -20,7 +20,7 @@ export const TransactionRepository = {
   // GET BY USER (Guest History)
   findByUserId: async (userId) => {
     return await Transaction.find({ userId })
-      .populate("hotelId", "name city") 
+      .populate("hotelId", "name city")
       .populate("reservationId", "confirmationCode checkIn checkOut")
       .sort({ createdAt: -1 });
   },
@@ -44,8 +44,17 @@ export const TransactionRepository = {
   // UPDATE STATUS
   updateStatus: async (id, status) => {
     return await Transaction.findByIdAndUpdate(
-      id, 
-      { status }, 
+      id,
+      { status },
+      { new: true }
+    );
+  },
+
+  // UPDATE BY RESERVATION ID (For Cancellations)
+  updateStatusByReservationId: async (reservationId, status) => {
+    return await Transaction.findOneAndUpdate(
+      { reservationId },
+      { status },
       { new: true }
     );
   }

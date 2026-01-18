@@ -67,7 +67,10 @@ export default function FoundReservation() {
             : ""),
       }).unwrap();
 
-      toast.success("Reservation cancelled successfully");
+      const last4 = reservation.paymentInfo?.lastFour || "xxxx";
+      toast.success(`Reservation cancelled. A refund will be complete in 3 business days to the card ending in ${last4}.`, {
+        duration: 5000,
+      });
       setIsCancelModalOpen(false); // Close modal
       navigate("/");
     } catch (err) {

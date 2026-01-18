@@ -10,6 +10,18 @@ import styles from "./styles.module.css";
 import toast from "react-hot-toast";
 import Breadcrumbs from "@/components/global/breadcumbs/Breadcumbs";
 
+/**
+ * Page: Checkout
+ * ----------------------------------------------------------------------
+ * The final step in the booking flow. Collects guest information,
+ * payment details, and submits the reservation to the backend.
+ * 
+ * Key Features:
+ * - Auto-fills user data if logged in.
+ * - Real-time validation of form fields.
+ * - Securely formats payment data (simulated).
+ * - Redirects to "Found Reservation" (Receipt) upon success.
+ */
 export default function Checkout() {
   const [postReservation] = usePostRerservationMutation();
   const reservation = useAppSelector(selectReservation);
@@ -158,8 +170,10 @@ export default function Checkout() {
           tax: (basePrice * 0.075).toFixed(2),
           fees: 100,
           totalAmount: calculatedTotal,
-          nameOnCard: reservation.nameOnCard,
-          cardNumber: reservation.cardNumber,
+          paymentInfo: {
+            cardHolderName: reservation.nameOnCard,
+            lastFour: reservation.cardNumber.slice(-4)
+          },
           newsletter: false
         };
 

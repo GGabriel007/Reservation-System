@@ -25,7 +25,7 @@ const TransactionSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
-    required: true,
+    required: false,
   },
   stripePaymentIntentId: {
     type: String,
@@ -49,21 +49,21 @@ const TransactionSchema = new mongoose.Schema({
   // Useful for the Guest Dashboard "Saved Cards" or "History" section
   paymentMethodDetails: {
     brand: String, // e.g., "visa", "mastercard"
-    last4: String, 
+    last4: String,
   },
   isDeleted: {
     type: Boolean,
     default: false,
   }
-}, { 
-  timestamps: true 
+}, {
+  timestamps: true
 });
 
 /**
  * SOFT DELETION MIDDLEWARE
  * Transactions should rarely be deleted, but this keeps the logic consistent.
  */
-TransactionSchema.pre(/^find/, function() {
+TransactionSchema.pre(/^find/, function () {
   this.where({ isDeleted: { $ne: true } });
 });
 
