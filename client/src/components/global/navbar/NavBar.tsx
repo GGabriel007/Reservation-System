@@ -24,7 +24,8 @@ export default function Navbar() {
   // Define View States
   const isStaffLogin = currentPath === "/staffLogin";
   // Checks for /admin, /adminPanel, /manager, etc.
-  const isStaffDashboard = currentPath.startsWith("/admin") || currentPath.startsWith("/manager");
+  const isStaffDashboard =
+    currentPath.startsWith("/admin") || currentPath.startsWith("/manager");
 
   // Environment Setup for Logout
   const baseUrl = import.meta.env.DEV
@@ -49,7 +50,7 @@ export default function Navbar() {
             dispatch(setUser(data.user));
           } else {
             dispatch(clearUser());
-            // Intentionally not resetting reservation here on initial load 
+            // Intentionally not resetting reservation here on initial load
             // to avoid clearing data if user refreshes page while booking
           }
         } else {
@@ -88,7 +89,6 @@ export default function Navbar() {
       // Smart Redirect: Staff -> Staff Login, User -> Home, Guest -> Login
       const redirectPath = isStaffDashboard ? "/staffLogin" : "/";
       navigate(redirectPath);
-
     } catch (error) {
       console.error("Logout request failed:", error);
       setIsAuthenticated(false);
@@ -105,7 +105,7 @@ export default function Navbar() {
           {/* Brand Identity */}
           {isStaffDashboard ? (
             /* For Staff: Just an image, no link, and a default cursor */
-            <div style={{ cursor: 'default' }}>
+            <div style={{ cursor: "default" }}>
               <img src="/liore.svg" alt="Liore Spa & Resort" />
             </div>
           ) : (
@@ -117,27 +117,28 @@ export default function Navbar() {
 
           {/* Navigation Links */}
           <div className={styles.navlinks}>
-
             {/* SCENARIO A: STAFF LOGIN PAGE (Clean Slate) */}
-            {isStaffLogin ? (
-              null
-            ) : isStaffDashboard ? (
-
+            {isStaffLogin ? null : isStaffDashboard ? (
               /* SCENARIO B: STAFF DASHBOARD (Logout Only) */
               <>
-                <span style={{ color: 'white', fontSize: '0.9em', marginRight: '10px' }}>
+                <span
+                  style={{
+                    color: "white",
+                    fontSize: "0.9em",
+                    marginRight: "10px",
+                  }}
+                >
                   Staff Workspace
                 </span>
-                <button
+                <a
                   onClick={handleLogout}
                   className="btn-secondary"
-                  style={{ cursor: 'pointer' }}
+                  style={{ cursor: "pointer" }}
                 >
                   Log Out
-                </button>
+                </a>
               </>
             ) : (
-
               /* SCENARIO C: GUEST VIEW (Standard) */
               <>
                 {currentPath === "/" && (
@@ -149,16 +150,18 @@ export default function Navbar() {
 
                 {/* Show "Log Out" button if user is authenticated */}
                 {!isLoading && isAuthenticated ? (
-                  <button
+                  <a
                     onClick={handleLogout}
-                    className="btn-secondary"
-                    style={{ cursor: 'pointer' }}
+                    className="btn-transparent"
+                    style={{ cursor: "pointer" }}
                   >
                     Log Out
-                  </button>
+                  </a>
                 ) : (
                   /* Hide "Sign Up" and "Log In" if on Login or Signup page, or if still loading */
-                  !isLoading && currentPath !== "/login" && currentPath !== "/signup" && (
+                  !isLoading &&
+                  currentPath !== "/login" &&
+                  currentPath !== "/signup" && (
                     <>
                       <NavLink to="/signup" className="btn-transparent">
                         Sign Up
@@ -172,26 +175,28 @@ export default function Navbar() {
 
                 {/* Show "View Profile" button if user is authenticated and not on user page */}
                 {!isLoading && isAuthenticated && currentPath !== "/user" && (
-                  <NavLink to="/user" className="btn-secondary">
+                  <NavLink to="/user" className="btn-transparent">
                     View Profile
                   </NavLink>
                 )}
 
-                {(currentPath === "/" || currentPath === "/check-reservation") && (
+                {(currentPath === "/" ||
+                  currentPath === "/check-reservation") && (
                   <NavLink to="/roomlisting" className="btn-secondary">
                     Book Now
                   </NavLink>
                 )}
 
                 {/* Hide "Check Reservation" if we are already there */}
-                {currentPath !== "/" && currentPath !== "/check-reservation" && currentPath !== "/login" && (
-                  <NavLink to="/check-reservation" className="btn-secondary">
-                    Check Reservation
-                  </NavLink>
-                )}
+                {currentPath !== "/" &&
+                  currentPath !== "/check-reservation" &&
+                  currentPath !== "/login" && (
+                    <NavLink to="/check-reservation" className="btn-secondary">
+                      Check Reservation
+                    </NavLink>
+                  )}
               </>
             )}
-
           </div>
         </div>
       </nav>

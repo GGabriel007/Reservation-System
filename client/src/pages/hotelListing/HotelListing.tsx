@@ -31,8 +31,11 @@ export default function RoomListing() {
     const fetchHotels = async () => {
       try {
         setLoading(true);
+        const baseUrl = import.meta.env.DEV
+          ? "http://localhost:8080"
+          : "http://liore.us-east-1.elasticbeanstalk.com";
         // Change this URL if your backend port is different
-        const response = await fetch("http://localhost:8080/hotels", {
+        const response = await fetch(baseUrl, {
           method: "GET",
           // CRITICAL: This allows the session cookie (sid) to be sent/received
           credentials: "include",

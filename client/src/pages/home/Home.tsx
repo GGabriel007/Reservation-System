@@ -63,7 +63,7 @@ export default function Home() {
                 Whether you're here for work or play, our fabulous suites and
                 rooms provide the perfect backdrop for an unforgettable stay
               </p>
-              <NavLink to="/roomlisting" className="btn-secondary">
+              <NavLink to="/roomlisting" className="btn-secondary btn-light-bs">
                 Book a Room
               </NavLink>
             </div>
@@ -92,7 +92,7 @@ export default function Home() {
                 artful presentation, and inspired craftsmanship come together to
                 create an unforgettable dining experience.
               </p>
-              <button className="btn-secondary">Discover</button>
+              <button className="btn-secondary btn-light-bs">Discover</button>
               <img src="/dine1.jpg" alt="" />
             </div>
             <div className={styles["col-right"]}>

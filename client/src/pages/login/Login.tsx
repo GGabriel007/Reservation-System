@@ -93,7 +93,7 @@ export default function Login() {
           Log In<span>* required</span>
         </h2>
         <div className="layout-grid">
-          {errorMessage && <p>{errorMessage}</p>}
+          {errorMessage && toast.error(errorMessage)}
           <form onSubmit={handleSubmit}>
             <label className={styles.flex}>
               Email Address *
@@ -121,10 +121,11 @@ export default function Login() {
               type="submit"
               disabled={isSubmitting}
               className={`btn-primary btn-medium
-              ${isSubmitting
+              ${
+                isSubmitting
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 shadow-md"
-                }`}
+              }`}
             >
               {isSubmitting ? "Logging in..." : "Login with Email"}
             </button>

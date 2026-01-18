@@ -15,7 +15,9 @@ interface RoomListingRoomCardProps {
  * @param room: Room interface
  * @returns RoomCard component
  */
-export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) {
+export default function RoomListingRoomCard({
+  room,
+}: RoomListingRoomCardProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const preference = useAppSelector(selectPreference);
@@ -65,7 +67,11 @@ export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) 
         <img
           src={
             room.images.length > 0
-              ? `${import.meta.env.PROD ? "http://liore.us-east-1.elasticbeanstalk.com" : "http://localhost:8080"}/uploads/${room.images[0]}`
+              ? `${
+                  import.meta.env.PROD
+                    ? "http://liore.us-east-1.elasticbeanstalk.com"
+                    : "http://localhost:8080"
+                }/uploads/${room.images[0]}`
               : "/placeholder.png"
           }
           alt={room.roomName}
@@ -87,11 +93,6 @@ export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) 
         <div className={styles.roomamenities}>
           <h3>{room.roomName}</h3>
           <p>{room.description}</p>
-          <div style={{ marginTop: "0.5rem", fontSize: "0.9rem", color: "#666" }}>
-            <p><strong>Type:</strong> {room.roomType}</p>
-            <p><strong>Guests:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
-            <p><strong>Status:</strong> {room.availabilityStatus}</p>
-          </div>
         </div>
         <div>
           <p className={styles.fee}>${room.basePrice} per night</p>
@@ -113,7 +114,11 @@ export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) 
           <img
             src={
               room.images.length > 0
-                ? `${import.meta.env.PROD ? "http://liore.us-east-1.elasticbeanstalk.com" : "http://localhost:8080"}/uploads/${room.images[0]}`
+                ? `${
+                    import.meta.env.PROD
+                      ? "http://liore.us-east-1.elasticbeanstalk.com"
+                      : "http://localhost:8080"
+                  }/uploads/${room.images[0]}`
                 : "/placeholder.png"
             }
             alt={room.roomName}
@@ -122,9 +127,13 @@ export default function RoomListingRoomCard({ room }: RoomListingRoomCardProps) 
             <h2>{room.roomName}</h2>
             <p>{room.description}</p>
             <div style={{ margin: "1rem 0" }}>
-              <p><strong>Type:</strong> {room.roomType}</p>
-              <p><strong>Guests:</strong> {room.maxOccupancy} {room.maxOccupancy > 1 ? "Guests" : "Guest"}</p>
-              <p><strong>Status:</strong> {room.availabilityStatus}</p>
+              <p>
+                <strong>Type:</strong> {room.roomType}
+              </p>
+              <p>
+                <strong>Guests:</strong> {room.maxOccupancy}{" "}
+                {room.maxOccupancy > 1 ? "Guests" : "Guest"}
+              </p>
             </div>
             <h3>Room Features Include:</h3>
             <ul>
