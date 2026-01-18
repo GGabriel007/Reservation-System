@@ -156,7 +156,9 @@ export default function FoundReservation() {
               <div className={styles.priceItem}>
                 <strong>Price:</strong>
                 <span>
-                  ${reservation.roomPrice || reservation.totalAmount.toFixed(2)}
+                  $
+                  {reservation.roomPrice.toFixed(2) ||
+                    reservation.totalAmount.toFixed(2)}
                 </span>
               </div>
               <div className={styles.priceDetailsText}>
@@ -174,7 +176,11 @@ export default function FoundReservation() {
             <div className={styles.finalTotalTable}>
               <div>
                 Room Price:{" "}
-                <span>${reservation.roomPrice || reservation.totalAmount}</span>
+                <span>
+                  $
+                  {reservation.roomPrice.toFixed(2) ||
+                    reservation.totalAmount.toFixed(2)}
+                </span>
               </div>
               <div>
                 Tax: <span>${reservation.tax || 0}</span>
@@ -184,7 +190,7 @@ export default function FoundReservation() {
               </div>
               <hr />
               <div className={styles.grandTotal}>
-                Total: <span>${reservation.totalAmount}</span>
+                Total: <span>${reservation.totalAmount.toFixed(2)}</span>
               </div>
             </div>
           </section>
