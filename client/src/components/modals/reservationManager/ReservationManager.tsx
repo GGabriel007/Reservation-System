@@ -35,9 +35,6 @@ interface Reservation {
   paymentInfo?: {
     lastFour: string;
   };
-  paymentInfo?: {
-    lastFour: string;
-  };
 }
 
 /**
